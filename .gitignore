@@ -1,0 +1,25 @@
+# Dependencies and builds
+node_modules/
+dist/
+build/
+.vite/
+coverage/
+
+# Secrets — never commit keys (only .env.example)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*client_secret*.json
+*credentials*.json
+
+# Private study material: textbook scans and packs made from copyrighted books
+private/
+*.pdf
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
