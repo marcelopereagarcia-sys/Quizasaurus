@@ -74,7 +74,7 @@ export function App() {
     <div class="app">
       <header class="topbar">
         <h1 class="logo">
-          <span aria-hidden="true">🦖</span> Quizasaurus
+          <img src="./logo.png" width="48" height="48" alt="" /> Quizasaurus
         </h1>
         <label class="lang">
           <span class="sr-only">{t.language}</span>

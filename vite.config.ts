@@ -14,7 +14,7 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       injectRegister: false,
-      includeAssets: ["icons/*.png"],
+      includeAssets: ["icons/*.png", "logo.png"],
       manifest: {
         name: "Quizasaurus",
         short_name: "Quizasaurus",
