@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { UI_LANGS, defaultUiLang } from "../app/src/i18n.js";
+import { UI_LANGS, defaultUiLang, packUiLang } from "../app/src/i18n.js";
 import { loadSettings, saveSettings } from "../app/src/settings.js";
 import { loadPacks, removePack, resetMemory, savePack } from "../app/src/storage.js";
 import type { Pack } from "../src/pack/schema.js";
@@ -69,6 +69,14 @@ describe("interface language", () => {
     const keys = (dict: object) => Object.keys(dict).sort();
     expect(Object.keys(UI_LANGS)).toEqual(["ca", "es", "en"]);
     for (const dict of Object.values(UI_LANGS)) expect(keys(dict)).toEqual(keys(UI_LANGS.es));
+  });
+});
+
+describe("language inside a unit", () => {
+  it("speaks the pack's language when the app has it, the chosen one if not", () => {
+    expect(packUiLang("ca", "en")).toBe("ca");
+    expect(packUiLang("es", "ca")).toBe("es");
+    expect(packUiLang("fr", "ca")).toBe("ca");
   });
 });
 

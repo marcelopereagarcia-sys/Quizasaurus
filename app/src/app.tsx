@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "preact/hooks";
 import examplePack from "../../examples/ciclo-del-agua.pack.json";
 import type { Pack } from "../../src/pack/schema.js";
 import { validatePack, validatePackJson } from "../../src/pack/validate.js";
-import { UI_LANGS, UI_LANG_NAMES, type UiLang, defaultUiLang, isUiLang } from "./i18n.js";
+import { type Dict, UI_LANGS, UI_LANG_NAMES, type UiLang, defaultUiLang, isUiLang, packUiLang } from "./i18n.js";
 import { GameRunner } from "./game/GameRunner.js";
 import { loadSettings } from "./settings.js";
 import { SKINS, SKIN_EMOJI, type Skin, applySkin, loadSkin, saveSkin } from "./skins.js";
@@ -46,7 +46,6 @@ export function App() {
   const allPacks = useMemo(() => [...BUILT_IN.filter((b) => !packs.some((p) => p.id === b.id)), ...packs], [packs]);
 
   useEffect(() => {
-    document.documentElement.lang = lang;
     safeStorage.set(LANG_KEY, lang);
   }, [lang]);
 
@@ -86,27 +85,20 @@ export function App() {
 
   const current = screen.name !== "home" ? allPacks.find((p) => p.id === screen.id) : undefined;
   const playable = current?.review.status === "approved";
+  // Inside a unit everything speaks the pack's language (charter v1.3).
+  const screenLang = current ? packUiLang(current.language, lang) : lang;
+  const ui = UI_LANGS[screenLang];
+
+  useEffect(() => {
+    document.documentElement.lang = screenLang;
+  }, [screenLang]);
 
   return (
     <div class="app">
-      <header class="topbar">
-        <h1 class="logo">
-          <img src="./logo.png" width="48" height="48" alt="" /> Quizasaurus
-        </h1>
-        <label class="lang">
-          <span class="sr-only">{t.language}</span>
-          <select value={lang} onChange={(e) => setLang((e.currentTarget as HTMLSelectElement).value as UiLang)}>
-            {(Object.keys(UI_LANGS) as UiLang[]).map((l) => (
-              <option value={l}>{UI_LANG_NAMES[l]}</option>
-            ))}
-          </select>
-        </label>
-      </header>
-
       {notice && (
-        <div class="notice" role="status">
+        <div class="notice panel" role="status">
           <p>{notice}</p>
-          <button class="link" aria-label={t.close} onClick={() => setNotice(undefined)}>
+          <button class="close" aria-label={ui.close} onClick={() => setNotice(undefined)}>
             ✕
           </button>
         </div>
@@ -117,7 +109,7 @@ export function App() {
           <GameRunner
             key={`${current.id}-${screen.game}`}
             game={current.games[screen.game]!}
-            t={t}
+            t={ui}
             bossThreshold={settings.bossThreshold}
             hasNext={screen.game + 1 < current.games.length}
             onFinish={() => undefined}
@@ -127,84 +119,126 @@ export function App() {
         </main>
       ) : current ? (
         <main class="screen">
-          <button class="link" onClick={() => setScreen({ name: "home" })}>
-            {t.back}
-          </button>
-          <h2>{current.title}</h2>
-          <p class="meta">
-            {current.subject} · <StatusBadge pack={current} t={t} />
-          </p>
-          {current.review.status === "draft" && <p class="warning">{t.needsReview}</p>}
-          <ol class="games">
+          <div>
+            <button class="btn small" onClick={() => setScreen({ name: "home" })}>
+              {ui.back}
+            </button>
+          </div>
+          <header class="sign">
+            <h1>{current.title}</h1>
+            <p class="sub">{current.subject}</p>
+            <div class="sign-row">
+              <span class="pill">{ui.games(current.games.length)}</span>
+              <span class="pill">
+                <StatusBadge pack={current} t={ui} />
+              </span>
+            </div>
+          </header>
+          {current.review.status === "draft" && <p class="warning panel">{ui.needsReview}</p>}
+          <ol class="levels">
             {current.games.map((game, i) => (
               <li>
-                <button class={`game game-${game.type}`} disabled={!playable} onClick={() => setScreen({ name: "play", id: current.id, game: i })}>
-                  <span class="game-icon" aria-hidden="true">
+                <button class={`lvl t-${game.type}`} disabled={!playable} onClick={() => setScreen({ name: "play", id: current.id, game: i })}>
+                  <span class="li" aria-hidden="true">
                     {GAME_ICONS[game.type]}
                   </span>
-                  <span>
-                    <strong>{game.title}</strong>
-                    {/* The template name, unless the pack already titled the game with it. */}
-                    {game.title !== t.gameNames[game.type] && <small>{t.gameNames[game.type]}</small>}
-                  </span>
+                  <span class="step-n">{ui.level(i + 1)}</span>
+                  <strong class="ln">{game.title}</strong>
+                  {/* The template name, unless the pack already titled the game with it. */}
+                  {game.title !== ui.gameNames[game.type] && <span class="ls">{ui.gameNames[game.type]}</span>}
                 </button>
               </li>
             ))}
           </ol>
           <div class="actions">
-            <button class="primary" disabled={!playable} onClick={() => setScreen({ name: "play", id: current.id, game: 0 })}>
-              {t.play}
+            <button class="btn prime" disabled={!playable} onClick={() => setScreen({ name: "play", id: current.id, game: 0 })}>
+              {ui.play}
             </button>
             {!BUILT_IN.some((b) => b.id === current.id) && (
-              <button class="secondary" onClick={() => onRemove(current)}>
-                {t.remove}
+              <button class="btn" onClick={() => onRemove(current)}>
+                {ui.remove}
               </button>
             )}
           </div>
+          <div class="ground" aria-hidden="true" />
         </main>
       ) : (
         <main class="screen">
-          <p class="tagline">{t.appTagline}</p>
-          <section class="skins" aria-labelledby="skins-title">
-            <h2 id="skins-title">{t.skinTitle}</h2>
-            <div class="skin-choices">
+          <header class="sign">
+            <h1>
+              <img src="./logo.png" width="56" height="56" alt="" /> Quizasaurus
+            </h1>
+            <p class="sub">{t.appTagline}</p>
+            <div class="sign-row">
+              <label class="pill">
+                <span class="sr-only">{t.language}</span>
+                <select value={lang} onChange={(e) => setLang((e.currentTarget as HTMLSelectElement).value as UiLang)}>
+                  {(Object.keys(UI_LANGS) as UiLang[]).map((l) => (
+                    <option value={l}>{UI_LANG_NAMES[l]}</option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          </header>
+
+          <section aria-labelledby="skins-title">
+            <div class="sec-h">
+              <h2 id="skins-title">{t.skinTitle}</h2>
+            </div>
+            <div class="worlds">
               {SKINS.map((s) => (
-                // Each button wears its own skin, so the child sees what they pick.
-                <button class="skin-choice" data-skin={s} aria-pressed={s === skin} onClick={() => chooseSkin(s)}>
-                  <span class="skin-emoji" aria-hidden="true">
+                // Each tab wears its own skin, so the child sees what they pick.
+                <button class="wtab" data-skin={s} aria-pressed={s === skin} onClick={() => chooseSkin(s)}>
+                  <span class="wi" aria-hidden="true">
                     {SKIN_EMOJI[s]}
                   </span>
-                  {t.skinNames[s]}
+                  <span class="wn">{t.skinNames[s]}</span>
                 </button>
               ))}
             </div>
           </section>
-          <h2>{t.myPacks}</h2>
-          {allPacks.length === 0 && <p>{t.noPacks}</p>}
-          <ul class="packs">
-            {allPacks.map((pack) => (
-              <li>
-                <button class="pack-card" onClick={() => setScreen({ name: "pack", id: pack.id })}>
-                  <strong>{pack.title}</strong>
-                  <span>{pack.subject}</span>
-                  <span>
-                    {t.games(pack.games.length)} · <StatusBadge pack={pack} t={t} />
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
-          <label class="primary file">
-            {t.loadPack}
-            <input type="file" accept="application/json,.json" onChange={onFile} />
-          </label>
+
+          <section aria-labelledby="packs-title">
+            <div class="sec-h">
+              <h2 id="packs-title">{t.myPacks}</h2>
+            </div>
+            {allPacks.length === 0 && <p>{t.noPacks}</p>}
+            <ul class="levels">
+              {allPacks.map((pack) => {
+                // A unit's card speaks the unit's language, like the unit itself.
+                const pt = UI_LANGS[packUiLang(pack.language, lang)];
+                return (
+                  <li>
+                    <button class="lvl" lang={packUiLang(pack.language, lang)} onClick={() => setScreen({ name: "pack", id: pack.id })}>
+                      <span class="li" aria-hidden="true">
+                        📚
+                      </span>
+                      <span class="step-n">{pack.subject}</span>
+                      <strong class="ln">{pack.title}</strong>
+                      <span class="ls">
+                        {pt.games(pack.games.length)} · <StatusBadge pack={pack} t={pt} />
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+
+          <div>
+            <label class="btn prime file">
+              {t.loadPack}
+              <input type="file" accept="application/json,.json" onChange={onFile} />
+            </label>
+          </div>
+          <div class="ground" aria-hidden="true" />
         </main>
       )}
     </div>
   );
 }
 
-function StatusBadge({ pack, t }: { pack: Pack; t: (typeof UI_LANGS)[UiLang] }) {
+function StatusBadge({ pack, t }: { pack: Pack; t: Dict }) {
   const approved = pack.review.status === "approved";
   return <span class={`badge ${approved ? "ok" : "pending"}`}>{approved ? t.approved : t.draft}</span>;
 }

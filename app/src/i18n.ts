@@ -4,7 +4,9 @@
  * missing translation. Texts with variables are functions, because each
  * language orders the sentence its own way.
  *
- * The interface language is independent of the pack's language.
+ * Inside a unit and its games the interface speaks the pack's language, so a
+ * screen never mixes two languages (charter v1.3); the language picker rules
+ * the home screen. See `packUiLang`.
  */
 
 const es = {
@@ -19,6 +21,7 @@ const es = {
   approved: "Revisada",
   needsReview: "Una persona adulta tiene que revisar las preguntas antes de jugar.",
   games: (count: number) => `${count} juegos`,
+  level: (n: number) => `Nivel ${n}`,
   back: "← Volver",
   play: "▶ Jugar",
   remove: "🗑 Quitar",
@@ -75,6 +78,7 @@ const ca: Dict = {
   approved: "Revisada",
   needsReview: "Una persona adulta ha de revisar les preguntes abans de jugar.",
   games: (count) => `${count} jocs`,
+  level: (n) => `Nivell ${n}`,
   back: "← Tornar",
   play: "▶ Jugar",
   remove: "🗑 Treure",
@@ -129,6 +133,7 @@ const en: Dict = {
   approved: "Reviewed",
   needsReview: "An adult has to review the questions before playing.",
   games: (count) => `${count} games`,
+  level: (n) => `Level ${n}`,
   back: "← Back",
   play: "▶ Play",
   remove: "🗑 Remove",
@@ -189,4 +194,9 @@ export function defaultUiLang(browserLangs: readonly string[]): UiLang {
 
 export function isUiLang(value: unknown): value is UiLang {
   return typeof value === "string" && value in UI_LANGS;
+}
+
+/** The interface language inside a pack: the pack's own, if the app speaks it. */
+export function packUiLang(packLanguage: string, chosen: UiLang): UiLang {
+  return isUiLang(packLanguage) ? packLanguage : chosen;
 }

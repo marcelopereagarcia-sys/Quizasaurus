@@ -27,17 +27,30 @@ function contrast(a: string, b: string): number {
 
 /** Text colour on background, as the app uses them. WCAG AA asks 4.5:1. */
 const TEXT_PAIRS = [
-  ["--text", "--bg"],
-  ["--text", "--surface"],
-  ["--muted", "--bg"],
-  ["--muted", "--surface"],
-  ["--primary", "--bg"],
-  ["--primary", "--surface"],
-  ["--primary-text", "--primary"],
-  ["--ok", "--bg"],
-  ["--ok", "--surface"],
-  ["--pending", "--bg"],
-  ["--pending", "--surface"],
+  ["--ink", "--sky"],
+  ["--ink", "--sky2"],
+  ["--ink", "--paper"],
+  ["--ink", "--card"],
+  ["--muted", "--paper"],
+  ["--muted", "--card"],
+  ["--muted", "--sky"],
+  ["--muted", "--sky2"],
+  ["--ok", "--paper"],
+  ["--bad", "--paper"],
+  ["--on-color", "--ok"],
+  ["--on-color", "--bad"],
+  ["--ink", "--gold"],
+  ["--ink", "--c1"],
+  ["--ink", "--c2"],
+  ["--ink", "--c3"],
+  ["--ink", "--c4"],
+  ["--ink", "--ok-bg"],
+  ["--ink", "--bad-bg"],
+  ["--night-fg", "--night"],
+  ["--night-muted", "--night"],
+  ["--night-fg", "--night-tile"],
+  ["--sign-fg", "--dirt"],
+  ["--sign-fg", "--dirt2"],
 ] as const;
 
 afterEach(() => vi.unstubAllGlobals());
@@ -46,7 +59,7 @@ describe("skins", () => {
   it("there are two, blocks and dinos, each with every theme token", () => {
     expect([...SKINS].sort()).toEqual(["blocks", "dinos"]);
     const names = Object.keys(tokens(DEFAULT_SKIN)).sort();
-    expect(names.length).toBeGreaterThan(10);
+    expect(names.length).toBeGreaterThan(20);
     for (const skin of SKINS) expect(Object.keys(tokens(skin)).sort()).toEqual(names);
   });
 
@@ -59,8 +72,8 @@ describe("skins", () => {
     }
   });
 
-  it("the browser bar colour is each skin's primary colour", () => {
-    for (const skin of SKINS) expect(SKIN_THEME_COLOR[skin]).toBe(tokens(skin)["--primary"]);
+  it("the browser bar colour is each skin's dark grass", () => {
+    for (const skin of SKINS) expect(SKIN_THEME_COLOR[skin]).toBe(tokens(skin)["--grass-dk"]);
   });
 
   it("no trademarked names in the skins or the interface texts", () => {
@@ -70,13 +83,20 @@ describe("skins", () => {
     expect(sources).not.toMatch(/minecraft|roblox|creeper|lego|fortnite|pok[eé]mon|jurassic/i);
   });
 
-  it("keeps the child's choice, with dinos by default", () => {
+  it("keeps the child's choice, with blocks by default", () => {
     const data = new Map<string, string>();
     vi.stubGlobal("localStorage", { getItem: (k: string) => data.get(k) ?? null, setItem: (k: string, v: string) => void data.set(k, v) });
-    expect(loadSkin()).toBe("dinos");
-    expect(saveSkin("blocks")).toBe(true);
     expect(loadSkin()).toBe("blocks");
-    data.set("quizasaurus.skin", "castle");
+    expect(saveSkin("dinos")).toBe(true);
     expect(loadSkin()).toBe("dinos");
+    data.set("quizasaurus.skin", "castle");
+    expect(loadSkin()).toBe("blocks");
+  });
+
+  it("ships the fonts with the app, so it looks the same offline", () => {
+    const main = readFileSync(new URL("../app/src/main.tsx", import.meta.url), "utf8");
+    expect(main).toMatch(/@fontsource\/pixelify-sans/);
+    expect(main).toMatch(/@fontsource\/lexend/);
+    expect(css).not.toMatch(/fonts\.googleapis/);
   });
 });

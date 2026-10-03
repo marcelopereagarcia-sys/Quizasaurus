@@ -1,20 +1,21 @@
 /**
- * Skins (QZS-20): the child picks the look of the games. Each skin is a set of
- * theme tokens in styles.css, chosen with data-skin on <html>; the choice is
- * kept on the device. Original designs: no trademarked names or graphics.
+ * Skins (QZS-20): the child picks the colours of the games. The look is the
+ * prototype's (a blocky world with dinosaurs); each skin is a set of colour
+ * tokens in styles.css, chosen with data-skin on <html>, and the choice is kept
+ * on the device. Original designs: no trademarked names or graphics.
  */
 import { safeStorage } from "./storage.js";
 
-export const SKINS = ["dinos", "blocks"] as const;
+export const SKINS = ["blocks", "dinos"] as const;
 export type Skin = (typeof SKINS)[number];
 
-export const DEFAULT_SKIN: Skin = "dinos";
+export const DEFAULT_SKIN: Skin = "blocks";
 
 /** The emoji on each skin's button. */
-export const SKIN_EMOJI: Record<Skin, string> = { dinos: "🦕", blocks: "🧱" };
+export const SKIN_EMOJI: Record<Skin, string> = { blocks: "🧱", dinos: "🦕" };
 
-/** The browser bar colour of each skin: its --primary token (a test keeps them equal). */
-export const SKIN_THEME_COLOR: Record<Skin, string> = { dinos: "#2a7047", blocks: "#2f6b21" };
+/** The browser bar colour of each skin: its --grass-dk token (a test keeps them equal). */
+export const SKIN_THEME_COLOR: Record<Skin, string> = { blocks: "#3f8a2c", dinos: "#2f6e24" };
 
 const SKIN_KEY = "quizasaurus.skin";
 

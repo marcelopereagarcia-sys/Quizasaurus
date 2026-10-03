@@ -97,7 +97,7 @@ export function GameRunner({ game, t, bossThreshold = DEFAULT_BOSS_THRESHOLD, ha
     // Losing to the boss never shows more than one star, whatever the threshold.
     const starCount = won ? stars(correct, steps.length) : Math.min(stars(correct, steps.length), 1);
     return (
-      <section class="game-screen results" aria-live="polite">
+      <section class="results panel" aria-live="polite">
         <h2>{t.results}</h2>
         <p class="stars" role="img" aria-label={t.starsLabel(starCount)}>
           {"⭐".repeat(starCount)}
@@ -107,14 +107,14 @@ export function GameRunner({ game, t, bossThreshold = DEFAULT_BOSS_THRESHOLD, ha
         {isBoss && <p class={won ? "boss-win" : "boss-lose"}>{won ? t.bossWin : t.bossLose(needed)}</p>}
         <div class="actions">
           {hasNext && won && (
-            <button class="primary" onClick={onNext}>
+            <button class="btn prime" onClick={onNext}>
               {t.nextGame}
             </button>
           )}
-          <button class={hasNext && won ? "secondary" : "primary"} onClick={restart}>
+          <button class={hasNext && won ? "btn" : "btn prime"} onClick={restart}>
             {t.playAgain}
           </button>
-          <button class="secondary" onClick={onExit}>
+          <button class="btn" onClick={onExit}>
             {t.finish}
           </button>
         </div>
@@ -126,13 +126,21 @@ export function GameRunner({ game, t, bossThreshold = DEFAULT_BOSS_THRESHOLD, ha
 
   return (
     <section class={`game-screen game-${game.type}`}>
-      <div class="game-head">
-        <button class="link" onClick={onExit}>
+      <div class="hud">
+        <button class="btn small" onClick={onExit}>
           {t.exitGame}
         </button>
-        <span class="progress">{t.questionOf(index + 1, steps.length)}</span>
+        <div class="ht">
+          <h2>{game.title}</h2>
+          {game.title !== t.gameNames[game.type] && <span>{t.gameNames[game.type]}</span>}
+        </div>
       </div>
-      <h2 class="game-title">{game.title}</h2>
+      {/* One block per question: right, wrong, the current one, and those to come. */}
+      <div class="prog" role="progressbar" aria-label={t.questionOf(index + 1, steps.length)} aria-valuemin={1} aria-valuemax={steps.length} aria-valuenow={index + 1}>
+        {steps.map((_, i) => (
+          <i class={i < answers.length ? (answers[i]!.correct ? "ok" : "bad") : i === index ? "cur" : ""} />
+        ))}
+      </div>
 
       {isBoss && (
         <div class="boss-bar" role="meter" aria-label={t.bossLife} aria-valuemin={0} aria-valuemax={steps.length} aria-valuenow={steps.length - correct}>
@@ -145,33 +153,35 @@ export function GameRunner({ game, t, bossThreshold = DEFAULT_BOSS_THRESHOLD, ha
         </div>
       )}
 
-      {step.kind === "pick" && (
-        <PickView step={step} t={t} disabled={phase.name !== "ask"} chosen={phase.name === "feedback" ? chosen : undefined} onAnswer={answer} />
-      )}
-      {step.kind === "order" && <OrderView key={`${round}-${index}`} step={step} t={t} disabled={phase.name !== "ask"} onAnswer={answer} />}
-      {step.kind === "swipe" && <SwipeView key={`${round}-${index}`} step={step} t={t} disabled={phase.name !== "ask"} onAnswer={answer} />}
+      <div class="stage panel">
+        {step.kind === "pick" && (
+          <PickView step={step} t={t} disabled={phase.name !== "ask"} chosen={phase.name === "feedback" ? chosen : undefined} onAnswer={answer} />
+        )}
+        {step.kind === "order" && <OrderView key={`${round}-${index}`} step={step} t={t} disabled={phase.name !== "ask"} onAnswer={answer} />}
+        {step.kind === "swipe" && <SwipeView key={`${round}-${index}`} step={step} t={t} disabled={phase.name !== "ask"} onAnswer={answer} />}
 
-      {phase.name === "feedback" && (
-        <div ref={feedbackRef} class={`feedback ${phase.ok ? "ok" : "ko"}`} role="status" aria-live="assertive">
-          {phase.ok ? (
-            <p class="praise">{t.right[praise]}</p>
-          ) : (
-            <>
-              <p class="feedback-title">{t.wrong}</p>
-              <p>
-                {t.rightAnswer}: <strong>{rightAnswerLabel(step, t.yes, t.no)}</strong>
-              </p>
-              <p>{step.explanation}</p>
-              <blockquote class="book-quote">
-                <span>{t.bookSays}:</span> {t.quote(step.source)}
-              </blockquote>
-              <button ref={nextRef} class="primary" onClick={advance}>
-                {t.next}
-              </button>
-            </>
-          )}
-        </div>
-      )}
+        {phase.name === "feedback" && (
+          <div ref={feedbackRef} class={`feedback ${phase.ok ? "ok" : "ko"}`} role="status" aria-live="assertive">
+            {phase.ok ? (
+              <p class="praise">{t.right[praise]}</p>
+            ) : (
+              <>
+                <p class="feedback-title">{t.wrong}</p>
+                <p>
+                  {t.rightAnswer}: <strong>{rightAnswerLabel(step, t.yes, t.no)}</strong>
+                </p>
+                <p>{step.explanation}</p>
+                <blockquote class="book-quote">
+                  <span>{t.bookSays}:</span> {t.quote(step.source)}
+                </blockquote>
+                <button ref={nextRef} class="btn prime" onClick={advance}>
+                  {t.next}
+                </button>
+              </>
+            )}
+          </div>
+        )}
+      </div>
     </section>
   );
 }
@@ -240,10 +250,10 @@ function OrderView({ step, t, disabled, onAnswer }: ViewProps<"order">) {
           ))}
       </div>
       <div class="actions">
-        <button class="secondary" disabled={disabled || chosen.length === 0} onClick={() => setChosen(chosen.slice(0, -1))}>
+        <button class="btn" disabled={disabled || chosen.length === 0} onClick={() => setChosen(chosen.slice(0, -1))}>
           {t.undo}
         </button>
-        <button class="primary" disabled={disabled || chosen.length !== step.items.length} onClick={() => onAnswer(chosen)}>
+        <button class="btn prime" disabled={disabled || chosen.length !== step.items.length} onClick={() => onAnswer(chosen)}>
           {t.check}
         </button>
       </div>

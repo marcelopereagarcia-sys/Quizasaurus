@@ -53,3 +53,5 @@ This repository is also a portfolio piece. It is run with the Google Project Man
 ## License
 
 [MIT](LICENSE) © 2026 Marcelo Perea García
+
+The player ships two fonts under the [SIL Open Font License 1.1](https://openfontlicense.org): [Pixelify Sans](https://github.com/eifetx/Pixelify-Sans) © 2021 The Pixelify Sans Project Authors, and [Lexend](https://github.com/googlefonts/lexend) © 2019 The Lexend Project Authors.
