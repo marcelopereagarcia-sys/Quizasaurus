@@ -1,6 +1,6 @@
 # ADR-0002: Leer escaneos y fotos con un modelo de visión local, no con OCR clásico
 
-- **Estado:** propuesta
+- **Estado:** aceptada (2026-10-03)
 - **Fecha:** 2026-10-03
 - **Decide:** Marcelo Perea (sponsor y product owner)
 - **Historia:** QZS-12
@@ -52,3 +52,12 @@ Observaciones:
 - **Recomendación a las familias:** fotografiar las páginas de teoría o las fichas en blanco da mejor resultado que las fichas ya hechas.
 - **Supuesto sin medir con un libro real:** el castellano funcionará igual o mejor que el catalán, porque los modelos se entrenan con mucho más castellano. Se comprobará con material propio en QZS-12.
 - **Pendiente de medir en QZS-15:** otros modelos de visión, más ligeros y en la nube.
+
+## Mejoras abiertas a la comunidad
+
+El PM acepta esta decisión con el alcance probado: Quizasaurus es un MVP de código abierto y estas mejoras quedan abiertas a contribuciones.
+
+- **Fotos directas de la cámara:** reducir las fotos grandes (12 MP o más) antes de enviarlas al modelo y respetar la orientación EXIF. Probado solo con imágenes de 750 × 1000 px dentro de PDF.
+- **Equipos sin GPU:** modelos de visión más ligeros o un proveedor en la nube para familias sin tarjeta gráfica de 8 GB.
+- **Castellano con un libro real:** medir con una unidad escaneada en castellano.
+- **Páginas con muchas líneas vacías:** detectar el bucle de repetición mientras se genera, en lugar de esperar al límite de tokens (~40 s).
