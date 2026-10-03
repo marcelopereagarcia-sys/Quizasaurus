@@ -658,6 +658,148 @@ button {
   font: 600 1rem var(--f-body);
 }
 
+/* ---------- Adult review (QZS-18) ---------- */
+
+.warning {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.gate,
+.review-head,
+.review-issues {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+}
+
+.gate .field span {
+  font-size: 1.3rem;
+}
+
+.gate-wrong,
+.review-issues {
+  color: var(--bad);
+}
+
+.review-issues ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.review {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.review-game {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.review-game h3 {
+  font-size: 1.3rem;
+}
+
+.review-game h3 small {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.qcards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.qcard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+}
+
+.qcard-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.field legend {
+  margin-bottom: 4px;
+  padding: 0;
+}
+
+.field input:not([type="radio"]),
+.field textarea,
+.field select {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 10px;
+  font: 400 1rem var(--f-body);
+  color: var(--ink);
+  background: var(--card);
+  border: 2px solid var(--line);
+  border-radius: 6px;
+}
+
+.field textarea {
+  resize: vertical;
+}
+
+.opt-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.opt-row input[type="radio"],
+.pill.choice input {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  accent-color: var(--ok);
+}
+
+.steps-edit {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* On a wide screen the buttons stay in view while scrolling; on a phone they would hide a third of it. */
+@media (min-width: 700px) {
+  .review-actions {
+    position: sticky;
+    bottom: 0;
+    padding: 12px 0;
+    background: linear-gradient(transparent, var(--sky2) 30%);
+  }
+}
+
 /* ---------- Game: heads-up bar, progress and stage ---------- */
 
 .game-screen {

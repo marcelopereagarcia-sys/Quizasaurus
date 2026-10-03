@@ -6,6 +6,7 @@ import { type Dict, UI_LANGS, UI_LANG_NAMES, type UiLang, defaultUiLang, isUiLan
 import { type AnswerRecord, type GameResult, GameRunner } from "./game/GameRunner.js";
 import { type Step, mixedSteps, stepsFor } from "./game/steps.js";
 import { DINOS, type Progress, dinoHue, dinoOf, emptyProgress, levelKey, loadProgress, recordGame, saveProgress } from "./progress.js";
+import { Review } from "./review/Review.js";
 import { type SavedRun, clearRun, loadRun, saveRun } from "./run.js";
 import { BOSS_THRESHOLD_CHOICES, loadSettings, saveSettings } from "./settings.js";
 import { SKINS, SKIN_EMOJI, type Skin, applySkin, loadSkin, saveSkin } from "./skins.js";
@@ -28,7 +29,11 @@ const GAME_ICONS: Record<Pack["games"][number]["type"], string> = {
 };
 
 /** `game` is the game's index in the pack, or the infinite mode. */
-type Screen = { name: "home" } | { name: "pack"; id: string } | { name: "play"; id: string; game: number | "mix" };
+type Screen =
+  | { name: "home" }
+  | { name: "pack"; id: string }
+  | { name: "play"; id: string; game: number | "mix" }
+  | { name: "review"; id: string };
 
 export function App() {
   const [lang, setLang] = useState<UiLang>(() => {
@@ -76,7 +81,7 @@ export function App() {
 
   /** Moves between screens through the browser history (see above). */
   function go(next: Screen) {
-    const depth = (s: Screen) => ({ home: 0, pack: 1, play: 2 })[s.name];
+    const depth = (s: Screen) => ({ home: 0, pack: 1, play: 2, review: 2 })[s.name];
     const back = depth(screen) - depth(next);
     if (back > 0) {
       history.go(-back); // popstate shows the screen
@@ -148,6 +153,16 @@ export function App() {
     return recorded.reward;
   }
 
+  /** The adult approved the pack, or kept their changes as a draft. */
+  function onReviewed(pack: Pack, approved: boolean, texts: Dict) {
+    const persisted = savePack(pack);
+    setPacks(loadPacks());
+    // A half-played game of the old questions would not match the new ones.
+    if (run?.packId === pack.id) onRunProgress(pack.id, run.game, undefined);
+    setNotice(persisted ? (approved ? texts.savedApproved : texts.savedDraft) : texts.notSaved);
+    go({ name: "pack", id: pack.id });
+  }
+
   function onBossThreshold(value: number) {
     const next = { ...settings, bossThreshold: value };
     setSettings(next);
@@ -181,7 +196,11 @@ export function App() {
         </div>
       )}
 
-      {current && screen.name === "play" && playable ? (
+      {current && screen.name === "review" ? (
+        <main class="screen">
+          <Review pack={current} t={ui} onDone={(pack, approved) => onReviewed(pack, approved, ui)} onCancel={() => go({ name: "pack", id: current.id })} />
+        </main>
+      ) : current && screen.name === "play" && playable ? (
         <main class="screen">
           {screen.game === "mix" ? (
             <GameRunner
@@ -234,7 +253,14 @@ export function App() {
               <span class="pill">💎 {ui.gemsPill(progress.gems)}</span>
             </div>
           </header>
-          {current.review.status === "draft" && <p class="warning panel">{ui.needsReview}</p>}
+          {current.review.status === "draft" && (
+            <div class="warning panel">
+              <p>{ui.needsReview}</p>
+              <button class="btn prime" onClick={() => go({ name: "review", id: current.id })}>
+                {ui.reviewOpen}
+              </button>
+            </div>
+          )}
           <ol class="levels">
             {current.games.map((game, i) => (
               <li>
@@ -277,6 +303,7 @@ export function App() {
             t={ui}
             onBossThreshold={onBossThreshold}
             onReset={() => onResetProgress(ui.resetConfirm)}
+            onEdit={() => go({ name: "review", id: current.id })}
           />
           <div class="ground" aria-hidden="true" />
         </main>
@@ -414,6 +441,7 @@ function FamilyCorner(props: {
   t: Dict;
   onBossThreshold: (value: number) => void;
   onReset: () => void;
+  onEdit: () => void;
 }) {
   const { pack, scores, bossThreshold, t } = props;
   const answered = pack.topics.filter((topic) => scores[topic.id]);
@@ -449,7 +477,10 @@ function FamilyCorner(props: {
             ))}
           </select>
         </label>
-        <div>
+        <div class="actions">
+          <button class="btn small" onClick={props.onEdit}>
+            {t.reviewEdit}
+          </button>
           <button class="btn small" onClick={props.onReset}>
             {t.resetProgress}
           </button>
