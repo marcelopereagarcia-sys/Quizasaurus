@@ -25,6 +25,10 @@ interface Props {
   title: string;
   /** The questions of one round; called again for each new round. */
   makeSteps: () => Step[];
+  /** A game left halfway (reload, app closed, back button): it goes on from there. */
+  resume?: { steps: Step[]; answers: AnswerRecord[] } | undefined;
+  /** Called after every answer to keep the game in progress, and with nothing when it ends. */
+  onProgress: (state: { steps: Step[]; answers: AnswerRecord[] } | undefined) => void;
   /** Diamonds before this round. */
   gems: number;
   t: Dict;
@@ -41,13 +45,13 @@ type Phase = { name: "ask" } | { name: "feedback"; ok: boolean } | { name: "done
 /** How long a right answer is celebrated before moving on. */
 const PRAISE_MS = 1100;
 
-export function GameRunner({ kind, title, makeSteps, gems, t, bossThreshold = DEFAULT_BOSS_THRESHOLD, hasNext, onFinish, onNext, onExit }: Props) {
+export function GameRunner({ kind, title, makeSteps, resume, onProgress, gems, t, bossThreshold = DEFAULT_BOSS_THRESHOLD, hasNext, onFinish, onNext, onExit }: Props) {
   const [round, setRound] = useState(0);
-  // A new shuffle every time the game is (re)started.
-  const steps = useMemo(makeSteps, [round]);
-  const [index, setIndex] = useState(0);
+  // A new shuffle every time the game is (re)started, unless it goes on from where it was left.
+  const steps = useMemo(() => (round === 0 && resume ? resume.steps : makeSteps()), [round]);
+  const [index, setIndex] = useState(() => resume?.answers.length ?? 0);
   const [phase, setPhase] = useState<Phase>({ name: "ask" });
-  const [answers, setAnswers] = useState<AnswerRecord[]>([]);
+  const [answers, setAnswers] = useState<AnswerRecord[]>(() => resume?.answers ?? []);
   const [praise, setPraise] = useState(0);
   const [chosen, setChosen] = useState<Answer | undefined>(undefined);
   const [reward, setReward] = useState<Reward | undefined>(undefined);
@@ -93,6 +97,10 @@ export function GameRunner({ kind, title, makeSteps, gems, t, bossThreshold = DE
     }
     return undefined;
   }, [phase]);
+
+  useEffect(() => {
+    onProgress(phase.name === "done" ? undefined : { steps, answers });
+  }, [steps, answers, phase.name === "done"]);
 
   function restart() {
     setRound(round + 1);

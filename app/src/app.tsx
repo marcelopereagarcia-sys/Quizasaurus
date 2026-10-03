@@ -3,9 +3,10 @@ import examplePack from "../../examples/ciclo-del-agua.pack.json";
 import type { Pack } from "../../src/pack/schema.js";
 import { validatePack, validatePackJson } from "../../src/pack/validate.js";
 import { type Dict, UI_LANGS, UI_LANG_NAMES, type UiLang, defaultUiLang, isUiLang, packUiLang } from "./i18n.js";
-import { type GameResult, GameRunner } from "./game/GameRunner.js";
-import { mixedSteps, stepsFor } from "./game/steps.js";
+import { type AnswerRecord, type GameResult, GameRunner } from "./game/GameRunner.js";
+import { type Step, mixedSteps, stepsFor } from "./game/steps.js";
 import { DINOS, type Progress, dinoHue, dinoOf, emptyProgress, levelKey, loadProgress, recordGame, saveProgress } from "./progress.js";
+import { type SavedRun, clearRun, loadRun, saveRun } from "./run.js";
 import { BOSS_THRESHOLD_CHOICES, loadSettings, saveSettings } from "./settings.js";
 import { SKINS, SKIN_EMOJI, type Skin, applySkin, loadSkin, saveSkin } from "./skins.js";
 import { loadPacks, removePack, safeStorage, savePack } from "./storage.js";
@@ -36,7 +37,13 @@ export function App() {
   });
   const t = UI_LANGS[lang];
   const [packs, setPacks] = useState<Pack[]>(() => loadPacks());
-  const [screen, setScreen] = useState<Screen>({ name: "home" });
+  // A game left halfway opens again where it was (reload, the tablet closed the app).
+  const [run, setRun] = useState<SavedRun | undefined>(() => loadRun());
+  const [screen, setScreen] = useState<Screen>(() => {
+    const pack = run && [...BUILT_IN, ...loadPacks()].find((p) => p.id === run.packId);
+    const gameExists = run && (run.game === "mix" || run.game < (pack?.games.length ?? 0));
+    return pack?.review.status === "approved" && gameExists ? { name: "play", id: pack.id, game: run.game } : { name: "home" };
+  });
   const [notice, setNotice] = useState<string>();
   const [settings, setSettings] = useState(() => loadSettings());
   const [progress, setProgress] = useState<Progress>(() => loadProgress());
@@ -52,6 +59,46 @@ export function App() {
   useEffect(() => {
     safeStorage.set(LANG_KEY, lang);
   }, [lang]);
+
+  // Every screen is a step in the browser history, so the phone's back button
+  // goes from a game to its unit and from the unit home, without leaving the app.
+  useEffect(() => {
+    const home: Screen = { name: "home" };
+    history.replaceState({ screen: home }, "");
+    if (screen.name !== "home") {
+      history.pushState({ screen: { name: "pack", id: screen.id } }, "");
+      if (screen.name === "play") history.pushState({ screen }, "");
+    }
+    const onPop = (e: PopStateEvent) => setScreen((e.state as { screen?: Screen } | null)?.screen ?? home);
+    addEventListener("popstate", onPop);
+    return () => removeEventListener("popstate", onPop);
+  }, []);
+
+  /** Moves between screens through the browser history (see above). */
+  function go(next: Screen) {
+    const depth = (s: Screen) => ({ home: 0, pack: 1, play: 2 })[s.name];
+    const back = depth(screen) - depth(next);
+    if (back > 0) {
+      history.go(-back); // popstate shows the screen
+    } else if (back === 0) {
+      history.replaceState({ screen: next }, "");
+      setScreen(next);
+    } else {
+      history.pushState({ screen: next }, "");
+      setScreen(next);
+    }
+  }
+
+  function onRunProgress(packId: string, game: number | "mix", state: { steps: Step[]; answers: AnswerRecord[] } | undefined) {
+    if (!state) {
+      setRun(undefined);
+      clearRun();
+    } else if (state.answers.length > 0) {
+      const next = { packId, game, ...state };
+      setRun(next);
+      saveRun(next);
+    }
+  }
 
   function chooseSkin(next: Skin) {
     applySkin(next);
@@ -84,7 +131,7 @@ export function App() {
     if (!confirm(t.removeConfirm(pack.title))) return;
     removePack(pack.id);
     setPacks(loadPacks());
-    setScreen({ name: "home" });
+    go({ name: "home" });
   }
 
   function onFinish(packId: string, game: number | "mix", result: GameResult) {
@@ -142,12 +189,14 @@ export function App() {
               kind="mix"
               title={ui.infinite}
               makeSteps={() => mixedSteps(current.games)}
+              resume={run?.packId === current.id && run.game === "mix" ? run : undefined}
+              onProgress={(state) => onRunProgress(current.id, "mix", state)}
               gems={progress.gems}
               t={ui}
               hasNext={false}
               onFinish={(result) => onFinish(current.id, "mix", result)}
               onNext={() => undefined}
-              onExit={() => setScreen({ name: "pack", id: current.id })}
+              onExit={() => go({ name: "pack", id: current.id })}
             />
           ) : (
             <GameRunner
@@ -155,20 +204,22 @@ export function App() {
               kind={current.games[screen.game]!.type}
               title={current.games[screen.game]!.title}
               makeSteps={() => stepsFor(current.games[screen.game as number]!)}
+              resume={run?.packId === current.id && run.game === screen.game ? run : undefined}
+              onProgress={(state) => onRunProgress(current.id, screen.game, state)}
               gems={progress.gems}
               t={ui}
               bossThreshold={settings.bossThreshold}
               hasNext={screen.game + 1 < current.games.length}
               onFinish={(result) => onFinish(current.id, screen.game, result)}
-              onNext={() => setScreen({ name: "play", id: current.id, game: (screen.game as number) + 1 })}
-              onExit={() => setScreen({ name: "pack", id: current.id })}
+              onNext={() => go({ name: "play", id: current.id, game: (screen.game as number) + 1 })}
+              onExit={() => go({ name: "pack", id: current.id })}
             />
           )}
         </main>
       ) : current ? (
         <main class="screen">
           <div>
-            <button class="btn small" onClick={() => setScreen({ name: "home" })}>
+            <button class="btn small" onClick={() => go({ name: "home" })}>
               {ui.back}
             </button>
           </div>
@@ -187,7 +238,7 @@ export function App() {
           <ol class="levels">
             {current.games.map((game, i) => (
               <li>
-                <button class={`lvl t-${game.type}`} disabled={!playable} onClick={() => setScreen({ name: "play", id: current.id, game: i })}>
+                <button class={`lvl t-${game.type}`} disabled={!playable} onClick={() => go({ name: "play", id: current.id, game: i })}>
                   <span class="li" aria-hidden="true">
                     {GAME_ICONS[game.type]}
                   </span>
@@ -200,7 +251,7 @@ export function App() {
               </li>
             ))}
             <li>
-              <button class="lvl t-mix" disabled={!playable} onClick={() => setScreen({ name: "play", id: current.id, game: "mix" })}>
+              <button class="lvl t-mix" disabled={!playable} onClick={() => go({ name: "play", id: current.id, game: "mix" })}>
                 <span class="li" aria-hidden="true">
                   ♾️
                 </span>
@@ -210,7 +261,7 @@ export function App() {
             </li>
           </ol>
           <div class="actions">
-            <button class="btn prime" disabled={!playable} onClick={() => setScreen({ name: "play", id: current.id, game: 0 })}>
+            <button class="btn prime" disabled={!playable} onClick={() => go({ name: "play", id: current.id, game: 0 })}>
               {ui.play}
             </button>
             {!BUILT_IN.some((b) => b.id === current.id) && (
@@ -278,7 +329,7 @@ export function App() {
                 const pt = UI_LANGS[packUiLang(pack.language, lang)];
                 return (
                   <li>
-                    <button class="lvl" lang={packUiLang(pack.language, lang)} onClick={() => setScreen({ name: "pack", id: pack.id })}>
+                    <button class="lvl" lang={packUiLang(pack.language, lang)} onClick={() => go({ name: "pack", id: pack.id })}>
                       <span class="li" aria-hidden="true">
                         📚
                       </span>
