@@ -10,7 +10,7 @@ import { anthropicProvider, DEFAULT_ANTHROPIC_MODEL } from "../../../src/ai/anth
 import { geminiProvider } from "../../../src/ai/gemini.js";
 import { DEFAULT_OLLAMA_HOST, ollamaProvider } from "../../../src/ai/ollama.js";
 import { openaiProvider } from "../../../src/ai/openai.js";
-import { type AIProvider, type ProviderId, ProviderConfigError } from "../../../src/ai/provider.js";
+import { type AIProvider, type ProviderId, ProviderConfigError, setRetryListener, setRetryPolicy } from "../../../src/ai/provider.js";
 import { extractUnit, type InputFile } from "../../../src/extract/extract.js";
 import { visionFromProvider } from "../../../src/extract/vision.js";
 import { GenerationError, generatePack, MAX_RETRIES } from "../../../src/generate/generate.js";
@@ -85,6 +85,7 @@ export type GenerationProblem =
   | "tooLittleText"
   | "unreachable"
   | "busy"
+  | "quota"
   | "invalidPack"
   | "other";
 
@@ -119,7 +120,9 @@ export function classifyError(error: unknown): GenerationProblem {
   const message = error instanceof Error ? `${error.name} ${error.message}` : String(error);
   // The browser says only "Failed to fetch" when a server cannot be reached (offline, Ollama off, CORS).
   if (/Failed to fetch|NetworkError|Load failed|ECONNREFUSED/i.test(message)) return "unreachable";
-  if (/\b(429|500|502|503|504)\b|overloaded|rate.?limit/i.test(message)) return "busy";
+  // 429: the key's free quota is used up (wait longer); 5xx: the provider is overloaded right now.
+  if (/\b429\b|RESOURCE_EXHAUSTED|quota|rate.?limit/i.test(message)) return "quota";
+  if (/\b(500|502|503|504)\b|overloaded|UNAVAILABLE|high demand/i.test(message)) return "busy";
   if (/InvalidPDF|Invalid PDF|PDF header|FormatError|password/i.test(message)) return "unreadable";
   return "other";
 }
@@ -132,7 +135,15 @@ export interface Progress {
   page?: { done: number; total: number };
   /** Attempt number, while generating (1 + up to MAX_RETRIES). */
   attempt?: { n: number; max: number };
+  /** The AI is busy: the next try is in this many seconds. */
+  waitSeconds?: number;
 }
+
+/**
+ * A family waits more patiently than the terminal: up to 5 tries over ~90 s
+ * (2, 6, 18, 30, 30 s), because free tiers are often briefly overloaded.
+ */
+export const WEB_RETRY = { retries: 5, baseDelayMs: 2_000, maxDelayMs: 30_000 };
 
 export interface GenerationRequest {
   files: InputFile[];
@@ -166,16 +177,25 @@ export async function generateFromFiles(request: GenerationRequest): Promise<Pac
   }
   if ((text.match(/\p{L}/gu) ?? []).length < MIN_UNIT_LETTERS) throw new WebGenerationError("tooLittleText");
 
-  onProgress({ step: "generate", attempt: { n: 1, max: MAX_RETRIES + 1 } });
-  const result = await generatePack(text, {
-    provider,
-    language: request.language,
-    grade: request.grade,
-    onAttempt: (attempt, issues) =>
-      onProgress(issues.length === 0 ? { step: "validate" } : { step: "generate", attempt: { n: attempt + 1, max: MAX_RETRIES + 1 } }),
-  });
-  onProgress({ step: "validate" });
-  return result.pack;
+  let attempt = { n: 1, max: MAX_RETRIES + 1 };
+  onProgress({ step: "generate", attempt });
+  setRetryPolicy(WEB_RETRY);
+  setRetryListener(({ delayMs }) => onProgress({ step: "generate", attempt, waitSeconds: Math.round(delayMs / 1000) }));
+  try {
+    const result = await generatePack(text, {
+      provider,
+      language: request.language,
+      grade: request.grade,
+      onAttempt: (n, issues) => {
+        attempt = { n: n + 1, max: MAX_RETRIES + 1 };
+        onProgress(issues.length === 0 ? { step: "validate" } : { step: "generate", attempt });
+      },
+    });
+    onProgress({ step: "validate" });
+    return result.pack;
+  } finally {
+    setRetryListener(undefined);
+  }
 }
 
 /** Photos from a phone or tablet are large: at most this many pixels on the long side is plenty to read. */

@@ -12,7 +12,7 @@ import {
   saveAiSettings,
   scaledSize,
 } from "../app/src/generator/pipeline.js";
-import { type AIProvider, ProviderConfigError, toBase64 } from "../src/ai/provider.js";
+import { type AIProvider, ProviderConfigError, fetchWithRetry, setRetryListener, toBase64 } from "../src/ai/provider.js";
 import { extensionOf } from "../src/extract/extract.js";
 import { GenerationError } from "../src/generate/generate.js";
 import { exampleLines, textPdf } from "./fixtures.js";
@@ -69,7 +69,8 @@ describe("errors a family can understand", () => {
     expect(classifyError(new ProviderConfigError("rejected", "key"))).toBe("badKey");
     expect(classifyError(new ProviderConfigError("not found", "model"))).toBe("badModel");
     expect(classifyError(new TypeError("Failed to fetch"))).toBe("unreachable");
-    expect(classifyError(new Error("Gemini answered 429: quota"))).toBe("busy");
+    expect(classifyError(new Error("Gemini answered 429: quota"))).toBe("quota");
+    expect(classifyError(new Error('Gemini answered 503: {"status": "UNAVAILABLE", "message": "high demand"}'))).toBe("busy");
     expect(classifyError(new GenerationError([], 3))).toBe("invalidPack");
     expect(classifyError(new Error("Invalid PDF structure"))).toBe("unreadable");
     expect(classifyError(new Error("something else"))).toBe("other");
@@ -117,6 +118,22 @@ describe("generating from the files", () => {
     expect(await run([{ name: "roto.pdf", data: new TextEncoder().encode("this is not a pdf") }])).toBe("unreadable");
     expect(await run([{ name: "corto.pdf", data: await textPdf([["Solo una línea de texto."]]) }])).toBe("tooLittleText");
     expect(await run([])).toBe("noFiles");
+  });
+});
+
+describe("a busy AI", () => {
+  it("tells the screen how long it waits before each retry, never more than the cap", async () => {
+    let calls = 0;
+    vi.stubGlobal("fetch", async () => new Response("busy", { status: calls++ < 3 ? 503 : 200, headers: { "retry-after": "999" } }));
+    const waits: number[] = [];
+    setRetryListener(({ delayMs }) => waits.push(delayMs));
+    try {
+      const res = await fetchWithRetry("https://x", {}, { retries: 5, baseDelayMs: 1, maxDelayMs: 5 });
+      expect(res.status).toBe(200);
+      expect(waits).toEqual([5, 5, 5]); // retry-after asked for 999 s; the cap wins
+    } finally {
+      setRetryListener(undefined);
+    }
   });
 });
 

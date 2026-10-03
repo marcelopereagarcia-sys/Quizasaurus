@@ -301,7 +301,7 @@ button {
   gap: 6px;
   min-height: 40px;
   padding: 4px 12px;
-  font: 700 1rem var(--f-display);
+  font: 700 1rem var(--f-body);
   color: var(--ink);
   background: var(--paper);
   border: 3px solid var(--line);
@@ -444,7 +444,8 @@ button {
 }
 
 .lvl .step-n {
-  font: 700 0.85rem var(--f-display);
+  font: 700 0.8rem var(--f-body);
+  letter-spacing: 0.04em;
   color: var(--muted);
   text-transform: uppercase;
 }
@@ -1193,7 +1194,8 @@ button {
   height: 30px;
   display: grid;
   place-items: center;
-  font: 700 1.2rem var(--f-display);
+  /* Numbers in Lexend: in the pixel font a small 2 reads like an 8. */
+  font: 700 1.05rem var(--f-body);
   background: var(--gold);
   border: 2px solid var(--line);
   border-radius: 4px;

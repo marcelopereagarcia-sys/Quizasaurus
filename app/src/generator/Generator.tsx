@@ -1,4 +1,4 @@
-import { useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import type { InputFile } from "../../../src/extract/extract.js";
 import type { Pack } from "../../../src/pack/schema.js";
 import type { Dict } from "../i18n.js";
@@ -212,6 +212,16 @@ export default function Generator({ t, onGenerated, onCancel }: Props) {
   );
 }
 
+/** "The AI is busy, trying again in N s", counting down. */
+function Countdown({ seconds, t }: { seconds: number; t: Dict }) {
+  const [left, setLeft] = useState(seconds);
+  useEffect(() => {
+    const timer = setInterval(() => setLeft((s) => Math.max(0, s - 1)), 1000);
+    return () => clearInterval(timer);
+  }, []);
+  return <small class="gen-wait">{t.genBusyWait(left)}</small>;
+}
+
 function Working({ t, progress }: { t: Dict; progress: Progress }) {
   const current = STEPS.indexOf(progress.step);
   return (
@@ -225,6 +235,7 @@ function Working({ t, progress }: { t: Dict; progress: Progress }) {
               <strong>{t.genSteps[step]}</strong>
               {i === current && progress.page && <small>{t.genPage(progress.page.done, progress.page.total)}</small>}
               {i === current && progress.attempt && progress.attempt.n > 1 && <small>{t.genAttempt(progress.attempt.n, progress.attempt.max)}</small>}
+              {i === current && progress.waitSeconds !== undefined && <Countdown key={JSON.stringify(progress)} seconds={progress.waitSeconds} t={t} />}
             </span>
           </li>
         ))}

@@ -70,20 +70,41 @@ export function toBase64(bytes: Uint8Array): string {
 /** Busy or rate-limited: worth trying again (free tiers return these often). */
 const TRANSIENT_STATUS = new Set([429, 500, 502, 503, 504]);
 
+export interface RetryPolicy {
+  retries: number;
+  baseDelayMs: number;
+  /** No single wait is longer than this. */
+  maxDelayMs: number;
+}
+
+/** Terminal default: 2 s, 6 s, 18 s. The web app is more patient (see `setRetryPolicy`). */
+let retryPolicy: RetryPolicy = { retries: 3, baseDelayMs: 2_000, maxDelayMs: 60_000 };
+
+/** Called before each wait, so a screen can say "busy, trying again in N s". */
+export type RetryListener = (info: { status: number; attempt: number; delayMs: number }) => void;
+let retryListener: RetryListener | undefined;
+
+export function setRetryPolicy(policy: Partial<RetryPolicy>): void {
+  retryPolicy = { ...retryPolicy, ...policy };
+}
+
+export function setRetryListener(listener: RetryListener | undefined): void {
+  retryListener = listener;
+}
+
 /**
  * fetch that retries transient errors with a growing wait (2 s, 6 s, 18 s by default),
  * honouring `retry-after` when the server sends it.
  */
-export async function fetchWithRetry(
-  url: string,
-  init: RequestInit,
-  { retries = 3, baseDelayMs = 2_000 }: { retries?: number; baseDelayMs?: number } = {},
-): Promise<Response> {
+export async function fetchWithRetry(url: string, init: RequestInit, options: Partial<RetryPolicy> = {}): Promise<Response> {
+  const { retries, baseDelayMs, maxDelayMs } = { ...retryPolicy, ...options };
   for (let attempt = 0; ; attempt++) {
     const res = await fetch(url, init);
     if (!TRANSIENT_STATUS.has(res.status) || attempt >= retries) return res;
     const retryAfter = Number(res.headers.get("retry-after"));
-    const delay = Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter * 1_000 : baseDelayMs * 3 ** attempt;
+    const wanted = Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter * 1_000 : baseDelayMs * 3 ** attempt;
+    const delay = Math.min(wanted, maxDelayMs);
+    retryListener?.({ status: res.status, attempt: attempt + 1, delayMs: delay });
     await new Promise((resolve) => setTimeout(resolve, delay));
   }
 }
