@@ -4,6 +4,7 @@ import {
   DEFAULT_MAX_TOKENS,
   ProviderConfigError,
   elapsedSeconds,
+  fetchWithRetry,
   imageMediaType,
   toBase64,
 } from "./provider.js";
@@ -19,7 +20,7 @@ export interface GeminiOptions {
 /** Models this key can use with `generateContent`, to suggest one when GEMINI_MODEL is missing. */
 export async function availableGeminiModels(apiKey: string, baseUrl = GEMINI_BASE_URL): Promise<string[]> {
   try {
-    const res = await fetch(`${baseUrl}/models?pageSize=1000`, {
+    const res = await fetchWithRetry(`${baseUrl}/models?pageSize=1000`, {
       headers: { "x-goog-api-key": apiKey },
       signal: AbortSignal.timeout(10_000),
     });
@@ -50,7 +51,7 @@ export function geminiProvider(options: GeminiOptions): AIProvider {
         })),
         { text: request.prompt },
       ];
-      const res = await fetch(`${baseUrl}/models/${encodeURIComponent(model)}:generateContent`, {
+      const res = await fetchWithRetry(`${baseUrl}/models/${encodeURIComponent(model)}:generateContent`, {
         method: "POST",
         headers: { "content-type": "application/json", "x-goog-api-key": apiKey },
         body: JSON.stringify({

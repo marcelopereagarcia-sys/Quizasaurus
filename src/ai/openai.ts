@@ -4,6 +4,7 @@ import {
   DEFAULT_MAX_TOKENS,
   ProviderConfigError,
   elapsedSeconds,
+  fetchWithRetry,
   imageMediaType,
   toBase64,
 } from "./provider.js";
@@ -34,7 +35,7 @@ export function openaiProvider(options: OpenAIOptions): AIProvider {
           image_url: { url: `data:${imageMediaType(image)};base64,${toBase64(image)}` },
         })),
       ];
-      const res = await fetch(`${baseUrl}/chat/completions`, {
+      const res = await fetchWithRetry(`${baseUrl}/chat/completions`, {
         method: "POST",
         headers: { "content-type": "application/json", authorization: `Bearer ${apiKey}` },
         body: JSON.stringify({

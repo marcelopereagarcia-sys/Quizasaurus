@@ -4,6 +4,7 @@ import {
   DEFAULT_MAX_TOKENS,
   ProviderConfigError,
   elapsedSeconds,
+  fetchWithRetry,
   toBase64,
 } from "./provider.js";
 
@@ -33,7 +34,7 @@ export function ollamaProvider(options: OllamaOptions): AIProvider {
       ];
       let res: Response;
       try {
-        res = await fetch(`${host}/api/chat`, {
+        res = await fetchWithRetry(`${host}/api/chat`, {
           method: "POST",
           headers: { "content-type": "application/json" },
           signal: AbortSignal.timeout(timeoutMs),

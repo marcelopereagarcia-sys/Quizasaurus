@@ -10,7 +10,7 @@ import { DEFAULT_OLLAMA_VISION_MODEL, providerFromEnv } from "../src/ai/config.j
 import { geminiProvider } from "../src/ai/gemini.js";
 import { ollamaProvider } from "../src/ai/ollama.js";
 import { openaiProvider } from "../src/ai/openai.js";
-import { type AIProvider, ProviderConfigError, imageMediaType } from "../src/ai/provider.js";
+import { type AIProvider, ProviderConfigError, fetchWithRetry, imageMediaType } from "../src/ai/provider.js";
 import { pageImage } from "./fixtures.js";
 
 const PNG = pageImage(["a"]);
@@ -58,6 +58,27 @@ describe("common interface", () => {
     expect(imageMediaType(PNG)).toBe("image/png");
     expect(imageMediaType(new Uint8Array([0xff, 0xd8, 0xff]))).toBe("image/jpeg");
     expect(() => imageMediaType(new Uint8Array([1, 2, 3]))).toThrow(/PNG, JPEG or WebP/);
+  });
+});
+
+describe("retries", () => {
+  it("retries busy or rate-limited answers and then returns the result", async () => {
+    const statuses = [503, 429, 200];
+    const fetchMock = vi.fn(async () => new Response("{}", { status: statuses.shift() ?? 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+    const res = await fetchWithRetry("https://x", {}, { baseDelayMs: 1 });
+    expect(res.status).toBe(200);
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+  });
+
+  it("gives up after the last retry and does not retry setup errors", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => new Response("{}", { status: 503 })));
+    expect((await fetchWithRetry("https://x", {}, { retries: 2, baseDelayMs: 1 })).status).toBe(503);
+    expect(fetch).toHaveBeenCalledTimes(3);
+    const notFound = vi.fn(async () => new Response("{}", { status: 404 }));
+    vi.stubGlobal("fetch", notFound);
+    await fetchWithRetry("https://x", {}, { baseDelayMs: 1 });
+    expect(notFound).toHaveBeenCalledTimes(1);
   });
 });
 

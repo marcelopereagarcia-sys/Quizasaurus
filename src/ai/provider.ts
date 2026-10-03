@@ -53,4 +53,25 @@ export function imageMediaType(image: Uint8Array): "image/png" | "image/jpeg" | 
 
 export const toBase64 = (bytes: Uint8Array) => Buffer.from(bytes).toString("base64");
 
+/** Busy or rate-limited: worth trying again (free tiers return these often). */
+const TRANSIENT_STATUS = new Set([429, 500, 502, 503, 504]);
+
+/**
+ * fetch that retries transient errors with a growing wait (2 s, 6 s, 18 s by default),
+ * honouring `retry-after` when the server sends it.
+ */
+export async function fetchWithRetry(
+  url: string,
+  init: RequestInit,
+  { retries = 3, baseDelayMs = 2_000 }: { retries?: number; baseDelayMs?: number } = {},
+): Promise<Response> {
+  for (let attempt = 0; ; attempt++) {
+    const res = await fetch(url, init);
+    if (!TRANSIENT_STATUS.has(res.status) || attempt >= retries) return res;
+    const retryAfter = Number(res.headers.get("retry-after"));
+    const delay = Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter * 1_000 : baseDelayMs * 3 ** attempt;
+    await new Promise((resolve) => setTimeout(resolve, delay));
+  }
+}
+
 export const elapsedSeconds = (started: number) => Math.round(performance.now() - started) / 1000;
