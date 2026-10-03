@@ -1,6 +1,6 @@
 # Project Charter — Quizasaurus
 
-Versión 1.0 · aprobada el 3 de octubre de 2026 · Marcelo Perea García
+Versión 1.1 · aprobada el 3 de octubre de 2026 · Marcelo Perea García
 
 > Copia exportada del charter aprobado. El original vive en Claude Docs; cualquier cambio de alcance, fechas o presupuesto pasa por el registro de cambios del final.
 
@@ -198,6 +198,7 @@ El charter entra en vigor cuando el sponsor lo aprueba; desde ese momento, cualq
 
 | Versión | Fecha | Cambio |
 | --- | --- | --- |
+| 1.1 | 03-oct-2026 | Cambio de alcance aprobado por el sponsor: O5 pasa de 3 publicaciones en LinkedIn a 1 publicación final, en el cierre. Se descarta la de arranque (QZS-10) |
 | 1.0 | 03-oct-2026 | Aprobado por el sponsor; dedicación fijada en ~8 h/día (112 h en total). Sprint 1 iniciado |
 | 0.2 | 02-oct-2026 | Plan comprimido a 2 semanas; prueba informal con 2 familias en lugar de piloto; sin lanzamiento al mercado |
 | 0.1 | 02-oct-2026 | Primer borrador del charter |
