@@ -5,6 +5,7 @@ import { validatePack, validatePackJson } from "../../src/pack/validate.js";
 import { UI_LANGS, UI_LANG_NAMES, type UiLang, defaultUiLang, isUiLang } from "./i18n.js";
 import { GameRunner } from "./game/GameRunner.js";
 import { loadSettings } from "./settings.js";
+import { SKINS, SKIN_EMOJI, type Skin, applySkin, loadSkin, saveSkin } from "./skins.js";
 import { loadPacks, removePack, safeStorage, savePack } from "./storage.js";
 
 const LANG_KEY = "quizasaurus.uiLang";
@@ -35,6 +36,12 @@ export function App() {
   const [screen, setScreen] = useState<Screen>({ name: "home" });
   const [notice, setNotice] = useState<string>();
   const [settings] = useState(() => loadSettings());
+  // Applied before the first paint, so the page never flashes the other skin.
+  const [skin, setSkin] = useState<Skin>(() => {
+    const saved = loadSkin();
+    applySkin(saved);
+    return saved;
+  });
 
   const allPacks = useMemo(() => [...BUILT_IN.filter((b) => !packs.some((p) => p.id === b.id)), ...packs], [packs]);
 
@@ -42,6 +49,12 @@ export function App() {
     document.documentElement.lang = lang;
     safeStorage.set(LANG_KEY, lang);
   }, [lang]);
+
+  function chooseSkin(next: Skin) {
+    applySkin(next);
+    saveSkin(next);
+    setSkin(next);
+  }
 
   useEffect(() => {
     const ready = () => setNotice(t.offlineReady);
@@ -152,6 +165,20 @@ export function App() {
       ) : (
         <main class="screen">
           <p class="tagline">{t.appTagline}</p>
+          <section class="skins" aria-labelledby="skins-title">
+            <h2 id="skins-title">{t.skinTitle}</h2>
+            <div class="skin-choices">
+              {SKINS.map((s) => (
+                // Each button wears its own skin, so the child sees what they pick.
+                <button class="skin-choice" data-skin={s} aria-pressed={s === skin} onClick={() => chooseSkin(s)}>
+                  <span class="skin-emoji" aria-hidden="true">
+                    {SKIN_EMOJI[s]}
+                  </span>
+                  {t.skinNames[s]}
+                </button>
+              ))}
+            </div>
+          </section>
           <h2>{t.myPacks}</h2>
           {allPacks.length === 0 && <p>{t.noPacks}</p>}
           <ul class="packs">

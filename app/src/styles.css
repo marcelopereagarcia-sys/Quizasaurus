@@ -1,17 +1,61 @@
-/* Theme tokens: skins (QZS-20) override these. */
-:root {
+/*
+ * Skins (QZS-20): each one sets the same theme tokens and is chosen with
+ * data-skin on <html>. A test checks that every skin defines them all and
+ * that text colours reach WCAG AA (4.5:1). Original designs, no trademarks.
+ */
+:root,
+[data-skin="dinos"] {
   --bg: #f4f1e8;
   --surface: #ffffff;
   --text: #1f2a24;
   --muted: #5b6b62;
-  --primary: #2a7047; /* 5.3:1 on --bg; white text on it 6:1 */
+  --primary: #2a7047;
   --primary-text: #ffffff;
   --ok: #2a7047;
-  --pending: #8f4e12; /* 5.7:1 on --bg, AA for small text */
+  --pending: #8f4e12;
+  --wrong: #d64545;
   --border: #d9d3c3;
+  /* The 3D edge under cards and options. */
+  --edge: #d9d3c3;
+  --button-edge: transparent;
   --radius: 16px;
+  --pill: 999px;
+  --font: system-ui, "Segoe UI", Roboto, sans-serif;
+  --font-display: ui-rounded, "Arial Rounded MT Bold", system-ui, sans-serif;
+  --boss-life: linear-gradient(90deg, #e2483d, #f5a623);
+  --page-top: 0px;
+  --backdrop: var(--bg);
+}
+
+/* A world of blocks: sky, grass and earth, square corners and chunky edges. */
+[data-skin="blocks"] {
+  --bg: #cfe9f7;
+  --surface: #fffdf5;
+  --text: #1d2a2f;
+  --muted: #3f4f56;
+  --primary: #2f6b21;
+  --primary-text: #ffffff;
+  --ok: #2b6e2f;
+  --pending: #7a4e32;
+  --wrong: #cf4333;
+  --border: #1d2a2f;
+  --edge: #7a4e32;
+  --button-edge: #1d4a14;
+  --radius: 4px;
+  --pill: 4px;
+  --font: system-ui, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Courier New", ui-monospace, monospace;
+  --boss-life: repeating-linear-gradient(90deg, #cf4333 0 14px, #e8664f 14px 18px);
+  /* A strip of grass over earth on top, and a faint grid of blocks in the sky. */
+  --page-top: 18px;
+  --backdrop: linear-gradient(#5aae3f 0 10px, #8a5a3b 10px 18px, transparent 18px) top / 100% 18px no-repeat,
+    linear-gradient(rgb(255 255 255 / 0.35) 2px, transparent 2px) 0 0 / 32px 32px,
+    linear-gradient(90deg, rgb(255 255 255 / 0.35) 2px, transparent 2px) 0 0 / 32px 32px, var(--bg);
+}
+
+:root {
   --tap: 56px; /* minimum touch target for small fingers */
-  font-family: system-ui, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--font);
   color: var(--text);
   background: var(--bg);
 }
@@ -22,7 +66,16 @@
 
 body {
   margin: 0;
-  background: var(--bg);
+  padding-top: var(--page-top);
+  background: var(--backdrop);
+}
+
+h1,
+h2,
+.praise,
+.feedback-title,
+.score {
+  font-family: var(--font-display);
 }
 
 .app {
@@ -50,7 +103,7 @@ body {
 .lang select {
   min-height: 44px;
   font-size: 1rem;
-  border-radius: 12px;
+  border-radius: var(--radius);
   border: 1px solid var(--border);
   padding: 0 8px;
   background: var(--surface);
@@ -190,6 +243,7 @@ button,
   background: var(--primary);
   color: var(--primary-text);
   border: none;
+  box-shadow: 0 4px 0 var(--button-edge);
 }
 
 .primary:disabled,
@@ -224,6 +278,57 @@ button,
 .file:focus-within {
   outline: 3px solid var(--text);
   outline-offset: 2px;
+}
+
+/* ---------- Skin picker ---------- */
+
+.skins h2 {
+  font-size: 1.2rem;
+}
+
+.skin-choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.skin-choice {
+  position: relative;
+  min-height: 104px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  /* Room for the blocks skin's strip of grass on top. */
+  padding: calc(var(--page-top) + 8px) 12px 10px;
+  font-size: 1rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--text);
+  background: var(--backdrop);
+  border: 3px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 0 var(--edge);
+}
+
+.skin-choice[aria-pressed="true"] {
+  border-color: var(--primary);
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.skin-choice[aria-pressed="true"]::after {
+  content: "✓";
+  position: absolute;
+  right: 8px;
+  bottom: 6px;
+  font-size: 1.3rem;
+  color: var(--primary);
+}
+
+.skin-emoji {
+  font-size: 2rem;
 }
 
 /* ---------- Game screen ---------- */
@@ -273,7 +378,7 @@ button,
   border: 3px solid var(--border);
   border-radius: calc(var(--radius) * 1.5);
   text-align: center;
-  box-shadow: 0 4px 0 var(--border);
+  box-shadow: 0 4px 0 var(--edge);
 }
 
 .card-emoji {
@@ -317,12 +422,12 @@ button,
   background: var(--surface);
   border: 3px solid var(--border);
   border-radius: var(--radius);
-  box-shadow: 0 4px 0 var(--border);
+  box-shadow: 0 4px 0 var(--edge);
 }
 
 .option:active:not(:disabled) {
   transform: translateY(3px);
-  box-shadow: 0 1px 0 var(--border);
+  box-shadow: 0 1px 0 var(--edge);
 }
 
 .option:disabled {
@@ -335,8 +440,8 @@ button,
 }
 
 .option.is-wrong {
-  border-color: #d64545;
-  background: color-mix(in srgb, #d64545 12%, var(--surface));
+  border-color: var(--wrong);
+  background: color-mix(in srgb, var(--wrong) 12%, var(--surface));
 }
 
 .option.is-dimmed {
@@ -413,7 +518,7 @@ button,
   color: var(--text);
   background: var(--surface);
   border: 3px solid var(--primary);
-  border-radius: 999px;
+  border-radius: var(--pill);
 }
 
 .feedback {
@@ -475,14 +580,14 @@ button,
   flex: 1;
   height: 22px;
   background: var(--border);
-  border-radius: 999px;
+  border-radius: var(--pill);
   overflow: hidden;
 }
 
 .boss-life span {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, #e2483d, #f5a623);
+  background: var(--boss-life);
   transition: width 0.4s ease;
 }
 

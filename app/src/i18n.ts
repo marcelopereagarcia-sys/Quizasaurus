@@ -57,6 +57,8 @@ const es = {
   finish: "🏠 Terminar",
   exitGame: "✕ Salir",
   close: "Cerrar",
+  skinTitle: "Elige tu mundo",
+  skinNames: { dinos: "Dinosaurios", blocks: "Mundo de bloques" },
 };
 
 export type Dict = typeof es;
@@ -111,6 +113,8 @@ const ca: Dict = {
   finish: "🏠 Acabar",
   exitGame: "✕ Sortir",
   close: "Tancar",
+  skinTitle: "Tria el teu món",
+  skinNames: { dinos: "Dinosaures", blocks: "Món de blocs" },
 };
 
 const en: Dict = {
@@ -163,6 +167,8 @@ const en: Dict = {
   finish: "🏠 Finish",
   exitGame: "✕ Exit",
   close: "Close",
+  skinTitle: "Pick your world",
+  skinNames: { dinos: "Dinosaurs", blocks: "Block world" },
 };
 
 export const UI_LANGS = { ca, es, en } as const;
