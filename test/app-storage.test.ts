@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { UI_LANGS, defaultUiLang } from "../app/src/i18n.js";
+import { loadSettings, saveSettings } from "../app/src/settings.js";
 import { loadPacks, removePack, resetMemory, savePack } from "../app/src/storage.js";
 import type { Pack } from "../src/pack/schema.js";
 
@@ -68,5 +69,28 @@ describe("interface language", () => {
     const keys = (dict: object) => Object.keys(dict).sort();
     expect(Object.keys(UI_LANGS)).toEqual(["ca", "es", "en"]);
     for (const dict of Object.values(UI_LANGS)) expect(keys(dict)).toEqual(keys(UI_LANGS.es));
+  });
+});
+
+describe("family settings", () => {
+  it("keeps the boss threshold, with 70 % by default and invalid values ignored", () => {
+    const storage = memoryStorage();
+    vi.stubGlobal("localStorage", storage);
+    expect(loadSettings().bossThreshold).toBe(0.7);
+    saveSettings({ bossThreshold: 0.9 });
+    expect(loadSettings().bossThreshold).toBe(0.9);
+    storage.setItem("quizasaurus.settings.v1", JSON.stringify({ bossThreshold: 3 }));
+    expect(loadSettings().bossThreshold).toBe(0.7);
+    storage.setItem("quizasaurus.settings.v1", JSON.stringify({ bossThreshold: 0.55 }));
+    expect(loadSettings().bossThreshold).toBe(0.7);
+  });
+
+  it("survives corrupt settings instead of breaking the app at start", () => {
+    const storage = memoryStorage();
+    vi.stubGlobal("localStorage", storage);
+    for (const raw of ["null", "42", '"text"', "{broken", "[]"]) {
+      storage.setItem("quizasaurus.settings.v1", raw);
+      expect(loadSettings().bossThreshold).toBe(0.7);
+    }
   });
 });

@@ -3,6 +3,8 @@ import examplePack from "../../examples/ciclo-del-agua.pack.json";
 import type { Pack } from "../../src/pack/schema.js";
 import { validatePack, validatePackJson } from "../../src/pack/validate.js";
 import { UI_LANGS, UI_LANG_NAMES, type UiLang, defaultUiLang, isUiLang } from "./i18n.js";
+import { GameRunner } from "./game/GameRunner.js";
+import { loadSettings } from "./settings.js";
 import { loadPacks, removePack, safeStorage, savePack } from "./storage.js";
 
 const LANG_KEY = "quizasaurus.uiLang";
@@ -21,7 +23,7 @@ const GAME_ICONS: Record<Pack["games"][number]["type"], string> = {
   boss: "🦖",
 };
 
-type Screen = { name: "home" } | { name: "pack"; id: string };
+type Screen = { name: "home" } | { name: "pack"; id: string } | { name: "play"; id: string; game: number };
 
 export function App() {
   const [lang, setLang] = useState<UiLang>(() => {
@@ -32,6 +34,7 @@ export function App() {
   const [packs, setPacks] = useState<Pack[]>(() => loadPacks());
   const [screen, setScreen] = useState<Screen>({ name: "home" });
   const [notice, setNotice] = useState<string>();
+  const [settings] = useState(() => loadSettings());
 
   const allPacks = useMemo(() => [...BUILT_IN.filter((b) => !packs.some((p) => p.id === b.id)), ...packs], [packs]);
 
@@ -68,7 +71,8 @@ export function App() {
     setScreen({ name: "home" });
   }
 
-  const current = screen.name === "pack" ? allPacks.find((p) => p.id === screen.id) : undefined;
+  const current = screen.name !== "home" ? allPacks.find((p) => p.id === screen.id) : undefined;
+  const playable = current?.review.status === "approved";
 
   return (
     <div class="app">
@@ -92,7 +96,20 @@ export function App() {
         </p>
       )}
 
-      {current ? (
+      {current && screen.name === "play" && playable ? (
+        <main class="screen">
+          <GameRunner
+            key={`${current.id}-${screen.game}`}
+            game={current.games[screen.game]!}
+            t={t}
+            bossThreshold={settings.bossThreshold}
+            hasNext={screen.game + 1 < current.games.length}
+            onFinish={() => undefined}
+            onNext={() => setScreen({ name: "play", id: current.id, game: screen.game + 1 })}
+            onExit={() => setScreen({ name: "pack", id: current.id })}
+          />
+        </main>
+      ) : current ? (
         <main class="screen">
           <button class="link" onClick={() => setScreen({ name: "home" })}>
             {t.back}
@@ -103,20 +120,23 @@ export function App() {
           </p>
           {current.review.status === "draft" && <p class="warning">{t.needsReview}</p>}
           <ol class="games">
-            {current.games.map((game) => (
-              <li class={`game game-${game.type}`}>
-                <span class="game-icon" aria-hidden="true">
-                  {GAME_ICONS[game.type]}
-                </span>
-                <span>
-                  <strong>{game.title}</strong>
-                  <small>{t.gameNames[game.type]}</small>
-                </span>
+            {current.games.map((game, i) => (
+              <li>
+                <button class={`game game-${game.type}`} disabled={!playable} onClick={() => setScreen({ name: "play", id: current.id, game: i })}>
+                  <span class="game-icon" aria-hidden="true">
+                    {GAME_ICONS[game.type]}
+                  </span>
+                  <span>
+                    <strong>{game.title}</strong>
+                    {/* The template name, unless the pack already titled the game with it. */}
+                    {game.title !== t.gameNames[game.type] && <small>{t.gameNames[game.type]}</small>}
+                  </span>
+                </button>
               </li>
             ))}
           </ol>
           <div class="actions">
-            <button class="primary" disabled={current.review.status !== "approved"}>
+            <button class="primary" disabled={!playable} onClick={() => setScreen({ name: "play", id: current.id, game: 0 })}>
               {t.play}
             </button>
             {!BUILT_IN.some((b) => b.id === current.id) && (
