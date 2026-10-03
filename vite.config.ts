@@ -14,18 +14,19 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       injectRegister: false,
-      includeAssets: ["icons/*.png", "logo.png"],
+      // globPatterns below already precaches the icons and the logo.
+      includeManifestIcons: false,
       manifest: {
         name: "Quizasaurus",
         short_name: "Quizasaurus",
         description: "Study games made from your own school unit. Works offline.",
-        lang: "ca",
+        lang: "en",
         start_url: "./",
         scope: "./",
         display: "standalone",
         orientation: "any",
         background_color: "#f4f1e8",
-        theme_color: "#2f7d4f",
+        theme_color: "#2a7047",
         icons: [
           { src: "icons/icon-192.png", sizes: "192x192", type: "image/png" },
           { src: "icons/icon-512.png", sizes: "512x512", type: "image/png" },

@@ -4,9 +4,9 @@
   --surface: #ffffff;
   --text: #1f2a24;
   --muted: #5b6b62;
-  --primary: #2f7d4f;
+  --primary: #2a7047; /* 5.3:1 on --bg; white text on it 6:1 */
   --primary-text: #ffffff;
-  --ok: #2f7d4f;
+  --ok: #2a7047;
   --pending: #8f4e12; /* 5.7:1 on --bg, AA for small text */
   --border: #d9d3c3;
   --radius: 16px;
@@ -70,11 +70,23 @@ body {
 }
 
 .notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 12px 16px;
-  cursor: pointer;
+  padding: 4px 4px 4px 16px;
+}
+
+.notice p {
+  margin: 0;
+}
+
+.notice .link {
+  min-width: 44px;
+  color: var(--text);
 }
 
 .warning {
@@ -205,6 +217,13 @@ button,
   width: 1px;
   height: 1px;
   opacity: 0;
+}
+
+/* The default ring is hard to see on green buttons; the file input is hidden, so its label shows it. */
+:focus-visible,
+.file:focus-within {
+  outline: 3px solid var(--text);
+  outline-offset: 2px;
 }
 
 /* ---------- Game screen ---------- */

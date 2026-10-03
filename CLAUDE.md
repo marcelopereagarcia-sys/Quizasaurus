@@ -42,5 +42,5 @@ Híbrido según el certificado Google Project Management:
 
 ## Git
 
-- Commits solo cuando el PM lo pide. Nunca reescribir el historial publicado.
+- Commits solo cuando el PM lo pide.
 - Antes de un push, comprobar que no se suben secretos, PDF ni datos personales.

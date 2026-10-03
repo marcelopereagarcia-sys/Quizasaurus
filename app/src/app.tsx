@@ -91,9 +91,12 @@ export function App() {
       </header>
 
       {notice && (
-        <p class="notice" role="status" onClick={() => setNotice(undefined)}>
-          {notice}
-        </p>
+        <div class="notice" role="status">
+          <p>{notice}</p>
+          <button class="link" aria-label={t.close} onClick={() => setNotice(undefined)}>
+            ✕
+          </button>
+        </div>
       )}
 
       {current && screen.name === "play" && playable ? (

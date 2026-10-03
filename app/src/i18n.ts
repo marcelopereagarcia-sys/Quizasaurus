@@ -13,7 +13,7 @@ const es = {
   noPacks: "Todavía no hay ninguna unidad. Carga un pack para empezar.",
   loadPack: "📂 Cargar un pack (.json)",
   loadError: (count: number) => `Este archivo no es un pack válido (${count} ${count === 1 ? "problema" : "problemas"}).`,
-  loaded: (title: string) => `«${title}» está lista.`,
+  loaded: (title: string) => `La unidad «${title}» está lista.`,
   notSaved: "No se ha podido guardar en este dispositivo: se perderá al cerrar.",
   draft: "Pendiente de revisión",
   approved: "Revisada",
@@ -56,6 +56,7 @@ const es = {
   nextGame: "▶ Siguiente juego",
   finish: "🏠 Terminar",
   exitGame: "✕ Salir",
+  close: "Cerrar",
 };
 
 export type Dict = typeof es;
@@ -109,6 +110,7 @@ const ca: Dict = {
   nextGame: "▶ Següent joc",
   finish: "🏠 Acabar",
   exitGame: "✕ Sortir",
+  close: "Tancar",
 };
 
 const en: Dict = {
@@ -160,6 +162,7 @@ const en: Dict = {
   nextGame: "▶ Next game",
   finish: "🏠 Finish",
   exitGame: "✕ Exit",
+  close: "Close",
 };
 
 export const UI_LANGS = { ca, es, en } as const;
