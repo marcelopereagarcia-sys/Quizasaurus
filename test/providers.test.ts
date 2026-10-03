@@ -8,7 +8,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { anthropicProvider } from "../src/ai/anthropic.js";
 import { DEFAULT_OLLAMA_VISION_MODEL, providerFromEnv } from "../src/ai/config.js";
 import { geminiProvider } from "../src/ai/gemini.js";
-import { ollamaProvider } from "../src/ai/ollama.js";
+import { contextSize, ollamaProvider } from "../src/ai/ollama.js";
 import { openaiProvider } from "../src/ai/openai.js";
 import { type AIProvider, ProviderConfigError, fetchWithRetry, imageMediaType } from "../src/ai/provider.js";
 import { pageImage } from "./fixtures.js";
@@ -93,6 +93,19 @@ describe("Ollama", () => {
       options: { num_predict: 500, temperature: 0 },
       messages: [{ role: "system", content: "Be brief." }, { role: "user", content: "Hola", images: [expect.any(String)] }],
     });
+  });
+
+  it("reads a streamed answer and sizes the context to the request", async () => {
+    const lines = [
+      { message: { content: '{"o' } },
+      { message: { content: 'k": true}' } },
+      { message: { content: "" }, done: true, prompt_eval_count: 7, eval_count: 3 },
+    ];
+    const calls = fakeFetch(200, lines.map((l) => JSON.stringify(l)).join("\n") + "\n");
+    const result = await ollamaProvider({ model: "m" }).complete({ prompt: "x".repeat(30_000), maxTokens: 16_000 });
+    expect(result).toMatchObject({ text: '{"ok": true}', usage: { inputTokens: 7, outputTokens: 3 } });
+    expect(calls[0]?.body).toMatchObject({ stream: true, options: { num_ctx: 26_624 } });
+    expect(contextSize({ prompt: "hi", maxTokens: 200 })).toBe(8_192);
   });
 
   it("explains a missing model and an unreachable server", async () => {

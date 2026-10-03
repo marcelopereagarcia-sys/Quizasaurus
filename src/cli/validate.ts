@@ -26,4 +26,4 @@ for (const file of files) {
     for (const issue of result.issues) console.error(`  • ${issue.path}: ${issue.message}`);
   }
 }
-process.exit(failed > 0 ? 1 : 0);
+process.exitCode = failed > 0 ? 1 : 0;

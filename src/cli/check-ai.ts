@@ -46,4 +46,4 @@ for (const role of ["text", "vision"] as ProviderRole[]) {
     console.error(`✘ ${role}: ${prefix}: ${(error as Error).message}`);
   }
 }
-process.exit(failed ? 1 : 0);
+process.exitCode = failed ? 1 : 0;

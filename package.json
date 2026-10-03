@@ -20,7 +20,8 @@
     "typecheck": "tsc --noEmit",
     "validate": "tsx src/cli/validate.ts",
     "extract": "tsx src/cli/extract.ts",
-    "check-ai": "tsx src/cli/check-ai.ts"
+    "check-ai": "tsx src/cli/check-ai.ts",
+    "generate": "tsx src/cli/generate.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.131.0",

@@ -13,14 +13,35 @@ export const DEFAULT_OLLAMA_HOST = "http://localhost:11434";
 export interface OllamaOptions {
   host?: string | undefined;
   model: string;
-  /** Per request. The first request also loads the model, which can take ~40 s. */
+  /** Whole request. Local packs on a modest GPU can take many minutes. */
   timeoutMs?: number;
+}
+
+/** Ollama's default context (4096 tokens) cuts off a pack; size it to the request instead. */
+const MIN_CONTEXT = 8_192;
+const MAX_CONTEXT = 65_536;
+/** Rough cost of one image in a vision model's context. */
+const TOKENS_PER_IMAGE = 1_500;
+
+export function contextSize(request: CompletionRequest): number {
+  const promptTokens = Math.ceil(((request.system?.length ?? 0) + request.prompt.length) / 3);
+  const needed = promptTokens + (request.images?.length ?? 0) * TOKENS_PER_IMAGE + (request.maxTokens ?? DEFAULT_MAX_TOKENS);
+  return Math.min(MAX_CONTEXT, Math.max(MIN_CONTEXT, Math.ceil(needed / 2_048) * 2_048));
+}
+
+interface OllamaChunk {
+  message?: { content?: string };
+  done?: boolean;
+  done_reason?: string;
+  prompt_eval_count?: number;
+  eval_count?: number;
+  error?: string;
 }
 
 export function ollamaProvider(options: OllamaOptions): AIProvider {
   const host = (options.host || DEFAULT_OLLAMA_HOST).replace(/\/+$/, "");
   const { model } = options;
-  const timeoutMs = options.timeoutMs ?? 300_000;
+  const timeoutMs = options.timeoutMs ?? 30 * 60_000;
 
   return {
     id: "ollama",
@@ -40,10 +61,12 @@ export function ollamaProvider(options: OllamaOptions): AIProvider {
           signal: AbortSignal.timeout(timeoutMs),
           body: JSON.stringify({
             model,
-            stream: false,
+            // Streaming: long local generations would otherwise hit fetch's 5-minute header timeout.
+            stream: true,
             messages,
             ...(request.json ? { format: "json" } : {}),
             options: {
+              num_ctx: contextSize(request),
               num_predict: request.maxTokens ?? DEFAULT_MAX_TOKENS,
               ...(request.temperature !== undefined ? { temperature: request.temperature } : {}),
             },
@@ -58,14 +81,33 @@ export function ollamaProvider(options: OllamaOptions): AIProvider {
       if (res.status === 404) {
         throw new ProviderConfigError(`The Ollama model "${model}" is not installed. Run: ollama pull ${model}`);
       }
-      if (!res.ok) throw new Error(`Ollama answered ${res.status}: ${await res.text()}`);
+      if (!res.ok || !res.body) throw new Error(`Ollama answered ${res.status}: ${await res.text()}`);
 
-      const json = (await res.json()) as { message?: { content?: string }; prompt_eval_count?: number; eval_count?: number };
+      // Newline-delimited JSON: one chunk per line, the last one with the token counts.
+      let text = "";
+      let last: OllamaChunk = {};
+      let buffer = "";
+      const decoder = new TextDecoder();
+      const handle = (line: string) => {
+        if (!line.trim()) return;
+        const chunk = JSON.parse(line) as OllamaChunk;
+        if (chunk.error) throw new Error(`Ollama: ${chunk.error}`);
+        text += chunk.message?.content ?? "";
+        last = chunk;
+      };
+      for await (const part of res.body) {
+        buffer += decoder.decode(part, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+        lines.forEach(handle);
+      }
+      handle(buffer + decoder.decode());
+
       return {
-        text: json.message?.content ?? "",
+        text,
         usage:
-          json.prompt_eval_count !== undefined && json.eval_count !== undefined
-            ? { inputTokens: json.prompt_eval_count, outputTokens: json.eval_count }
+          last.prompt_eval_count !== undefined && last.eval_count !== undefined
+            ? { inputTokens: last.prompt_eval_count, outputTokens: last.eval_count }
             : undefined,
         seconds: elapsedSeconds(started),
       };
