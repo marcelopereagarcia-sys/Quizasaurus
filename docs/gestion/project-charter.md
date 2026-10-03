@@ -1,6 +1,6 @@
 # Project Charter — Quizasaurus
 
-Versión 1.3 · aprobada el 3 de octubre de 2026 · Marcelo Perea García
+Versión 1.4 · aprobada el 3 de octubre de 2026 · Marcelo Perea García
 
 > Copia exportada del charter aprobado. El original vive en Claude Docs; cualquier cambio de alcance, fechas o presupuesto pasa por el registro de cambios del final.
 
@@ -45,7 +45,7 @@ La versión 1.0 cubre el ciclo completo de una familia: subir una unidad, revisa
 - Pantalla de revisión del pack para el adulto, con la frase del libro de la que sale cada pregunta.
 - Reproductor PWA offline con 5 plantillas: clasificar, ordenar, situación con opciones, deslizar sí/no y jefe final.
 - Identidad visual del prototipo (mundo de bloques con dinos) con 2 skins de color, y 3 idiomas de interfaz (catalán, castellano e inglés; cambio v1.2). Dentro de una unidad, la interfaz va en el idioma del pack (cambio v1.3).
-- Progreso guardado en el dispositivo y panel para la familia con los temas a repasar.
+- Progreso guardado en el dispositivo (diamantes, estrellas, huevos y colección de dinos, modo infinito) y panel para la familia con los temas a repasar. Varios mundos por unidad, como mejora abierta a la comunidad (cambio v1.4).
 - Prueba informal con 2 familias amigas y documentación de gestión del proyecto en el repositorio.
 
 **Fuera del alcance (v1.0)**
@@ -198,6 +198,7 @@ El charter entra en vigor cuando el sponsor lo aprueba; desde ese momento, cualq
 
 | Versión | Fecha | Cambio |
 | --- | --- | --- |
+| 1.4 | 03-oct-2026 | Cambio de alcance aprobado por el sponsor: las «varias sesiones con contenido distinto» por unidad (los 3 mundos del prototipo) salen del MVP y quedan como mejora abierta a la comunidad, porque exigen que el generador cree el triple de preguntas y cambiar el formato del pack. El modo infinito, que mezcla toda la unidad en cada ronda, cubre la rejugabilidad |
 | 1.3 | 03-oct-2026 | Cambio de alcance aprobado por el sponsor tras probar la app: (1) dentro de una unidad y sus juegos, la interfaz va en el idioma del pack, para no mezclar idiomas en pantalla; el selector de idioma solo afecta a la pantalla de inicio; (2) el reproductor recupera la identidad visual del prototipo (bloques y dinos, letra pixelada y Lexend) y las 2 skins pasan a ser variaciones de color de esa identidad |
 | 1.2 | 03-oct-2026 | Cambio de alcance aprobado por el sponsor: la interfaz pasa de 2 a 3 idiomas (catalán, castellano e inglés), porque el repositorio está en inglés. Más idiomas, solo como contribuciones |
 | 1.1 | 03-oct-2026 | Cambio de alcance aprobado por el sponsor: O5 pasa de 3 publicaciones en LinkedIn a 1 publicación final, en el cierre. Se descarta la de arranque (QZS-10) |

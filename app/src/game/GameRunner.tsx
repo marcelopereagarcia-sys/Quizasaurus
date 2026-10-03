@@ -1,15 +1,19 @@
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 import type { Game } from "../../../src/pack/schema.js";
 import type { Dict } from "../i18n.js";
-import { type Answer, DEFAULT_BOSS_THRESHOLD, type Step, bossBeaten, isCorrect, rightAnswerLabel, stars, stepsFor } from "./steps.js";
+import { DINOS, type Reward, dinoHue } from "../progress.js";
+import { type Answer, DEFAULT_BOSS_THRESHOLD, type Step, bossBeaten, isCorrect, rightAnswerLabel } from "./steps.js";
 
 export interface AnswerRecord {
   topic: string;
   correct: boolean;
 }
 
+/** A game of the pack, or the infinite mode that mixes them all. */
+export type GameKind = Game["type"] | "mix";
+
 export interface GameResult {
-  type: Game["type"];
+  kind: GameKind;
   correct: number;
   total: number;
   answers: AnswerRecord[];
@@ -17,11 +21,17 @@ export interface GameResult {
 }
 
 interface Props {
-  game: Game;
+  kind: GameKind;
+  title: string;
+  /** The questions of one round; called again for each new round. */
+  makeSteps: () => Step[];
+  /** Diamonds before this round. */
+  gems: number;
   t: Dict;
   bossThreshold?: number;
   hasNext: boolean;
-  onFinish: (result: GameResult) => void;
+  /** Saves the result and says what it earned. */
+  onFinish: (result: GameResult) => Reward;
   onNext: () => void;
   onExit: () => void;
 }
@@ -31,21 +41,22 @@ type Phase = { name: "ask" } | { name: "feedback"; ok: boolean } | { name: "done
 /** How long a right answer is celebrated before moving on. */
 const PRAISE_MS = 1100;
 
-export function GameRunner({ game, t, bossThreshold = DEFAULT_BOSS_THRESHOLD, hasNext, onFinish, onNext, onExit }: Props) {
+export function GameRunner({ kind, title, makeSteps, gems, t, bossThreshold = DEFAULT_BOSS_THRESHOLD, hasNext, onFinish, onNext, onExit }: Props) {
   const [round, setRound] = useState(0);
   // A new shuffle every time the game is (re)started.
-  const steps = useMemo(() => stepsFor(game), [game, round]);
+  const steps = useMemo(makeSteps, [round]);
   const [index, setIndex] = useState(0);
   const [phase, setPhase] = useState<Phase>({ name: "ask" });
   const [answers, setAnswers] = useState<AnswerRecord[]>([]);
   const [praise, setPraise] = useState(0);
   const [chosen, setChosen] = useState<Answer | undefined>(undefined);
+  const [reward, setReward] = useState<Reward | undefined>(undefined);
   const feedbackRef = useRef<HTMLDivElement>(null);
   const nextRef = useRef<HTMLButtonElement>(null);
 
   const step = steps[index];
   const correct = answers.filter((a) => a.correct).length;
-  const isBoss = game.type === "boss";
+  const isBoss = kind === "boss";
   const needed = Math.ceil(steps.length * bossThreshold);
 
   function answer(value: Answer) {
@@ -63,6 +74,8 @@ export function GameRunner({ game, t, bossThreshold = DEFAULT_BOSS_THRESHOLD, ha
       setChosen(undefined);
       setPhase({ name: "ask" });
     } else {
+      const won = !isBoss || bossBeaten(correct, steps.length, bossThreshold);
+      setReward(onFinish({ kind, correct, total: steps.length, answers, won }));
       setPhase({ name: "done" });
     }
   }
@@ -78,9 +91,6 @@ export function GameRunner({ game, t, bossThreshold = DEFAULT_BOSS_THRESHOLD, ha
       feedbackRef.current?.scrollIntoView({ block: "nearest" });
       nextRef.current?.focus({ preventScroll: true });
     }
-    if (phase.name === "done") {
-      onFinish({ type: game.type, correct, total: steps.length, answers, won: !isBoss || bossBeaten(correct, steps.length, bossThreshold) });
-    }
     return undefined;
   }, [phase]);
 
@@ -89,22 +99,31 @@ export function GameRunner({ game, t, bossThreshold = DEFAULT_BOSS_THRESHOLD, ha
     setIndex(0);
     setAnswers([]);
     setChosen(undefined);
+    setReward(undefined);
     setPhase({ name: "ask" });
   }
 
-  if (phase.name === "done") {
+  if (phase.name === "done" && reward) {
     const won = !isBoss || bossBeaten(correct, steps.length, bossThreshold);
-    // Losing to the boss never shows more than one star, whatever the threshold.
-    const starCount = won ? stars(correct, steps.length) : Math.min(stars(correct, steps.length), 1);
     return (
       <section class="results panel" aria-live="polite">
         <h2>{t.results}</h2>
-        <p class="stars" role="img" aria-label={t.starsLabel(starCount)}>
-          {"⭐".repeat(starCount)}
-          <span class="stars-empty">{"☆".repeat(3 - starCount)}</span>
+        <p class="stars" role="img" aria-label={t.starsLabel(reward.stars)}>
+          {"★".repeat(reward.stars)}
+          <span class="stars-empty">{"★".repeat(3 - reward.stars)}</span>
         </p>
-        <p class="score">{t.score(correct, steps.length)}</p>
+        <p class="score">
+          {t.score(correct, steps.length)} · <span class="gems-won">{t.gemsWon(reward.gems)}</span>
+        </p>
         {isBoss && <p class={won ? "boss-win" : "boss-lose"}>{won ? t.bossWin : t.bossLose(needed)}</p>}
+        {reward.dino !== undefined && (
+          <div class="hatch">
+            <span class="hatch-dino" style={{ filter: dinoHue(reward.dino) }} aria-hidden="true">
+              {DINOS[reward.dino]}
+            </span>
+            <strong>{t.hatched(t.dinoNames[reward.dino]!)}</strong>
+          </div>
+        )}
         <div class="actions">
           {hasNext && won && (
             <button class="btn prime" onClick={onNext}>
@@ -125,15 +144,18 @@ export function GameRunner({ game, t, bossThreshold = DEFAULT_BOSS_THRESHOLD, ha
   if (!step) return null;
 
   return (
-    <section class={`game-screen game-${game.type}`}>
+    <section class={`game-screen game-${kind}`}>
       <div class="hud">
         <button class="btn small" onClick={onExit}>
           {t.exitGame}
         </button>
         <div class="ht">
-          <h2>{game.title}</h2>
-          {game.title !== t.gameNames[game.type] && <span>{t.gameNames[game.type]}</span>}
+          <h2>{title}</h2>
+          {kind === "mix" ? <span>{t.infiniteHint}</span> : title !== t.gameNames[kind] && <span>{t.gameNames[kind]}</span>}
         </div>
+        <span class="pill" aria-label={t.gemsPill(gems + correct)}>
+          💎 {gems + correct}
+        </span>
       </div>
       {/* One block per question: right, wrong, the current one, and those to come. */}
       <div class="prog" role="progressbar" aria-label={t.questionOf(index + 1, steps.length)} aria-valuemin={1} aria-valuemax={steps.length} aria-valuenow={index + 1}>

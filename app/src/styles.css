@@ -477,6 +477,35 @@ button {
   --wb: var(--c4);
 }
 
+.lvl.t-mix {
+  --wb: var(--c3);
+}
+
+/* Footer of a level card: best stars and the egg, or the dinosaur that hatched. */
+.lvl .lf {
+  grid-column: 1 / 3;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 2px dashed rgb(29 42 47 / 0.25);
+}
+
+.lvl .lf .stars {
+  font-size: 1.2rem;
+  letter-spacing: 2px;
+}
+
+.lvl .egg {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.lvl.t-boss .lf {
+  border-color: rgb(255 243 220 / 0.3);
+}
+
 .lvl.t-boss {
   color: var(--night-fg);
   background: var(--night);
@@ -489,6 +518,144 @@ button {
 .lvl.t-boss .step-n,
 .lvl.t-boss .ls {
   color: var(--night-muted);
+}
+
+/* ---------- Dino collection ---------- */
+
+.collection {
+  padding: 16px;
+}
+
+.collection .sec-h p {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.dinos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+}
+
+@media (max-width: 600px) {
+  .dinos {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.dslot {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 2px;
+  background: var(--card);
+  border: 2px solid var(--line);
+  border-radius: 6px;
+}
+
+.dslot .de {
+  font-size: 1.7rem;
+  line-height: 1.1;
+}
+
+.dslot .dn {
+  font-size: 0.68rem;
+  line-height: 1.1;
+  text-align: center;
+  overflow-wrap: anywhere;
+  color: var(--muted);
+}
+
+.dslot.locked .de {
+  filter: grayscale(1);
+  opacity: 0.5;
+}
+
+/* ---------- Family corner ---------- */
+
+.parents summary {
+  display: flex;
+  justify-content: space-between;
+  min-height: var(--tap);
+  align-items: center;
+  padding: 0 16px;
+  font: 700 1.15rem var(--f-display);
+  list-style: none;
+  cursor: pointer;
+}
+
+.parents summary::-webkit-details-marker {
+  display: none;
+}
+
+.parents summary::after {
+  content: "+";
+}
+
+.parents[open] summary::after {
+  content: "−";
+}
+
+.pbody {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 0 16px 16px;
+  font-size: 0.95rem;
+}
+
+.pbody h3 {
+  font-size: 1.05rem;
+}
+
+.topics {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.topic {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 100px auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.bar {
+  height: 14px;
+  background: rgb(29 42 47 / 0.12);
+  border: 2px solid var(--line);
+}
+
+.bar i {
+  display: block;
+  height: 100%;
+  background: var(--ok);
+}
+
+.topic .tn {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.row select {
+  font: 600 1rem var(--f-body);
 }
 
 /* ---------- Game: heads-up bar, progress and stage ---------- */
@@ -515,6 +682,10 @@ button {
 .hud h2 {
   font-size: 1.3rem;
   line-height: 1.15;
+}
+
+.hud .pill {
+  flex: none;
 }
 
 .hud .ht span {
@@ -915,6 +1086,44 @@ button {
 .boss-lose {
   font-weight: 600;
   color: var(--bad);
+}
+
+.gems-won {
+  white-space: nowrap;
+}
+
+/* A dinosaur out of its egg. */
+.hatch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 20px;
+  background: var(--card);
+  border: 3px solid var(--line);
+  border-radius: 8px;
+}
+
+.hatch-dino {
+  font-size: 4rem;
+  line-height: 1;
+  animation: hatch 0.8s ease-out;
+}
+
+.hatch strong {
+  font: 700 1.2rem var(--f-display);
+}
+
+@keyframes hatch {
+  0% {
+    transform: scale(0.2) rotate(-20deg);
+  }
+  70% {
+    transform: scale(1.2) rotate(8deg);
+  }
+  100% {
+    transform: none;
+  }
 }
 
 .results .actions {

@@ -142,6 +142,17 @@ export function stepsFor(game: Game, random: Random = Math.random): Step[] {
   }
 }
 
+/** Questions per round of the infinite mode. */
+export const MIX_SIZE = 10;
+
+/** The infinite mode: questions from every game of the unit, mixed up; a new mix each round. */
+export function mixedSteps(games: readonly Game[], count = MIX_SIZE, random: Random = Math.random): Step[] {
+  return shuffle(
+    games.flatMap((g) => stepsFor(g, random)),
+    random,
+  ).slice(0, count);
+}
+
 /** The answer the child gave: an option id, an order of ids, or yes/no. */
 export type Answer = string | string[] | boolean;
 

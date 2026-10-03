@@ -3,8 +3,10 @@ import examplePack from "../../examples/ciclo-del-agua.pack.json";
 import type { Pack } from "../../src/pack/schema.js";
 import { validatePack, validatePackJson } from "../../src/pack/validate.js";
 import { type Dict, UI_LANGS, UI_LANG_NAMES, type UiLang, defaultUiLang, isUiLang, packUiLang } from "./i18n.js";
-import { GameRunner } from "./game/GameRunner.js";
-import { loadSettings } from "./settings.js";
+import { type GameResult, GameRunner } from "./game/GameRunner.js";
+import { mixedSteps, stepsFor } from "./game/steps.js";
+import { DINOS, type Progress, dinoHue, dinoOf, emptyProgress, levelKey, loadProgress, recordGame, saveProgress } from "./progress.js";
+import { BOSS_THRESHOLD_CHOICES, loadSettings, saveSettings } from "./settings.js";
 import { SKINS, SKIN_EMOJI, type Skin, applySkin, loadSkin, saveSkin } from "./skins.js";
 import { loadPacks, removePack, safeStorage, savePack } from "./storage.js";
 
@@ -24,7 +26,8 @@ const GAME_ICONS: Record<Pack["games"][number]["type"], string> = {
   boss: "🦖",
 };
 
-type Screen = { name: "home" } | { name: "pack"; id: string } | { name: "play"; id: string; game: number };
+/** `game` is the game's index in the pack, or the infinite mode. */
+type Screen = { name: "home" } | { name: "pack"; id: string } | { name: "play"; id: string; game: number | "mix" };
 
 export function App() {
   const [lang, setLang] = useState<UiLang>(() => {
@@ -35,7 +38,8 @@ export function App() {
   const [packs, setPacks] = useState<Pack[]>(() => loadPacks());
   const [screen, setScreen] = useState<Screen>({ name: "home" });
   const [notice, setNotice] = useState<string>();
-  const [settings] = useState(() => loadSettings());
+  const [settings, setSettings] = useState(() => loadSettings());
+  const [progress, setProgress] = useState<Progress>(() => loadProgress());
   // Applied before the first paint, so the page never flashes the other skin.
   const [skin, setSkin] = useState<Skin>(() => {
     const saved = loadSkin();
@@ -83,6 +87,32 @@ export function App() {
     setScreen({ name: "home" });
   }
 
+  function onFinish(packId: string, game: number | "mix", result: GameResult) {
+    const recorded = recordGame(progress, {
+      packId,
+      game: game === "mix" ? undefined : game,
+      correct: result.correct,
+      total: result.total,
+      passed: result.won,
+      answers: result.answers,
+    });
+    setProgress(recorded.progress);
+    saveProgress(recorded.progress);
+    return recorded.reward;
+  }
+
+  function onBossThreshold(value: number) {
+    const next = { ...settings, bossThreshold: value };
+    setSettings(next);
+    saveSettings(next);
+  }
+
+  function onResetProgress(question: string) {
+    if (!confirm(question)) return;
+    setProgress(emptyProgress());
+    saveProgress(emptyProgress());
+  }
+
   const current = screen.name !== "home" ? allPacks.find((p) => p.id === screen.id) : undefined;
   const playable = current?.review.status === "approved";
   // Inside a unit everything speaks the pack's language (charter v1.3).
@@ -106,16 +136,34 @@ export function App() {
 
       {current && screen.name === "play" && playable ? (
         <main class="screen">
-          <GameRunner
-            key={`${current.id}-${screen.game}`}
-            game={current.games[screen.game]!}
-            t={ui}
-            bossThreshold={settings.bossThreshold}
-            hasNext={screen.game + 1 < current.games.length}
-            onFinish={() => undefined}
-            onNext={() => setScreen({ name: "play", id: current.id, game: screen.game + 1 })}
-            onExit={() => setScreen({ name: "pack", id: current.id })}
-          />
+          {screen.game === "mix" ? (
+            <GameRunner
+              key={`${current.id}-mix`}
+              kind="mix"
+              title={ui.infinite}
+              makeSteps={() => mixedSteps(current.games)}
+              gems={progress.gems}
+              t={ui}
+              hasNext={false}
+              onFinish={(result) => onFinish(current.id, "mix", result)}
+              onNext={() => undefined}
+              onExit={() => setScreen({ name: "pack", id: current.id })}
+            />
+          ) : (
+            <GameRunner
+              key={`${current.id}-${screen.game}`}
+              kind={current.games[screen.game]!.type}
+              title={current.games[screen.game]!.title}
+              makeSteps={() => stepsFor(current.games[screen.game as number]!)}
+              gems={progress.gems}
+              t={ui}
+              bossThreshold={settings.bossThreshold}
+              hasNext={screen.game + 1 < current.games.length}
+              onFinish={(result) => onFinish(current.id, screen.game, result)}
+              onNext={() => setScreen({ name: "play", id: current.id, game: (screen.game as number) + 1 })}
+              onExit={() => setScreen({ name: "pack", id: current.id })}
+            />
+          )}
         </main>
       ) : current ? (
         <main class="screen">
@@ -132,6 +180,7 @@ export function App() {
               <span class="pill">
                 <StatusBadge pack={current} t={ui} />
               </span>
+              <span class="pill">💎 {ui.gemsPill(progress.gems)}</span>
             </div>
           </header>
           {current.review.status === "draft" && <p class="warning panel">{ui.needsReview}</p>}
@@ -146,9 +195,19 @@ export function App() {
                   <strong class="ln">{game.title}</strong>
                   {/* The template name, unless the pack already titled the game with it. */}
                   {game.title !== ui.gameNames[game.type] && <span class="ls">{ui.gameNames[game.type]}</span>}
+                  <LevelFooter progress={progress} levelKey={levelKey(current.id, i)} t={ui} />
                 </button>
               </li>
             ))}
+            <li>
+              <button class="lvl t-mix" disabled={!playable} onClick={() => setScreen({ name: "play", id: current.id, game: "mix" })}>
+                <span class="li" aria-hidden="true">
+                  ♾️
+                </span>
+                <span class="step-n">{ui.infinite}</span>
+                <strong class="ln">{ui.infiniteHint}</strong>
+              </button>
+            </li>
           </ol>
           <div class="actions">
             <button class="btn prime" disabled={!playable} onClick={() => setScreen({ name: "play", id: current.id, game: 0 })}>
@@ -160,6 +219,14 @@ export function App() {
               </button>
             )}
           </div>
+          <FamilyCorner
+            pack={current}
+            scores={progress.topics[current.id] ?? {}}
+            bossThreshold={settings.bossThreshold}
+            t={ui}
+            onBossThreshold={onBossThreshold}
+            onReset={() => onResetProgress(ui.resetConfirm)}
+          />
           <div class="ground" aria-hidden="true" />
         </main>
       ) : (
@@ -178,6 +245,8 @@ export function App() {
                   ))}
                 </select>
               </label>
+              <span class="pill">💎 {t.gemsPill(progress.gems)}</span>
+              <span class="pill">🦖 {t.dinosPill(Math.min(progress.hatched.length, DINOS.length), DINOS.length)}</span>
             </div>
           </header>
 
@@ -225,6 +294,8 @@ export function App() {
             </ul>
           </section>
 
+          <Collection progress={progress} t={t} />
+
           <div>
             <label class="btn prime file">
               {t.loadPack}
@@ -235,6 +306,105 @@ export function App() {
         </main>
       )}
     </div>
+  );
+}
+
+/** Stars and the egg, or the dinosaur that hatched from it. */
+function LevelFooter({ progress, levelKey: key, t }: { progress: Progress; levelKey: string; t: Dict }) {
+  const got = progress.stars[key] ?? 0;
+  const dino = dinoOf(progress, key);
+  return (
+    <span class="lf">
+      <span class="stars" role="img" aria-label={t.starsLabel(got)}>
+        {"★".repeat(got)}
+        <span class="stars-empty">{"★".repeat(3 - got)}</span>
+      </span>
+      {dino === undefined ? (
+        <span class="egg" role="img" aria-label={t.eggHint}>
+          🥚
+        </span>
+      ) : (
+        <span class="egg" role="img" aria-label={t.dinoNames[dino]} style={{ filter: dinoHue(dino) }}>
+          {DINOS[dino]}
+        </span>
+      )}
+    </span>
+  );
+}
+
+function Collection({ progress, t }: { progress: Progress; t: Dict }) {
+  return (
+    <section class="panel collection" aria-labelledby="collection-title">
+      <div class="sec-h">
+        <h2 id="collection-title">{t.collectionTitle}</h2>
+        <p>{t.collectionHint}</p>
+      </div>
+      <ul class="dinos">
+        {DINOS.map((emoji, i) => {
+          const got = i < progress.hatched.length;
+          return (
+            <li class={`dslot ${got ? "" : "locked"}`}>
+              <span class="de" style={got ? { filter: dinoHue(i) } : undefined} aria-hidden="true">
+                {got ? emoji : "🥚"}
+              </span>
+              <span class="dn">{got ? t.dinoNames[i] : "???"}</span>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}
+
+function FamilyCorner(props: {
+  pack: Pack;
+  scores: Record<string, { right: number; wrong: number }>;
+  bossThreshold: number;
+  t: Dict;
+  onBossThreshold: (value: number) => void;
+  onReset: () => void;
+}) {
+  const { pack, scores, bossThreshold, t } = props;
+  const answered = pack.topics.filter((topic) => scores[topic.id]);
+  return (
+    <details class="panel parents">
+      <summary>{t.familyCorner}</summary>
+      <div class="pbody">
+        <h3>{t.topicsTitle}</h3>
+        {answered.length === 0 ? (
+          <p>{t.noAnswersYet}</p>
+        ) : (
+          <ul class="topics">
+            {answered.map((topic) => {
+              const { right, wrong } = scores[topic.id]!;
+              const total = right + wrong;
+              return (
+                <li class="topic">
+                  <span>{topic.name}</span>
+                  <span class="bar" aria-hidden="true">
+                    <i style={{ width: `${(right / total) * 100}%` }} />
+                  </span>
+                  <span class="tn">{t.topicScore(right, total)}</span>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+        <label class="row">
+          {t.bossThresholdLabel}
+          <select class="pill" value={String(bossThreshold)} onChange={(e) => props.onBossThreshold(Number((e.currentTarget as HTMLSelectElement).value))}>
+            {BOSS_THRESHOLD_CHOICES.map((c) => (
+              <option value={String(c)}>{Math.round(c * 100)} %</option>
+            ))}
+          </select>
+        </label>
+        <div>
+          <button class="btn small" onClick={props.onReset}>
+            {t.resetProgress}
+          </button>
+        </div>
+      </div>
+    </details>
   );
 }
 
