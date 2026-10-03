@@ -14,13 +14,16 @@
     "node": ">=22"
   },
   "scripts": {
-    "test": "vitest run --exclude \"test/**/*.ollama.test.ts\"",
+    "test": "vitest run --exclude \"test/**/*.ollama.test.ts\" --exclude \"test/**/*.live.test.ts\"",
     "test:ollama": "vitest run test/extract.ollama.test.ts",
+    "test:live": "vitest run test/providers.live.test.ts",
     "typecheck": "tsc --noEmit",
     "validate": "tsx src/cli/validate.ts",
-    "extract": "tsx src/cli/extract.ts"
+    "extract": "tsx src/cli/extract.ts",
+    "check-ai": "tsx src/cli/check-ai.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.131.0",
     "@napi-rs/canvas": "^1.0.10",
     "unpdf": "^1.8.1",
     "zod": "^4.6.5"

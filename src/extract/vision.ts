@@ -1,9 +1,8 @@
 /**
- * Transcribes a photo or scanned page with a vision model (ADR-0002).
- *
- * Only Ollama is implemented here; QZS-13 adds the cloud providers behind the
- * same interface.
+ * Transcribes a photo or scanned page with a vision model (ADR-0002), through
+ * any configured provider. Local Ollama is the default for privacy.
  */
+import type { AIProvider } from "../ai/provider.js";
 
 export interface VisionTranscriber {
   /** Shown in logs and reports, e.g. "ollama/qwen2.5vl:7b". */
@@ -17,52 +16,20 @@ Transcribe ONLY the printed text, exactly as written, in its original language. 
 Ignore handwriting, pencil marks, ticks, red-ink corrections and drawings. Do not translate, explain or add anything.
 Output plain text only.`;
 
-export const DEFAULT_OLLAMA_HOST = "http://localhost:11434";
-export const DEFAULT_OLLAMA_VISION_MODEL = "qwen2.5vl:7b";
+/** A textbook page is ~300-800 tokens; the cap stops repetition loops early. */
+const MAX_PAGE_TOKENS = 2048;
 
-export interface OllamaVisionOptions {
-  host?: string | undefined;
-  model?: string | undefined;
-  /** Per page. The first page also loads the model, which can take ~40 s. */
-  timeoutMs?: number;
-}
-
-export function ollamaVision(options: OllamaVisionOptions = {}): VisionTranscriber {
-  const host = (options.host || DEFAULT_OLLAMA_HOST).replace(/\/+$/, "");
-  const model = options.model || DEFAULT_OLLAMA_VISION_MODEL;
-  const timeoutMs = options.timeoutMs ?? 180_000;
-
+export function visionFromProvider(provider: AIProvider): VisionTranscriber {
   return {
-    name: `ollama/${model}`,
+    name: `${provider.id}/${provider.model}`,
     async transcribe(image) {
-      let res: Response;
-      try {
-        res = await fetch(`${host}/api/chat`, {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          signal: AbortSignal.timeout(timeoutMs),
-          body: JSON.stringify({
-            model,
-            stream: false,
-            // A textbook page is ~300-800 tokens; the cap stops repetition loops early.
-            options: { temperature: 0, num_predict: 2048 },
-            messages: [{ role: "user", content: TRANSCRIBE_PROMPT, images: [Buffer.from(image).toString("base64")] }],
-          }),
-        });
-      } catch (error) {
-        throw new Error(
-          `Cannot reach Ollama at ${host} (${(error as Error).message}). ` +
-            "Is Ollama running? Set OLLAMA_HOST in .env if it runs elsewhere.",
-        );
-      }
-      if (res.status === 404) {
-        throw new Error(`The vision model "${model}" is not installed. Run: ollama pull ${model}`);
-      }
-      if (!res.ok) {
-        throw new Error(`Ollama answered ${res.status}: ${await res.text()}`);
-      }
-      const json = (await res.json()) as { message?: { content?: string } };
-      return json.message?.content ?? "";
+      const result = await provider.complete({
+        prompt: TRANSCRIBE_PROMPT,
+        images: [image],
+        maxTokens: MAX_PAGE_TOKENS,
+        temperature: 0,
+      });
+      return result.text;
     },
   };
 }

@@ -10,8 +10,9 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { basename } from "node:path";
 import { parseArgs } from "node:util";
+import { loadEnvFile, providerFromEnv } from "../ai/config.js";
 import { extractUnit, joinPages } from "../extract/extract.js";
-import { ollamaVision } from "../extract/vision.js";
+import { visionFromProvider } from "../extract/vision.js";
 
 const { values, positionals } = parseArgs({
   allowPositionals: true,
@@ -22,13 +23,12 @@ if (positionals.length === 0) {
   process.exit(2);
 }
 
-try {
-  process.loadEnvFile();
-} catch {
-  // No .env file: defaults apply (local Ollama).
+loadEnvFile();
+const provider = await providerFromEnv(process.env, "vision");
+if (!provider.local) {
+  console.warn(`⚠ Scanned pages and photos will be sent to ${provider.id} (${provider.model}), outside this computer.`);
 }
-
-const vision = ollamaVision({ host: process.env.OLLAMA_HOST, model: process.env.OLLAMA_VISION_MODEL });
+const vision = visionFromProvider(provider);
 const files = await Promise.all(positionals.map(async (path) => ({ name: path, data: await readFile(path) })));
 
 const started = performance.now();
