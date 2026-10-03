@@ -37,9 +37,18 @@ export interface AIProvider {
   complete(request: CompletionRequest): Promise<CompletionResult>;
 }
 
+/** What a setup problem is about, so the web app can explain it in the family's language. */
+export type ConfigProblem = "key" | "model" | "setup";
+
 /** A setting is missing or wrong; the message says what to put in .env. */
 export class ProviderConfigError extends Error {
   override name = "ProviderConfigError";
+  constructor(
+    message: string,
+    readonly problem: ConfigProblem = "setup",
+  ) {
+    super(message);
+  }
 }
 
 export const DEFAULT_MAX_TOKENS = 16_000;
@@ -51,7 +60,12 @@ export function imageMediaType(image: Uint8Array): "image/png" | "image/jpeg" | 
   throw new Error("Unsupported image format: use PNG, JPEG or WebP");
 }
 
-export const toBase64 = (bytes: Uint8Array) => Buffer.from(bytes).toString("base64");
+/** Base64 that works in Node and in the browser (no Buffer). */
+export function toBase64(bytes: Uint8Array): string {
+  let binary = "";
+  for (let i = 0; i < bytes.length; i += 0x8000) binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  return btoa(binary);
+}
 
 /** Busy or rate-limited: worth trying again (free tiers return these often). */
 const TRANSIENT_STATUS = new Set([429, 500, 502, 503, 504]);

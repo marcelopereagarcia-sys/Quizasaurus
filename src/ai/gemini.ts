@@ -65,9 +65,9 @@ export function geminiProvider(options: GeminiOptions): AIProvider {
         }),
       });
       if (res.status === 401 || res.status === 403 || (res.status === 400 && (await res.clone().text()).includes("API_KEY_INVALID"))) {
-        throw new ProviderConfigError("GEMINI_API_KEY was rejected. Check the key in .env.");
+        throw new ProviderConfigError("GEMINI_API_KEY was rejected. Check the key in .env.", "key");
       }
-      if (res.status === 404) throw new ProviderConfigError(`GEMINI_MODEL="${model}" was not found. Check the model name in .env.`);
+      if (res.status === 404) throw new ProviderConfigError(`GEMINI_MODEL="${model}" was not found. Check the model name in .env.`, "model");
       if (!res.ok) throw new Error(`Gemini answered ${res.status}: ${await res.text()}`);
 
       const json = (await res.json()) as {

@@ -49,8 +49,8 @@ export function openaiProvider(options: OpenAIOptions): AIProvider {
           ...(request.temperature !== undefined ? { temperature: request.temperature } : {}),
         }),
       });
-      if (res.status === 401) throw new ProviderConfigError("OPENAI_API_KEY was rejected (401). Check the key in .env.");
-      if (res.status === 404) throw new ProviderConfigError(`OPENAI_MODEL="${model}" was not found. Check the model name in .env.`);
+      if (res.status === 401) throw new ProviderConfigError("OPENAI_API_KEY was rejected (401). Check the key in .env.", "key");
+      if (res.status === 404) throw new ProviderConfigError(`OPENAI_MODEL="${model}" was not found. Check the model name in .env.`, "model");
       if (!res.ok) throw new Error(`OpenAI answered ${res.status}: ${await res.text()}`);
 
       const json = (await res.json()) as {

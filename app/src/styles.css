@@ -784,6 +784,91 @@ button {
   accent-color: var(--ok);
 }
 
+/* ---------- Generator (QZS-21) ---------- */
+
+.generator {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.generator .field .btn.file {
+  align-self: flex-start;
+}
+
+.generator .row .field {
+  flex: 1 1 180px;
+}
+
+.privacy {
+  align-items: flex-start;
+  flex-wrap: nowrap;
+  font-size: 0.95rem;
+}
+
+.privacy input {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  margin: 2px 0 0;
+  accent-color: var(--ok);
+}
+
+.file-list {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 0.95rem;
+}
+
+.detail {
+  margin-top: 6px;
+  font-size: 0.85rem;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.gen-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+}
+
+.gen-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.gen-steps li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  opacity: 0.5;
+}
+
+.gen-steps li.now,
+.gen-steps li.done {
+  opacity: 1;
+}
+
+.gen-steps li > span:last-child {
+  display: flex;
+  flex-direction: column;
+}
+
+.gen-steps small {
+  color: var(--muted);
+}
+
+.gen-steps li.done .slot-number {
+  color: var(--on-color);
+  background: var(--ok);
+}
+
 .steps-edit {
   list-style: none;
   margin: 0;

@@ -23,7 +23,8 @@ export interface AnthropicOptions {
 
 export function anthropicProvider(options: AnthropicOptions): AIProvider {
   const { model } = options;
-  const client = options.client ?? new Anthropic({ apiKey: options.apiKey });
+  // In the web app each family uses its own key on its own device (ADR-0003), so the browser is allowed.
+  const client = options.client ?? new Anthropic({ apiKey: options.apiKey, dangerouslyAllowBrowser: typeof window !== "undefined" });
   const current = CURRENT_GENERATION.test(model);
 
   return {
@@ -66,10 +67,10 @@ export function anthropicProvider(options: AnthropicOptions): AIProvider {
         });
       } catch (error) {
         if (error instanceof Anthropic.AuthenticationError) {
-          throw new ProviderConfigError("ANTHROPIC_API_KEY was rejected (401). Check the key in .env.");
+          throw new ProviderConfigError("ANTHROPIC_API_KEY was rejected (401). Check the key in .env.", "key");
         }
         if (error instanceof Anthropic.NotFoundError) {
-          throw new ProviderConfigError(`ANTHROPIC_MODEL="${model}" does not exist. Use e.g. ${DEFAULT_ANTHROPIC_MODEL}.`);
+          throw new ProviderConfigError(`ANTHROPIC_MODEL="${model}" does not exist. Use e.g. ${DEFAULT_ANTHROPIC_MODEL}.`, "model");
         }
         throw error;
       }

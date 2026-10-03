@@ -5,7 +5,6 @@
  * - Scanned PDF pages and photos go to a vision model (ADR-0002).
  * - Every page is cleaned of identification fields before it is returned.
  */
-import { extname } from "node:path";
 import { getDocumentProxy, renderPageAsImage } from "unpdf";
 import { cleanPageText } from "./clean.js";
 import type { VisionTranscriber } from "./vision.js";
@@ -35,6 +34,19 @@ const RENDER_SCALE = 2;
 
 export const SUPPORTED_EXTENSIONS = [".pdf", ".jpg", ".jpeg", ".png", ".webp"] as const;
 
+/** ".pdf", ".jpg"…: the extension of a file name, lowercase (no node:path, so it also runs in the browser). */
+export function extensionOf(name: string): string {
+  const dot = name.lastIndexOf(".");
+  return dot > name.lastIndexOf("/") && dot > name.lastIndexOf("\\") ? name.slice(dot).toLowerCase() : "";
+}
+
+/**
+ * The canvas pdf.js draws scanned pages on: Node needs @napi-rs/canvas, the
+ * browser has its own. The module name is a variable so the web bundle skips it.
+ */
+const NODE_CANVAS = "@napi-rs/canvas";
+const canvasImport = typeof document === "undefined" ? () => import(/* @vite-ignore */ NODE_CANVAS) : undefined;
+
 export interface InputFile {
   name: string;
   data: Uint8Array;
@@ -44,7 +56,7 @@ export interface InputFile {
 export async function extractUnit(files: InputFile[], options: ExtractOptions = {}): Promise<ExtractedPage[]> {
   const pages: ExtractedPage[] = [];
   for (const file of files) {
-    const ext = extname(file.name).toLowerCase();
+    const ext = extensionOf(file.name);
     if (ext === ".pdf") {
       pages.push(...(await extractPdf(file.data, { ...options, firstPage: pages.length + 1 })));
     } else if ((SUPPORTED_EXTENSIONS as readonly string[]).includes(ext)) {
@@ -75,7 +87,7 @@ export async function extractPdf(
       page = { page: first + n - 1, method: "text-layer", text: cleanPageText(raw), seconds: elapsed(started) };
     } else {
       const image = new Uint8Array(
-        await renderPageAsImage(pdf, n, { scale: RENDER_SCALE, canvasImport: () => import("@napi-rs/canvas") }),
+        await renderPageAsImage(pdf, n, { scale: RENDER_SCALE, ...(canvasImport ? { canvasImport } : {}) }),
       );
       page = await transcribe(image, first + n - 1, options.vision, `page ${n}`);
       page.seconds = elapsed(started);

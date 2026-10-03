@@ -27,6 +27,15 @@ PDF / photos ──> OCR ──> Generator ──> Pack (JSON) ──> Adult rev
 4. **An adult reviews every pack** before a child plays it, with the source sentence shown next to each question.
 5. **Offline player.** Installs from the browser on any tablet and works without internet.
 
+### Make a unit from the web app
+
+Open the app, choose **Make a unit with AI** (an adult gate comes first), upload the PDF or photos of the unit, pick the year, the language and the AI, and wait for the three steps: read, write the questions, check them. The new pack goes straight to the adult review.
+
+- **Gemini** is recommended: it scored 98.9 % in our model comparison and has a free tier. Get a key at [Google AI Studio](https://aistudio.google.com/apikey).
+- **Your key stays on your device** (browser storage) and is sent only to the provider you chose. You can delete it from the same screen.
+- **Ollama on your computer** needs no key, but it must allow the app's website: start it with `OLLAMA_ORIGINS=https://marcelopereagarcia-sys.github.io` (or `*`).
+- With a cloud AI, the text of the unit and any photos leave your device: photograph pages with no names or handwriting.
+
 ## A public case study in AI-assisted project management
 
 This repository is also a portfolio piece. It is run with the Google Project Management method (hybrid: a waterfall frame and daily Scrum sprints in Jira), and every artifact is public:

@@ -8,7 +8,8 @@ export default defineConfig({
   root: "app",
   base: "./",
   publicDir: "public",
-  build: { outDir: "../dist", emptyOutDir: true },
+  // pdf.js alone is ~1.6 MB; it only loads when a family opens the generator.
+  build: { outDir: "../dist", emptyOutDir: true, chunkSizeWarningLimit: 2_000 },
   plugins: [
     preact(),
     VitePWA({
@@ -41,6 +42,8 @@ export default defineConfig({
         cleanupOutdatedCaches: true,
         // Everything the player needs is precached, so it opens in airplane mode.
         globPatterns: ["**/*.{js,css,html,png,svg,woff2}"],
+        // The generator needs the internet anyway (it calls the AI): its code is not kept offline.
+        globIgnores: ["**/Generator-*.js", "**/pdfjs-*.js"],
         navigateFallback: "index.html",
       },
     }),

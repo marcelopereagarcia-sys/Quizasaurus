@@ -7,6 +7,8 @@ import { MIN_QUESTIONS, canRemove, finishReview, gateQuestion, issueKind, issueP
 interface Props {
   pack: Pack;
   t: Dict;
+  /** The adult already passed the gate (they just generated this pack). */
+  unlocked?: boolean | undefined;
   /** The reviewed pack, valid; approved or still a draft. */
   onDone: (pack: Pack, approved: boolean) => void;
   onCancel: () => void;
@@ -14,11 +16,11 @@ interface Props {
 
 /** Adult review of a pack (QZS-18), behind a simple parental gate. */
 export function Review(props: Props) {
-  const [unlocked, setUnlocked] = useState(false);
+  const [unlocked, setUnlocked] = useState(props.unlocked ?? false);
   return unlocked ? <ReviewForm {...props} /> : <ParentGate t={props.t} onPass={() => setUnlocked(true)} onCancel={props.onCancel} />;
 }
 
-function ParentGate({ t, onPass, onCancel }: { t: Dict; onPass: () => void; onCancel: () => void }) {
+export function ParentGate({ t, onPass, onCancel }: { t: Dict; onPass: () => void; onCancel: () => void }) {
   const [q, setQ] = useState(() => gateQuestion());
   const [value, setValue] = useState("");
   const [wrong, setWrong] = useState(false);

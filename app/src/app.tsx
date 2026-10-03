@@ -1,3 +1,4 @@
+import type { ComponentType } from "preact";
 import { useEffect, useMemo, useState } from "preact/hooks";
 import examplePack from "../../examples/ciclo-del-agua.pack.json";
 import type { Pack } from "../../src/pack/schema.js";
@@ -6,7 +7,7 @@ import { type Dict, UI_LANGS, UI_LANG_NAMES, type UiLang, defaultUiLang, isUiLan
 import { type AnswerRecord, type GameResult, GameRunner } from "./game/GameRunner.js";
 import { type Step, mixedSteps, stepsFor } from "./game/steps.js";
 import { DINOS, type Progress, dinoHue, dinoOf, emptyProgress, levelKey, loadProgress, recordGame, saveProgress } from "./progress.js";
-import { Review } from "./review/Review.js";
+import { ParentGate, Review } from "./review/Review.js";
 import { type SavedRun, clearRun, loadRun, saveRun } from "./run.js";
 import { BOSS_THRESHOLD_CHOICES, loadSettings, saveSettings } from "./settings.js";
 import { SKINS, SKIN_EMOJI, type Skin, applySkin, loadSkin, saveSkin } from "./skins.js";
@@ -33,7 +34,8 @@ type Screen =
   | { name: "home" }
   | { name: "pack"; id: string }
   | { name: "play"; id: string; game: number | "mix" }
-  | { name: "review"; id: string };
+  | { name: "review"; id: string; fromGenerator?: boolean }
+  | { name: "generate"; unlocked?: boolean };
 
 export function App() {
   const [lang, setLang] = useState<UiLang>(() => {
@@ -70,20 +72,24 @@ export function App() {
   useEffect(() => {
     const home: Screen = { name: "home" };
     history.replaceState({ screen: home }, "");
-    if (screen.name !== "home") {
+    // The app opens on home or on a game left halfway (then its unit sits in between).
+    if (screen.name === "play") {
       history.pushState({ screen: { name: "pack", id: screen.id } }, "");
-      if (screen.name === "play") history.pushState({ screen }, "");
+      history.pushState({ screen }, "");
     }
     const onPop = (e: PopStateEvent) => setScreen((e.state as { screen?: Screen } | null)?.screen ?? home);
     addEventListener("popstate", onPop);
     return () => removeEventListener("popstate", onPop);
   }, []);
 
-  /** Moves between screens through the browser history (see above). */
-  function go(next: Screen) {
-    const depth = (s: Screen) => ({ home: 0, pack: 1, play: 2, review: 2 })[s.name];
+  /** Moves between screens through the browser history (see above); `replace` swaps the current step. */
+  function go(next: Screen, replace = false) {
+    const depth = (s: Screen) => ({ home: 0, pack: 1, generate: 1, play: 2, review: 2 })[s.name];
     const back = depth(screen) - depth(next);
-    if (back > 0) {
+    if (replace) {
+      history.replaceState({ screen: next }, "");
+      setScreen(next);
+    } else if (back > 0) {
       history.go(-back); // popstate shows the screen
     } else if (back === 0) {
       history.replaceState({ screen: next }, "");
@@ -160,7 +166,36 @@ export function App() {
     // A half-played game of the old questions would not match the new ones.
     if (run?.packId === pack.id) onRunProgress(pack.id, run.game, undefined);
     setNotice(persisted ? (approved ? texts.savedApproved : texts.savedDraft) : texts.notSaved);
-    go({ name: "pack", id: pack.id });
+    leaveReview(pack.id);
+  }
+
+  /** From a review back to its unit; after the generator, the unit takes the review's place in the history. */
+  function leaveReview(id: string) {
+    go({ name: "pack", id }, screen.name === "review" && screen.fromGenerator === true);
+  }
+
+  // The generator (pdf.js and the AI SDKs) loads only when a family opens it, so the player stays light.
+  const [Generator, setGenerator] = useState<ComponentType<{ t: Dict; onGenerated: (pack: Pack) => void; onCancel: () => void }>>();
+  useEffect(() => {
+    if (screen.name !== "generate" || Generator) return;
+    import("./generator/Generator.js")
+      .then((m) => setGenerator(() => m.default))
+      .catch(() => {
+        // Offline: the generator's code is not kept on the device.
+        setNotice(t.genProblems.unreachable);
+        go({ name: "home" });
+      });
+  }, [screen.name]);
+
+  /** A new pack from the generator: saved as a draft, with an id of its own, and straight to the review. */
+  function onGenerated(pack: Pack) {
+    const taken = new Set(allPacks.map((p) => p.id));
+    let id = pack.id;
+    for (let n = 2; taken.has(id); n++) id = `${pack.id.slice(0, 36)}-${n}`;
+    const draft = { ...pack, id };
+    savePack(draft);
+    setPacks(loadPacks());
+    go({ name: "review", id, fromGenerator: true }, true);
   }
 
   function onBossThreshold(value: number) {
@@ -175,7 +210,7 @@ export function App() {
     saveProgress(emptyProgress());
   }
 
-  const current = screen.name !== "home" ? allPacks.find((p) => p.id === screen.id) : undefined;
+  const current = screen.name !== "home" && screen.name !== "generate" ? allPacks.find((p) => p.id === screen.id) : undefined;
   const playable = current?.review.status === "approved";
   // Inside a unit everything speaks the pack's language (charter v1.3).
   const screenLang = current ? packUiLang(current.language, lang) : lang;
@@ -196,9 +231,25 @@ export function App() {
         </div>
       )}
 
-      {current && screen.name === "review" ? (
+      {screen.name === "generate" ? (
         <main class="screen">
-          <Review pack={current} t={ui} onDone={(pack, approved) => onReviewed(pack, approved, ui)} onCancel={() => go({ name: "pack", id: current.id })} />
+          {!screen.unlocked ? (
+            <ParentGate t={t} onPass={() => go({ name: "generate", unlocked: true }, true)} onCancel={() => go({ name: "home" })} />
+          ) : Generator ? (
+            <Generator t={t} onGenerated={onGenerated} onCancel={() => go({ name: "home" })} />
+          ) : (
+            <p class="panel review-head">…</p>
+          )}
+        </main>
+      ) : current && screen.name === "review" ? (
+        <main class="screen">
+          <Review
+            pack={current}
+            t={ui}
+            unlocked={screen.fromGenerator}
+            onDone={(pack, approved) => onReviewed(pack, approved, ui)}
+            onCancel={() => leaveReview(current.id)}
+          />
         </main>
       ) : current && screen.name === "play" && playable ? (
         <main class="screen">
@@ -374,8 +425,11 @@ export function App() {
 
           <Collection progress={progress} t={t} />
 
-          <div>
-            <label class="btn prime file">
+          <div class="actions">
+            <button class="btn prime" onClick={() => go({ name: "generate" })}>
+              {t.createUnit}
+            </button>
+            <label class="btn file">
               {t.loadPack}
               <input type="file" accept="application/json,.json" onChange={onFile} />
             </label>

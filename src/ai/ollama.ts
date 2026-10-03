@@ -85,7 +85,7 @@ export function ollamaProvider(options: OllamaOptions): AIProvider {
         throw new Error(`Ollama request failed (${err.cause?.code ?? err.message}).`);
       }
       if (res.status === 404) {
-        throw new ProviderConfigError(`The Ollama model "${model}" is not installed. Run: ollama pull ${model}`);
+        throw new ProviderConfigError(`The Ollama model "${model}" is not installed. Run: ollama pull ${model}`, "model");
       }
       if (!res.ok || !res.body) throw new Error(`Ollama answered ${res.status}: ${await res.text()}`);
 
