@@ -1,0 +1,239 @@
+{
+  "schemaVersion": 1,
+  "id": "ciclo-del-agua",
+  "title": "El ciclo del agua",
+  "subject": "Ciencias de la naturaleza",
+  "language": "es",
+  "grade": { "stage": "primary", "year": 3 },
+  "topics": [
+    { "id": "estados", "name": "Los estados del agua" },
+    { "id": "ciclo", "name": "El ciclo del agua" },
+    { "id": "cuidado", "name": "Cuidar el agua" }
+  ],
+  "games": [
+    {
+      "type": "classify",
+      "title": "¿Sólido, líquido o gas?",
+      "instructions": "Arrastra cada cosa a su estado.",
+      "categories": [
+        { "id": "solido", "label": "Sólido", "emoji": "🧊" },
+        { "id": "liquido", "label": "Líquido", "emoji": "💧" },
+        { "id": "gas", "label": "Gas", "emoji": "💨" }
+      ],
+      "items": [
+        {
+          "label": "Hielo",
+          "emoji": "🧊",
+          "category": "solido",
+          "topic": "estados",
+          "source": "El hielo y la nieve son agua en estado sólido.",
+          "explanation": "El hielo es agua en estado sólido."
+        },
+        {
+          "label": "Nieve",
+          "emoji": "❄️",
+          "category": "solido",
+          "topic": "estados",
+          "source": "El hielo y la nieve son agua en estado sólido.",
+          "explanation": "La nieve también es agua en estado sólido."
+        },
+        {
+          "label": "Agua del río",
+          "emoji": "🏞️",
+          "category": "liquido",
+          "topic": "estados",
+          "source": "El agua de los ríos, los mares y la lluvia está en estado líquido.",
+          "explanation": "El agua de los ríos está en estado líquido."
+        },
+        {
+          "label": "Agua del mar",
+          "emoji": "🌊",
+          "category": "liquido",
+          "topic": "estados",
+          "source": "El agua de los ríos, los mares y la lluvia está en estado líquido.",
+          "explanation": "El agua del mar está en estado líquido."
+        },
+        {
+          "label": "Lluvia",
+          "emoji": "🌧️",
+          "category": "liquido",
+          "topic": "estados",
+          "source": "El agua de los ríos, los mares y la lluvia está en estado líquido.",
+          "explanation": "La lluvia es agua en estado líquido."
+        },
+        {
+          "label": "Vapor de agua",
+          "emoji": "♨️",
+          "category": "gas",
+          "topic": "estados",
+          "source": "El vapor de agua es agua en estado gaseoso y no lo podemos ver.",
+          "explanation": "El vapor es agua en estado gaseoso."
+        }
+      ]
+    },
+    {
+      "type": "order",
+      "title": "El viaje del agua",
+      "instructions": "Ordena los pasos de primero a último.",
+      "rounds": [
+        {
+          "prompt": "Ordena el ciclo del agua",
+          "items": [
+            { "label": "Evaporación", "emoji": "☀️" },
+            { "label": "Condensación", "emoji": "☁️" },
+            { "label": "Precipitación", "emoji": "🌧️" },
+            { "label": "Vuelta al mar", "emoji": "🌊" }
+          ],
+          "topic": "ciclo",
+          "source": "Primero, el calor del Sol calienta el agua de los mares y los ríos, y una parte se convierte en vapor. Esto se llama evaporación.",
+          "explanation": "Evaporación, condensación, precipitación y el agua vuelve al mar."
+        },
+        {
+          "prompt": "¿Qué le pasa al vapor?",
+          "items": [
+            { "label": "Sube", "emoji": "⬆️" },
+            { "label": "Se enfría", "emoji": "🥶" },
+            { "label": "Forma las nubes", "emoji": "☁️" }
+          ],
+          "topic": "ciclo",
+          "source": "Después, el vapor sube, se enfría y forma las nubes. Esto se llama condensación.",
+          "explanation": "El vapor sube, se enfría y forma las nubes."
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "title": "¿Qué pasa aquí?",
+      "questions": [
+        {
+          "prompt": "¿Qué calienta el agua de los mares para que se evapore?",
+          "emoji": "🌊",
+          "options": ["El Sol", "La Luna", "El viento"],
+          "answer": "El Sol",
+          "topic": "ciclo",
+          "source": "Primero, el calor del Sol calienta el agua de los mares y los ríos, y una parte se convierte en vapor.",
+          "explanation": "El calor del Sol convierte una parte del agua en vapor."
+        },
+        {
+          "prompt": "El vapor se enfría y forma nubes. ¿Cómo se llama?",
+          "emoji": "☁️",
+          "options": ["Condensación", "Evaporación", "Precipitación"],
+          "answer": "Condensación",
+          "topic": "ciclo",
+          "source": "Después, el vapor sube, se enfría y forma las nubes. Esto se llama condensación.",
+          "explanation": "Cuando el vapor forma nubes, se llama condensación."
+        },
+        {
+          "prompt": "Te estás lavando los dientes. ¿Qué haces con el grifo?",
+          "emoji": "🪥",
+          "options": ["Lo cierro", "Lo dejo abierto"],
+          "answer": "Lo cierro",
+          "topic": "cuidado",
+          "source": "Podemos ahorrar agua si cerramos el grifo mientras nos lavamos los dientes.",
+          "explanation": "Cerrar el grifo ahorra agua."
+        }
+      ]
+    },
+    {
+      "type": "yesno",
+      "title": "¿Sí o no?",
+      "questions": [
+        {
+          "statement": "El vapor de agua se puede ver.",
+          "emoji": "👀",
+          "answer": false,
+          "topic": "estados",
+          "source": "El vapor de agua es agua en estado gaseoso y no lo podemos ver.",
+          "explanation": "No: el vapor de agua no lo podemos ver."
+        },
+        {
+          "statement": "La lluvia es agua en estado líquido.",
+          "emoji": "🌧️",
+          "answer": true,
+          "topic": "estados",
+          "source": "El agua de los ríos, los mares y la lluvia está en estado líquido.",
+          "explanation": "Sí: la lluvia está en estado líquido."
+        },
+        {
+          "statement": "Ducharse gasta menos agua que bañarse.",
+          "emoji": "🚿",
+          "answer": true,
+          "topic": "cuidado",
+          "source": "Es mejor ducharse que bañarse, porque se gasta menos agua.",
+          "explanation": "Sí: con la ducha se gasta menos agua."
+        },
+        {
+          "statement": "Podemos tirar aceite al fregadero.",
+          "emoji": "🫗",
+          "answer": false,
+          "topic": "cuidado",
+          "source": "No debemos tirar basura ni aceite a los ríos ni al fregadero.",
+          "explanation": "No: el aceite ensucia el agua."
+        },
+        {
+          "statement": "Hay muchísima agua dulce.",
+          "emoji": "🚰",
+          "answer": false,
+          "topic": "cuidado",
+          "source": "El agua dulce es muy poca y la necesitamos para vivir.",
+          "explanation": "No: el agua dulce es muy poca."
+        }
+      ]
+    },
+    {
+      "type": "boss",
+      "title": "El examen del dinosaurio",
+      "questions": [
+        {
+          "prompt": "¿En cuántos estados puede estar el agua?",
+          "options": ["3", "2", "4"],
+          "answer": "3",
+          "topic": "estados",
+          "source": "El agua puede estar en tres estados: sólido, líquido y gaseoso.",
+          "explanation": "Tres estados: sólido, líquido y gaseoso."
+        },
+        {
+          "prompt": "¿En qué estado está el hielo?",
+          "options": ["Sólido", "Líquido", "Gaseoso"],
+          "answer": "Sólido",
+          "topic": "estados",
+          "source": "El hielo y la nieve son agua en estado sólido.",
+          "explanation": "El hielo es agua en estado sólido."
+        },
+        {
+          "prompt": "¿Cómo se llama cuando el agua cae de las nubes?",
+          "options": ["Precipitación", "Evaporación", "Condensación"],
+          "answer": "Precipitación",
+          "topic": "ciclo",
+          "source": "Cuando las gotas de las nubes pesan mucho, caen en forma de lluvia, nieve o granizo. Esto se llama precipitación.",
+          "explanation": "La lluvia, la nieve o el granizo que caen son la precipitación."
+        },
+        {
+          "prompt": "¿Qué pasa al final del ciclo del agua?",
+          "options": [
+            "El agua vuelve al mar y el ciclo empieza otra vez",
+            "El agua desaparece",
+            "El agua se queda en las nubes para siempre"
+          ],
+          "answer": "El agua vuelve al mar y el ciclo empieza otra vez",
+          "topic": "ciclo",
+          "source": "Por último, el agua corre por los ríos o se filtra bajo la tierra y vuelve al mar. Así el ciclo empieza otra vez.",
+          "explanation": "El agua vuelve al mar y el ciclo empieza otra vez."
+        },
+        {
+          "prompt": "¿Por qué hay que cuidar el agua dulce?",
+          "options": [
+            "Porque hay muy poca y la necesitamos para vivir",
+            "Porque es salada",
+            "Porque no sirve para nada"
+          ],
+          "answer": "Porque hay muy poca y la necesitamos para vivir",
+          "topic": "cuidado",
+          "source": "El agua dulce es muy poca y la necesitamos para vivir. Por eso hay que cuidarla.",
+          "explanation": "Hay muy poca agua dulce y la necesitamos para vivir."
+        }
+      ]
+    }
+  ],
+  "review": { "status": "approved", "approvedAt": "2026-10-03T12:00:00Z" }
+}
