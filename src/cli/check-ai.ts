@@ -6,6 +6,7 @@
  * Sends one short text request (AI_PROVIDER) and one image request
  * (VISION_PROVIDER), and reports model, time and tokens.
  */
+import "./node-setup.js";
 import { createCanvas } from "@napi-rs/canvas";
 import { type ProviderRole, loadEnvFile, providerFromEnv } from "../ai/config.js";
 import { ProviderConfigError } from "../ai/provider.js";

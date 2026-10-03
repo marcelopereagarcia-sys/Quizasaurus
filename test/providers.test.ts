@@ -111,7 +111,7 @@ describe("Ollama", () => {
   it("explains a missing model and an unreachable server", async () => {
     fakeFetch(404, { error: "model not found" });
     await expect(ollamaProvider({ model: "x:1b" }).complete(request)).rejects.toThrow("Run: ollama pull x:1b");
-    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("ECONNREFUSED")));
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(Object.assign(new TypeError("fetch failed"), { cause: { code: "ECONNREFUSED" } })));
     await expect(ollamaProvider({ model: "x" }).complete(request)).rejects.toThrow(/Is Ollama running\?/);
   });
 });

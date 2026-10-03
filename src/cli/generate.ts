@@ -7,6 +7,7 @@
  * The input is the text written by `npm run extract`. The pack is written next
  * to it (inside private/) as a draft: an adult must review it before playing.
  */
+import "./node-setup.js";
 import { readFile, writeFile } from "node:fs/promises";
 import { basename } from "node:path";
 import { parseArgs } from "node:util";

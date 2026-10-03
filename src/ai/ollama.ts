@@ -73,10 +73,16 @@ export function ollamaProvider(options: OllamaOptions): AIProvider {
           }),
         });
       } catch (error) {
-        throw new ProviderConfigError(
-          `Cannot reach Ollama at ${host} (${(error as Error).message}). ` +
-            "Is Ollama running? Set OLLAMA_HOST in .env if it runs elsewhere.",
-        );
+        const err = error as Error & { cause?: { code?: string } };
+        if (err.name === "TimeoutError") {
+          throw new Error(`Ollama (${model}) did not finish within ${Math.round(timeoutMs / 60_000)} min. Try a smaller model.`);
+        }
+        if (err.cause?.code === "ECONNREFUSED") {
+          throw new ProviderConfigError(
+            `Cannot reach Ollama at ${host}. Is Ollama running? Set OLLAMA_HOST in .env if it runs elsewhere.`,
+          );
+        }
+        throw new Error(`Ollama request failed (${err.cause?.code ?? err.message}).`);
       }
       if (res.status === 404) {
         throw new ProviderConfigError(`The Ollama model "${model}" is not installed. Run: ollama pull ${model}`);

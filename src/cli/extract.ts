@@ -7,6 +7,7 @@
  * Writes `<first input>.txt` next to the input unless --out is given, so text
  * from private material stays in `private/`.
  */
+import "./node-setup.js";
 import { readFile, writeFile } from "node:fs/promises";
 import { basename } from "node:path";
 import { parseArgs } from "node:util";
