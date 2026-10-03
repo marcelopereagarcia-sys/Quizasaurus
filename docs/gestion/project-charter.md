@@ -1,6 +1,6 @@
 # Project Charter — Quizasaurus
 
-Versión 1.1 · aprobada el 3 de octubre de 2026 · Marcelo Perea García
+Versión 1.2 · aprobada el 3 de octubre de 2026 · Marcelo Perea García
 
 > Copia exportada del charter aprobado. El original vive en Claude Docs; cualquier cambio de alcance, fechas o presupuesto pasa por el registro de cambios del final.
 
@@ -44,7 +44,7 @@ La versión 1.0 cubre el ciclo completo de una familia: subir una unidad, revisa
 - Generador con OCR y al menos 2 proveedores de IA: Ollama (local) y uno en la nube.
 - Pantalla de revisión del pack para el adulto, con la frase del libro de la que sale cada pregunta.
 - Reproductor PWA offline con 5 plantillas: clasificar, ordenar, situación con opciones, deslizar sí/no y jefe final.
-- 2 skins (bloques y dinos) y 2 idiomas de interfaz (catalán y castellano).
+- 2 skins (bloques y dinos) y 3 idiomas de interfaz (catalán, castellano e inglés; cambio v1.2).
 - Progreso guardado en el dispositivo y panel para la familia con los temas a repasar.
 - Prueba informal con 2 familias amigas y documentación de gestión del proyecto en el repositorio.
 
@@ -198,6 +198,7 @@ El charter entra en vigor cuando el sponsor lo aprueba; desde ese momento, cualq
 
 | Versión | Fecha | Cambio |
 | --- | --- | --- |
+| 1.2 | 03-oct-2026 | Cambio de alcance aprobado por el sponsor: la interfaz pasa de 2 a 3 idiomas (catalán, castellano e inglés), porque el repositorio está en inglés. Más idiomas, solo como contribuciones |
 | 1.1 | 03-oct-2026 | Cambio de alcance aprobado por el sponsor: O5 pasa de 3 publicaciones en LinkedIn a 1 publicación final, en el cierre. Se descarta la de arranque (QZS-10) |
 | 1.0 | 03-oct-2026 | Aprobado por el sponsor; dedicación fijada en ~8 h/día (112 h en total). Sprint 1 iniciado |
 | 0.2 | 02-oct-2026 | Plan comprimido a 2 semanas; prueba informal con 2 familias en lugar de piloto; sin lanzamiento al mercado |

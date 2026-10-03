@@ -173,10 +173,15 @@ export function stripPageMarkers(text: string): string {
 // Word edges by letter class: `\b` ignores accented letters such as "é".
 const CATALAN = /(?<!\p{L})(?:els|les|amb|però|també|què|són|seva|aquest|aquesta|molt|perquè|mateix|fins)(?!\p{L})|(?<!\p{L})[ldn]'(?=\p{L})|l·l/giu;
 const SPANISH = /(?<!\p{L})(?:los|las|con|pero|también|qué|son|su|este|esta|muy|porque|hasta|mismo)(?!\p{L})|ñ/giu;
+const ENGLISH = /(?<!\p{L})(?:the|and|with|is|are|of|which|this|that|they|from|have)(?!\p{L})/giu;
 
-/** "ca" or "es", by counting very common words. */
-export function detectLanguage(text: string): "ca" | "es" {
-  const ca = text.match(CATALAN)?.length ?? 0;
-  const es = text.match(SPANISH)?.length ?? 0;
-  return ca >= es ? "ca" : "es";
+/** "ca", "es" or "en" (the languages Quizasaurus supports), by counting very common words. */
+export function detectLanguage(text: string): "ca" | "es" | "en" {
+  const counts = {
+    ca: text.match(CATALAN)?.length ?? 0,
+    es: text.match(SPANISH)?.length ?? 0,
+    en: text.match(ENGLISH)?.length ?? 0,
+  };
+  const [best] = (Object.entries(counts) as ["ca" | "es" | "en", number][]).sort((a, b) => b[1] - a[1]);
+  return best?.[0] ?? "ca";
 }

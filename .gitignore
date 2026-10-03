@@ -23,3 +23,6 @@ private/
 Thumbs.db
 .vscode/
 .idea/
+
+# Local agent tooling
+.claude/

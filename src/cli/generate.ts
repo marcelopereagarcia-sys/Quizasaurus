@@ -27,7 +27,7 @@ const input = positionals[0];
 const stage = values.stage === "secondary" ? "secondary" : "primary";
 const year = Number(values.grade);
 if (!input || !Number.isInteger(year) || year < 1 || year > 6) {
-  console.error("Usage: npm run generate -- <unit.txt> [--grade 1-6] [--stage primary|secondary] [--lang ca|es] [--out pack.json]");
+  console.error("Usage: npm run generate -- <unit.txt> [--grade 1-6] [--stage primary|secondary] [--lang ca|es|en] [--out pack.json]");
   process.exit(2);
 }
 

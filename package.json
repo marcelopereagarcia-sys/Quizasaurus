@@ -17,24 +17,31 @@
     "test": "vitest run --exclude \"test/**/*.ollama.test.ts\" --exclude \"test/**/*.live.test.ts\"",
     "test:ollama": "vitest run test/extract.ollama.test.ts",
     "test:live": "vitest run test/providers.live.test.ts",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.app.json",
     "validate": "tsx src/cli/validate.ts",
     "extract": "tsx src/cli/extract.ts",
     "check-ai": "tsx src/cli/check-ai.ts",
-    "generate": "tsx src/cli/generate.ts"
+    "generate": "tsx src/cli/generate.ts",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.131.0",
     "@napi-rs/canvas": "^1.0.10",
+    "preact": "^11.0.0",
     "undici": "^7.30.0",
     "unpdf": "^1.8.1",
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@preact/preset-vite": "^2.10.6",
     "@types/node": "^26.6.4",
     "pdf-lib": "^1.17.1",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
+    "vite": "^8.3.2",
+    "vite-plugin-pwa": "^2.0.0",
     "vitest": "^5.0.3"
   }
 }

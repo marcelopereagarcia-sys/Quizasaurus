@@ -17,7 +17,7 @@ Quizasaurus se gestiona con el método del certificado Google Project Management
 
 | Artefacto | Estado | Archivo |
 | --- | --- | --- |
-| Project Charter (objetivos SMART, alcance, RACI, riesgos) | Aprobado (v1.1, 3 oct) | [`project-charter.md`](project-charter.md) |
+| Project Charter (objetivos SMART, alcance, RACI, riesgos) | Aprobado (v1.2, 3 oct) | [`project-charter.md`](project-charter.md) |
 | Decisiones de arquitectura (ADR) | 1 aceptada | [`../adr`](../adr/) |
 | Informes de estado diarios (semáforo) | Desde el 5 oct | [`estado/`](estado/) |
 | Rúbrica de «pregunta correcta» | Aprobada (3 oct) | [`rubrica-pregunta-correcta.md`](rubrica-pregunta-correcta.md) |

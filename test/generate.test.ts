@@ -142,6 +142,10 @@ describe("prompt", () => {
 });
 
 describe("detectLanguage", () => {
+  it("recognises English", () => {
+    expect(detectLanguage("The root is the part of the plant that is under the ground. Leaves grow from the branches and they make food.")).toBe("en");
+  });
+
   it("tells Catalan from Spanish", () => {
     expect(detectLanguage(unitText)).toBe("es");
     expect(detectLanguage("L'arrel és la part de la planta que està sota la terra. Les fulles neixen de les branques i també del tronc.")).toBe("ca");

@@ -51,3 +51,5 @@ This repository is also a portfolio piece. It is run with the Google Project Man
 ## License
 
 [MIT](LICENSE) © 2026 Marcelo Perea García
+
+The app icon uses the T-Rex from [Microsoft Fluent Emoji](https://github.com/microsoft/fluentui-emoji) (MIT License).
