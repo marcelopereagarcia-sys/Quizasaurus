@@ -801,6 +801,33 @@ button {
   flex: 1 1 180px;
 }
 
+.key-help {
+  padding: 10px 14px;
+  background: var(--card);
+  border: 2px dashed var(--line);
+  border-radius: 6px;
+}
+
+.key-help summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.key-help ol {
+  margin: 4px 0 10px;
+  padding-left: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.key-help .hint {
+  margin-bottom: 10px;
+}
+
 .privacy {
   align-items: flex-start;
   flex-wrap: nowrap;

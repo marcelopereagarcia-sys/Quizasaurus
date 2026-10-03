@@ -25,11 +25,11 @@ interface Props {
   onCancel: () => void;
 }
 
-/** Where each provider gives out keys (Gemini's is free). */
-const KEY_HELP: Partial<Record<WebProvider, string>> = {
-  gemini: "https://aistudio.google.com/apikey",
-  anthropic: "https://console.anthropic.com/settings/keys",
-  openai: "https://platform.openai.com/api-keys",
+/** Where each provider gives out keys (Gemini's is free), and the site's name on the button. */
+const KEY_SITE: Record<Exclude<WebProvider, "ollama">, { url: string; name: string }> = {
+  gemini: { url: "https://aistudio.google.com/apikey", name: "Google AI Studio" },
+  anthropic: { url: "https://console.anthropic.com/settings/keys", name: "Anthropic Console" },
+  openai: { url: "https://platform.openai.com/api-keys", name: "OpenAI Platform" },
 };
 
 /** Who receives the data, as named in the privacy notes (brand names, the same in every language). */
@@ -174,21 +174,32 @@ export default function Generator({ t, onGenerated, onCancel }: Props) {
               />
               <small class="hint">{t.genKeyNote(providerName)}</small>
             </label>
-            <div class="actions">
-              {KEY_HELP[provider] && (
-                <a class="btn small" href={KEY_HELP[provider]} target="_blank" rel="noopener noreferrer">
-                  {t.genKeyHelp} ↗
-                </a>
-              )}
-              {settings.keys[provider] && (
+            {/* Step by step, open by default while there is no key: "a link to Google" alone does not say what to do there. */}
+            <details class="key-help" open={!settings.keys[provider]}>
+              <summary>{t.genKeyHelp}</summary>
+              <ol>
+                {t.genKeySteps[provider].map((step) => (
+                  <li>{step}</li>
+                ))}
+              </ol>
+              {provider === "gemini" && <p class="hint">{t.genKeyFree}</p>}
+              <a class="btn small" href={KEY_SITE[provider].url} target="_blank" rel="noopener noreferrer">
+                {t.genKeyOpen(KEY_SITE[provider].name)}
+              </a>
+            </details>
+            {settings.keys[provider] && (
+              <div>
                 <button class="btn small" type="button" onClick={() => change(forgetKey(settings, provider))}>
                   {t.genForgetKey}
                 </button>
-              )}
-            </div>
+              </div>
+            )}
             <label class="row privacy">
               <input type="checkbox" checked={privacyOk} onChange={(e) => setPrivacyOk((e.currentTarget as HTMLInputElement).checked)} />
-              <span>{t.genPrivacy(providerName)}</span>
+              <span>
+                {t.genPrivacy(providerName)}
+                {provider === "gemini" && ` ${t.genPrivacyFree}`}
+              </span>
             </label>
           </>
         ) : (
