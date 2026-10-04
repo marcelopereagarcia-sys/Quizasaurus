@@ -22,5 +22,6 @@ Quizasaurus se gestiona con el método del certificado Google Project Management
 | Informes de estado diarios (semáforo) | Desde el 5 oct | [`estado/`](estado/) |
 | Rúbrica de «pregunta correcta» | Aprobada (3 oct) | [`rubrica-pregunta-correcta.md`](rubrica-pregunta-correcta.md) |
 | Informe comparativo de modelos de IA (puerta O1) | Puerta O1 aprobada (3 oct) | [`informe-modelos.md`](informe-modelos.md) |
+| Auditoría automática del reproductor (puerta O2), con `npm run audit` | Superada; puerta O2 pendiente de aprobar (4 oct) | [`auditoria-o2.md`](auditoria-o2.md) |
 | Informe de la prueba con familias | F2 | Pendiente |
 | Informe de cierre e informe de impacto | Cierre | Pendiente |

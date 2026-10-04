@@ -4,6 +4,7 @@ dist/
 build/
 .vite/
 coverage/
+audit-output/
 
 # Secrets — never commit keys (only .env.example)
 .env

@@ -38,7 +38,7 @@ Híbrido según el certificado Google Project Management:
 - **Ninguna clave** en el código: solo `.env.example`.
 - **Ninguna marca registrada** (Minecraft, Roblox…) en skins ni nombres.
 - Para niños de primaria: tocar y arrastrar, no escribir; la respuesta correcta nunca fija en la misma posición.
-- Antes de cada entrega, **auditoría automática**: partida completa acertando y fallando, 375 px y 768 px, 0 errores de JavaScript.
+- Antes de cada entrega, **auditoría automática** con `npm run audit`: partida completa acertando y fallando, 375, 768 y 1440 px, 0 errores de JavaScript. El informe queda en [`docs/gestion/auditoria-o2.md`](docs/gestion/auditoria-o2.md).
 
 ## Git
 

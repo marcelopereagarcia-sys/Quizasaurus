@@ -83,6 +83,16 @@
   box-sizing: border-box;
 }
 
+/*
+ * A card dragged past the edge must not widen the page: a phone would zoom out
+ * and stay so. Clipping on body does it; html must clip too, or body's value
+ * would pass to the window instead, where it does not help.
+ */
+html,
+body {
+  overflow-x: clip;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -628,6 +638,7 @@ button {
   grid-template-columns: minmax(0, 1fr) 100px auto;
   gap: 10px;
   align-items: center;
+  overflow-wrap: anywhere;
 }
 
 .bar {
@@ -753,7 +764,7 @@ button {
   padding: 0;
 }
 
-.field input:not([type="radio"]),
+.field input:not([type="radio"], [type="file"]),
 .field textarea,
 .field select {
   width: 100%;
@@ -937,6 +948,7 @@ button {
 .hud h2 {
   font-size: 1.3rem;
   line-height: 1.15;
+  overflow-wrap: anywhere;
 }
 
 .hud .pill {
@@ -1267,6 +1279,8 @@ button {
   background: var(--ok-bg);
   border: 3px solid var(--ok);
   border-radius: 6px;
+  /* A long word of the book (or a long explanation) wraps instead of spilling out. */
+  overflow-wrap: anywhere;
 }
 
 .feedback.ko {
