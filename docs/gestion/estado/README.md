@@ -16,4 +16,4 @@ Un informe por día de trabajo, con un semáforo por área (alcance, plazo, pres
 | 3 oct | 42 | 42 | ~10 | QZS-11 a 17 y QZS-19 |
 | 4 oct | 23 | 65 | ~10 | QZS-18, 20 a 25 |
 
-Plan: 83 puntos en total, con los 12 de Lanzamiento (v1.7) y los 6 de la sesión de correcciones (v1.8). Las correcciones, compartir packs y la portada (10 puntos: QZS-26, 27, 32, 33 y 34) están hechas y pendientes de aceptar. Horas: unas 30 hasta el 4 de octubre, frente a las 112 del plan inicial de 2 semanas.
+Plan: 84 puntos en total, con los 12 de Lanzamiento (v1.7) y los 7 de la sesión de correcciones (v1.8). Las correcciones, compartir packs y la portada (11 puntos: QZS-26, 27, 32, 33, 34 y 35) están hechas y pendientes de aceptar. Horas: unas 30 hasta el 4 de octubre, frente a las 112 del plan inicial de 2 semanas.

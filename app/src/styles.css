@@ -213,7 +213,8 @@ button {
   padding: 4px 4px 4px 16px;
 }
 
-.notice .close {
+.notice .close,
+.share-prompt .close {
   min-width: 44px;
   min-height: 44px;
   background: none;
@@ -692,6 +693,25 @@ button {
 
 .share p {
   margin: 0;
+}
+
+/* Right after a unit is made: the offer to send it to the child's device (QZS-35). */
+.share-prompt {
+  position: relative;
+  padding: 16px 52px 16px 16px;
+  border-color: var(--gold);
+  box-shadow: 0 6px 0 var(--gold);
+}
+
+.share-prompt .share {
+  padding-top: 0;
+  border-top: none;
+}
+
+.share-prompt .close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
 }
 
 .pbody h3 {

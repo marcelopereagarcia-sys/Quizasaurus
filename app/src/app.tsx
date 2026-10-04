@@ -1,5 +1,5 @@
 import type { ComponentType } from "preact";
-import { useEffect, useMemo, useState } from "preact/hooks";
+import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 import examplePack from "../../examples/ciclo-del-agua.pack.json";
 import type { Pack } from "../../src/pack/schema.js";
 import { validatePack, validatePackJson } from "../../src/pack/validate.js";
@@ -54,6 +54,10 @@ export function App() {
     return pack?.review.status === "approved" && gameExists ? { name: "play", id: pack.id, game: run.game } : { name: "welcome" };
   });
   const [notice, setNotice] = useState<string>();
+  // A unit just made and approved offers to be shared at once (QZS-35).
+  const [sharePrompt, setSharePrompt] = useState<string>();
+  // Each press of "Share" on a unit opens its family corner at "Share this unit".
+  const [shareRequest, setShareRequest] = useState(0);
   const [settings, setSettings] = useState(() => loadSettings());
   const [progress, setProgress] = useState<Progress>(() => loadProgress());
   // Applied before the first paint, so the page never flashes the other skin.
@@ -103,6 +107,11 @@ export function App() {
       openUnit(result.pack.id);
     });
   }, []);
+
+  // Every new screen starts at the top: after a long review, the unit (and its offer to share) shows from its sign.
+  useEffect(() => {
+    scrollTo({ top: 0 });
+  }, [screen]);
 
   /** Moves between screens through the browser history (see above); `replace` swaps the current step. */
   function go(next: Screen, replace = false) {
@@ -197,6 +206,7 @@ export function App() {
     // A half-played game of the old questions would not match the new ones.
     if (run?.packId === pack.id) onRunProgress(pack.id, run.game, undefined);
     setNotice(persisted ? (approved ? texts.savedApproved : texts.savedDraft) : texts.notSaved);
+    if (approved && screen.name === "review" && screen.fromGenerator === true) setSharePrompt(pack.id);
     leaveReview(pack.id);
   }
 
@@ -344,6 +354,14 @@ export function App() {
               <span class="pill">💎 {ui.gemsPill(progress.gems)}</span>
             </div>
           </header>
+          {sharePrompt === current.id && (
+            <div class="panel share-prompt">
+              <button class="close" aria-label={ui.close} onClick={() => setSharePrompt(undefined)}>
+                ✕
+              </button>
+              <SharePanel pack={current} t={ui} title={ui.sharePromptTitle} />
+            </div>
+          )}
           {current.review.status === "draft" && (
             <div class="warning panel">
               <p>{ui.needsReview}</p>
@@ -384,6 +402,9 @@ export function App() {
             <button class="btn prime" disabled={!playable} onClick={() => go({ name: "play", id: current.id, game: next ?? 0 })}>
               {resuming ? ui.continueAt(next + 1) : ui.play}
             </button>
+            <button class="btn" onClick={() => setShareRequest((n) => n + 1)}>
+              {ui.shareButton}
+            </button>
             {!BUILT_IN.some((b) => b.id === current.id) && (
               <button class="btn" onClick={() => onRemove(current)}>
                 {ui.remove}
@@ -391,6 +412,8 @@ export function App() {
             )}
           </div>
           <FamilyCorner
+            key={current.id}
+            shareRequest={shareRequest}
             pack={current}
             scores={progress.topics[current.id] ?? {}}
             bossThreshold={settings.bossThreshold}
@@ -559,11 +582,24 @@ function FamilyCorner(props: {
   onBossThreshold: (value: number) => void;
   onReset: () => void;
   onEdit: () => void;
+  /** Goes up with each press of the unit's "Share" button. */
+  shareRequest: number;
 }) {
   const { pack, scores, bossThreshold, t } = props;
   const answered = pack.topics.filter((topic) => scores[topic.id]);
+  const [open, setOpen] = useState(false);
+  const shareRef = useRef<HTMLDivElement>(null);
+  // Only a press made while this unit is on screen counts, not one made on another unit.
+  const seen = useRef(props.shareRequest);
+  useEffect(() => {
+    if (props.shareRequest === seen.current) return;
+    seen.current = props.shareRequest;
+    setOpen(true);
+    // Once the corner has opened, its sharing part comes into view.
+    requestAnimationFrame(() => shareRef.current?.scrollIntoView({ block: "start" }));
+  }, [props.shareRequest]);
   return (
-    <details class="panel parents">
+    <details class="panel parents" open={open} onToggle={(e) => setOpen((e.currentTarget as HTMLDetailsElement).open)}>
       <summary>{t.familyCorner}</summary>
       <div class="pbody">
         <h3>{t.topicsTitle}</h3>
@@ -602,14 +638,16 @@ function FamilyCorner(props: {
             {t.resetProgress}
           </button>
         </div>
-        <SharePanel pack={pack} t={t} />
+        <div ref={shareRef}>
+          <SharePanel pack={pack} t={t} />
+        </div>
       </div>
     </details>
   );
 }
 
 /** The parent sends the unit to the child's device (QZS-26): a link first, a file for iPad and iPhone. */
-function SharePanel({ pack, t }: { pack: Pack; t: Dict }) {
+function SharePanel({ pack, t, title = t.shareTitle }: { pack: Pack; t: Dict; title?: string }) {
   const [status, setStatus] = useState<string>();
   const canSend = typeof navigator.share === "function";
   const cancelled = (error: unknown) => error instanceof DOMException && error.name === "AbortError";
@@ -654,7 +692,7 @@ function SharePanel({ pack, t }: { pack: Pack; t: Dict }) {
 
   return (
     <section class="share">
-      <h3>{t.shareTitle}</h3>
+      <h3>{title}</h3>
       <p>{t.shareIntro}</p>
       <div class="actions">
         {canSend && (
