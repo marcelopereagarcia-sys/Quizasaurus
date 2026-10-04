@@ -29,6 +29,16 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+      # Plays the built app like a child before publishing it (QZS-22): a failed audit stops the deploy.
+      - run: npx playwright install --with-deps --only-shell chromium
+      - run: npx tsx scripts/audit.mts
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit
+          path: |
+            docs/gestion/auditoria-o2.md
+            audit-output/
       - uses: actions/upload-pages-artifact@v4
         with:
           path: dist
