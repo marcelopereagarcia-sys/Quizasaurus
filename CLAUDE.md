@@ -17,7 +17,7 @@ Herramienta de código abierto (MIT) que convierte una unidad escolar (PDF o fot
 Híbrido según el certificado Google Project Management:
 - **Cascada** para el marco: charter, ADR, registro de riesgos, hitos con puertas de aprobación, informe de cierre e impacto.
 - **Scrum** para construir: sprints de un día en Jira (proyecto **QZS**), historias INVEST con criterios de aceptación y puntos de historia.
-- Plan: 2 semanas, del 5 al 18 de octubre de 2026. Fases y puertas en [`docs/gestion/README.md`](docs/gestion/README.md).
+- Plan: del 2 al 8 de octubre de 2026 (adelantado en la v1.6 del charter; el inicial era del 5 al 18). Fases y puertas en [`docs/gestion/README.md`](docs/gestion/README.md).
 
 ### Al trabajar una incidencia de Jira
 1. Leer la historia y sus criterios de aceptación antes de empezar.

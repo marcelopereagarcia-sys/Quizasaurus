@@ -1,12 +1,12 @@
 # Project Charter — Quizasaurus
 
-Versión 1.5 · aprobada el 4 de octubre de 2026 · Marcelo Perea García
+Versión 1.6 · aprobada el 4 de octubre de 2026 · Marcelo Perea García
 
 > Copia exportada del charter aprobado. El original vive en Claude Docs; cualquier cambio de alcance, fechas o presupuesto pasa por el registro de cambios del final.
 
 ## Resumen del proyecto
 
-Quizasaurus es una herramienta de código abierto (licencia MIT) que convierte el material de una unidad escolar, en PDF o fotos, en un pack de 5 juegos y un examen final que el niño juega sin conexión. El objetivo es entregarla en 2 semanas, funcionando, probada por 2 familias y documentada como caso de gestión de proyectos con IA.
+Quizasaurus es una herramienta de código abierto (licencia MIT) que convierte el material de una unidad escolar, en PDF o fotos, en un pack de 5 juegos y un examen final que el niño juega sin conexión. El objetivo es entregarla en una semana (del 2 al 8 de octubre, tras adelantar el plan en la v1.6), funcionando, probada por 2 familias y documentada como caso de gestión de proyectos con IA.
 
 **Origen.** En octubre de 2026 un alumno de 3º de primaria prepara su examen de Coneixement del Medi (Unitat 1, «Les persones») con un prototipo construido en un fin de semana. El examen es el 5 de octubre; su resultado será el primer dato del informe de impacto. Ese prototipo es el MVP de referencia de este proyecto.
 
@@ -22,15 +22,15 @@ Quizasaurus es una herramienta de código abierto (licencia MIT) que convierte e
 
 ## Objetivos SMART y métricas de éxito
 
-El proyecto tiene éxito si cumple los 5 objetivos antes del cierre previsto, el 18 de octubre de 2026.
+El proyecto tiene éxito si cumple los 5 objetivos antes del cierre previsto, el 8 de octubre de 2026 (era el 18; adelantado en la v1.6).
 
 | # | Objetivo SMART | Métrica (KPI) | Meta | Fecha |
 | --- | --- | --- | --- | --- |
-| O1 | Generar un pack válido a partir de una unidad escaneada de primaria | % de preguntas correctas tras revisión adulta, sobre 3 unidades de prueba | ≥ 90 %, en < 3 min por unidad | 07-oct-2026 |
-| O2 | Entregar un reproductor PWA que funcione sin conexión | Plantillas de juego jugables offline en Xiaomi Pad 7 y navegador de escritorio | 5 plantillas, en catalán y castellano | 11-oct-2026 |
-| O3 | Probar el ciclo completo con familias reales | Familias que generan, revisan y juegan un pack sin ayuda técnica | 2 de 2 familias | 15-oct-2026 |
-| O4 | Medir la satisfacción de la prueba | Valoración media en una encuesta de 5 preguntas | ≥ 4 sobre 5 | 15-oct-2026 |
-| O5 | Publicar el proyecto como código abierto y caso de portfolio | Repositorio público MIT con README, guía de contribución y documentación de gestión; caso publicado en LinkedIn | Repo publicado + 3 publicaciones | 18-oct-2026 |
+| O1 | Generar un pack válido a partir de una unidad escaneada de primaria | % de preguntas correctas tras revisión adulta, sobre 3 unidades de prueba | ≥ 90 %, en < 3 min por unidad | 03-oct-2026 |
+| O2 | Entregar un reproductor PWA que funcione sin conexión | Plantillas de juego jugables offline en Xiaomi Pad 7 y navegador de escritorio | 5 plantillas, en catalán y castellano | 04-oct-2026 |
+| O3 | Probar el ciclo completo con familias reales | Familias que generan, revisan y juegan un pack sin ayuda técnica | 2 de 2 familias | 04-oct-2026 |
+| O4 | Medir la satisfacción de la prueba | Valoración media en una encuesta de 5 preguntas | ≥ 4 sobre 5 | 04-oct-2026 |
+| O5 | Publicar el proyecto como código abierto y caso de portfolio | Repositorio público MIT con README, guía de contribución y documentación de gestión; caso publicado en LinkedIn | Repo publicado + 1 publicación | 08-oct-2026 |
 
 Indicadores secundarios, sin meta fija: estrellas y contribuciones externas en GitHub, packs compartidos por la comunidad y alcance de las publicaciones.
 
@@ -101,24 +101,24 @@ El sponsor, el project manager y el product owner son la misma persona. El desar
 
 ## Hitos y calendario
 
-El proyecto dura 2 semanas, del 5 al 18 de octubre de 2026, con sprints de un día y una puerta de aprobación al final de cada fase.
+El plan inicial era de 2 semanas, del 5 al 18 de octubre de 2026. Como las fases avanzaron más rápido de lo previsto, en la v1.6 se adelantan las fechas: el proyecto va del 2 al 8 de octubre, con sprints de un día y una puerta de aprobación al final de cada fase.
 
 **Hoja de ruta: 6 fases, cada una cerrada por una puerta de aprobación**
 
 | Fase | Fechas | Qué se entrega | Puerta de aprobación |
 | --- | --- | --- | --- |
-| Iniciación | lun 5 oct | Charter, ADR y registro de riesgos; backlog inicial en Jira | Charter aprobado |
-| F0 · Generador | mar 6 – mié 7 oct | Esquema del pack y generador CLI; comparativa de modelos | ≥ 90 % correctas (O1) y coste por pack medido |
-| F1 · MVP | jue 8 – dom 11 oct | Reproductor PWA con 5 plantillas; generador con pantalla web | Juega offline en la Xiaomi Pad 7 (O2) |
-| F2 · Prueba con familias | lun 12 – jue 15 oct | 2 familias amigas lo prueban por su cuenta, cada una con un pack completo; encuesta en un formulario de Google | 2 de 2 familias (O3); satisfacción ≥ 4 de 5 (O4) |
-| Lanzamiento | vie 16 oct | Repositorio público v1.0 y demo; publicación de lanzamiento en LinkedIn | Repo MIT publicado (O5) |
-| Cierre | sáb 17 – dom 18 oct | Informe de cierre e impacto; retrospectiva y lecciones aprendidas | Cierre aprobado |
+| Iniciación | vie 2 – sáb 3 oct | Charter, ADR y registro de riesgos; backlog inicial en Jira | Charter aprobado |
+| F0 · Generador | sáb 3 oct | Esquema del pack y generador CLI; comparativa de modelos | ≥ 90 % correctas (O1) y coste por pack medido |
+| F1 · MVP | sáb 3 – dom 4 oct | Reproductor PWA con 5 plantillas; generador con pantalla web | Juega offline en la Xiaomi Pad 7 (O2) |
+| F2 · Prueba con familias | dom 4 oct | 2 familias amigas lo prueban por su cuenta, cada una con un pack completo; encuesta en un formulario de Google | 2 de 2 familias (O3); satisfacción ≥ 4 de 5 (O4) |
+| Lanzamiento | lun 5 – mar 6 oct | Repositorio público v1.0 y demo | Repo MIT publicado (O5) |
+| Cierre | mié 7 – jue 8 oct | Informe de cierre e impacto; retrospectiva y lecciones aprendidas; publicación final en LinkedIn | Cierre aprobado |
 
 Ninguna fase empieza sin pasar la puerta de la anterior. Si F0 no alcanza el 90 %, se revisa el alcance antes de construir el MVP.
 
 ## Presupuesto, recursos y herramientas
 
-El presupuesto monetario es de 50 € como máximo, destinado casi entero al uso de APIs de IA en las pruebas. El recurso principal es el tiempo: unas 8 horas al día durante 14 días, aproximadamente 112 horas.
+El presupuesto monetario es de 50 € como máximo, destinado casi entero al uso de APIs de IA en las pruebas. El recurso principal es el tiempo: el plan inicial preveía unas 8 horas al día durante 14 días, aproximadamente 112 horas. Con el adelanto de la v1.6 el plazo baja a 7 días; las horas reales se miden en el informe de cierre.
 
 | Partida | Coste previsto | Notas |
 | --- | --- | --- |
@@ -146,15 +146,15 @@ El riesgo más serio es que un modelo pequeño no genere preguntas fiables en ca
 | R6 | Las familias de prueba no encuentran hueco esa semana | Media | Medio | Lo hacen en casa cuando les va bien, sin cita; el alumno de referencia como respaldo |
 | R7 | Fallos en tablets o navegadores concretos (offline, voz, emojis) | Media | Medio | Auditoría automática; pruebas en Xiaomi Pad 7 y un iPad; la voz es opcional |
 | R8 | Cambios en las APIs o condiciones de los proveedores de IA | Baja | Medio | Capa de proveedores intercambiable; Ollama como opción local |
-| R9 | El plan de 2 semanas deja poco margen para imprevistos | Alta | Medio | Revisión diaria del avance; el prototipo como base de las plantillas; recortar alcance antes que fechas |
+| R9 | El plan comprimido (7 días desde la v1.6) deja poco margen para imprevistos | Alta | Medio | Revisión diaria del avance; el prototipo como base de las plantillas; recortar alcance antes que fechas |
 
 ## Supuestos y restricciones
 
 **Supuestos**
 
-- El PM dedica unas 8 horas al día durante las 2 semanas.
+- El PM dedica unas 8 horas al día durante el proyecto.
 - Un modelo de IA, local o en la nube, alcanza el 90 % de preguntas correctas en catalán y castellano.
-- Dos familias amigas prueban la herramienta entre el 12 y el 15 de octubre.
+- Las familias de prueba prueban la herramienta durante F2.
 - Una PWA cubre la necesidad offline sin publicar en tiendas de apps.
 
 **Restricciones**
@@ -176,7 +176,7 @@ El proyecto es híbrido: cascada para el marco y los hitos, Scrum para construir
 - Sprints de un día: objetivo por la mañana, demo y revisión al final del día.
 - Backlog de historias de usuario con criterios INVEST y criterios de aceptación.
 - Planificación al inicio de cada sprint, revisión con demo y retrospectiva escrita al final.
-- Burndown de las 2 semanas e informe de estado diario con semáforo (verde, ámbar o rojo).
+- Burndown del proyecto e informe de estado diario con semáforo (verde, ámbar o rojo).
 
 **Plan de comunicación**
 
@@ -184,9 +184,9 @@ El proyecto es híbrido: cascada para el marco y los hitos, Scrum para construir
 | --- | --- | --- | --- | --- |
 | Informe de estado (semáforo) | Sponsor | Diario | Jira + nota en el vault | `docs/gestion/estado` |
 | Demo del día | Sponsor y alumno de referencia | Diario en F1 | Sesión en la tablet | Notas de la revisión |
-| Seguimiento de la prueba | Familias de prueba | Diario del 12 al 15 de octubre | Grupo de mensajería | Informe de la prueba |
+| Seguimiento de la prueba | Familias de prueba | Diario durante F2 | Grupo de mensajería | Informe de la prueba |
 | Decisiones de arquitectura | Comunidad y reclutadores | Cuando se toma una | ADR en el repositorio | `docs/adr` |
-| Serie «construyendo en público» | Red profesional | 3 publicaciones: arranque, lanzamiento y cierre | LinkedIn | Enlaces en el README |
+| Serie «construyendo en público» | Red profesional | 1 publicación final, en el cierre | LinkedIn | Enlaces en el README |
 
 ## Aprobaciones y control de versiones
 
@@ -198,6 +198,7 @@ El charter entra en vigor cuando el sponsor lo aprueba; desde ese momento, cualq
 
 | Versión | Fecha | Cambio |
 | --- | --- | --- |
+| 1.6 | 04-oct-2026 | Cambio de plazo aprobado por el sponsor: como Iniciación, F0, F1 y la prueba F2 se completaron entre el 2 y el 4 de octubre, se adelantan las fechas. Lanzamiento pasa al 5 y 6 de octubre, y Cierre al 7 y 8; el proyecto termina el 8 de octubre en lugar del 18. Las fechas de O1 a O5 se ajustan al plan nuevo. Se corrigen también la meta de O5, la hoja de ruta y el plan de comunicación, que aún decían 3 publicaciones en LinkedIn: desde la v1.1 es 1, en el cierre |
 | 1.5 | 04-oct-2026 | Cambio de alcance aprobado por el sponsor para simplificar F2: las 2 familias prueban la app por su cuenta, sin sesión guiada. Reciben un mensaje con el enlace y los pasos, cada una crea, revisa y juega un pack completo (todos los niveles y el examen final), y responden una encuesta anónima en un formulario de Google. O3 y O4 no cambian |
 | 1.4 | 03-oct-2026 | Cambio de alcance aprobado por el sponsor: las «varias sesiones con contenido distinto» por unidad (los 3 mundos del prototipo) salen del MVP y quedan como mejora abierta a la comunidad, porque exigen que el generador cree el triple de preguntas y cambiar el formato del pack. El modo infinito, que mezcla toda la unidad en cada ronda, cubre la rejugabilidad |
 | 1.3 | 03-oct-2026 | Cambio de alcance aprobado por el sponsor tras probar la app: (1) dentro de una unidad y sus juegos, la interfaz va en el idioma del pack, para no mezclar idiomas en pantalla; el selector de idioma solo afecta a la pantalla de inicio; (2) el reproductor recupera la identidad visual del prototipo (bloques y dinos, letra pixelada y Lexend) y las 2 skins pasan a ser variaciones de color de esa identidad |
