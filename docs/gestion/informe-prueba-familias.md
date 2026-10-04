@@ -1,6 +1,6 @@
 # Informe de la prueba con familias (F2)
 
-Tres familias probaron Quizasaurus en casa, por su cuenta, el 4 de octubre de 2026. La satisfacción media fue de **4,67 sobre 5** (O4 ✅). **2 de las 3 familias** completaron el ciclo sin ayuda (O3). La tercera necesitó ayuda para conseguir la clave de la IA y no terminó todos los niveles. Ese es el punto débil que deja la prueba.
+**Puerta F2 aprobada por el PM con una incidencia (4 de octubre de 2026).** Tres familias probaron Quizasaurus en casa, por su cuenta, el 4 de octubre de 2026. La satisfacción media fue de **4,67 sobre 5** (O4 ✅). **2 de las 3 familias** completaron el ciclo sin ayuda (O3). La tercera necesitó ayuda para conseguir la clave de la IA y no terminó todos los niveles. Ese es el punto débil que deja la prueba.
 
 Formato (charter v1.5): cada familia recibió un mensaje con el enlace y los pasos ([kit](prueba-familias.md)), creó un pack con un tema propio, lo revisó, el niño o la niña lo jugó, y la familia respondió una encuesta anónima.
 
@@ -8,10 +8,10 @@ Formato (charter v1.5): cada familia recibió un mensaje con el enlace y los pas
 
 | Objetivo | Meta (charter) | Resultado | Estado |
 | --- | --- | --- | --- |
-| O3 · Familias que crean, revisan y juegan un pack completo sin ayuda técnica | 2 de 2 familias | 2 de 3 familias (la tercera necesitó ayuda con la clave) | ⚠️ Lo decide el PM |
+| O3 · Familias que crean, revisan y juegan un pack completo sin ayuda técnica | 2 de 2 familias | 2 de 3 familias (la tercera necesitó ayuda con la clave) | ✅ Aprobado con incidencia |
 | O4 · Satisfacción media en las 5 preguntas | ≥ 4 sobre 5 | 4,67 sobre 5 | ✅ |
 
-Se cumple la cifra de O3 (2 familias completan el ciclo sin ayuda), pero no el 100 %, porque probaron 3 familias en lugar de 2. Aprobar la puerta o pedir antes una mejora lo decide el PM (ver «Incidencias»).
+Se cumple la cifra de O3 (2 familias completan el ciclo sin ayuda), pero no el 100 %, porque probaron 3 familias en lugar de 2. El PM aprobó la puerta con esta incidencia, que se corrige en Lanzamiento (QZS-27).
 
 ## Por familia
 
@@ -44,7 +44,7 @@ A los tres niños les gustó jugar y las tres familias lo volverían a usar (5 d
 
 | # | Qué pasó | Paso y aparato | Propuesta | Decisión del PM |
 | --- | --- | --- | --- | --- |
-| 1 | Conseguir la clave de la IA necesitó ayuda; la familia lo señala como lo más difícil | Crear la unidad · móvil | **Corregir antes del lanzamiento:** un botón «Pegar» junto al campo de la clave (copiar y pegar en el móvil es lo más torpe) y avisar al momento si lo pegado no tiene forma de clave de Gemini. Preguntar a la familia B en qué paso exacto se atascó | Pendiente |
+| 1 | Conseguir la clave de la IA necesitó ayuda; la familia lo señala como lo más difícil | Crear la unidad · móvil | **Corregir antes del lanzamiento:** un botón «Pegar» junto al campo de la clave (copiar y pegar en el móvil es lo más torpe) y avisar al momento si lo pegado no tiene forma de clave de Gemini. Preguntar a la familia B en qué paso exacto se atascó | Corregir en Lanzamiento (QZS-27) |
 | 2 | El niño no jugó todos los niveles | Jugar · móvil | Sin acción: la prueba se hizo en una tarde. No consta ningún fallo de la app | Pendiente |
 | 3 | Revisar las preguntas sacó un 3 en una familia de 1.º | Revisión · ordenador | Dejar a la comunidad: con alumnos que aún no leen solos, revisar recae en el adulto. Una revisión más corta (solo las preguntas dudosas) es una mejora posible | Pendiente |
 

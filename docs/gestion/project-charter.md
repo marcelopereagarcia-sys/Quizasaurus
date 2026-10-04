@@ -1,6 +1,6 @@
 # Project Charter — Quizasaurus
 
-Versión 1.6 · aprobada el 4 de octubre de 2026 · Marcelo Perea García
+Versión 1.7 · aprobada el 4 de octubre de 2026 · Marcelo Perea García
 
 > Copia exportada del charter aprobado. El original vive en Claude Docs; cualquier cambio de alcance, fechas o presupuesto pasa por el registro de cambios del final.
 
@@ -111,7 +111,7 @@ El plan inicial era de 2 semanas, del 5 al 18 de octubre de 2026. Como las fases
 | F0 · Generador | sáb 3 oct | Esquema del pack y generador CLI; comparativa de modelos | ≥ 90 % correctas (O1) y coste por pack medido |
 | F1 · MVP | sáb 3 – dom 4 oct | Reproductor PWA con 5 plantillas; generador con pantalla web | Juega offline en la Xiaomi Pad 7 (O2) |
 | F2 · Prueba con familias | dom 4 oct | 2 familias amigas lo prueban por su cuenta, cada una con un pack completo; encuesta en un formulario de Google | 2 de 2 familias (O3); satisfacción ≥ 4 de 5 (O4) |
-| Lanzamiento | lun 5 – mar 6 oct | Repositorio público v1.0 y demo | Repo MIT publicado (O5) |
+| Lanzamiento | lun 5 – mar 6 oct | Repositorio público v1.0 y demo; guardar y compartir packs, botón «Pegar» en la clave y generar desde texto pegado | Repo MIT publicado (O5) |
 | Cierre | mié 7 – jue 8 oct | Informe de cierre e impacto; retrospectiva y lecciones aprendidas; publicación final en LinkedIn | Cierre aprobado |
 
 Ninguna fase empieza sin pasar la puerta de la anterior. Si F0 no alcanza el 90 %, se revisa el alcance antes de construir el MVP.
@@ -198,6 +198,7 @@ El charter entra en vigor cuando el sponsor lo aprueba; desde ese momento, cualq
 
 | Versión | Fecha | Cambio |
 | --- | --- | --- |
+| 1.7 | 04-oct-2026 | Cambio de alcance aprobado por el sponsor en la revisión de pendientes: Lanzamiento suma 3 mejoras de la app (12 puntos con la documentación). Guardar y compartir un pack en un archivo, para cumplir que los packs se pueden compartir (QZS-26). Botón «Pegar» y aviso de formato en la clave de la IA, la incidencia de la prueba F2 (QZS-27). Generar desde texto pegado, la mitigación del riesgo R2 que faltaba (QZS-28). Las mejoras para la comunidad se listan en la guía de contribución |
 | 1.6 | 04-oct-2026 | Cambio de plazo aprobado por el sponsor: como Iniciación, F0, F1 y la prueba F2 se completaron entre el 2 y el 4 de octubre, se adelantan las fechas. Lanzamiento pasa al 5 y 6 de octubre, y Cierre al 7 y 8; el proyecto termina el 8 de octubre en lugar del 18. Las fechas de O1 a O5 se ajustan al plan nuevo. Se corrigen también la meta de O5, la hoja de ruta y el plan de comunicación, que aún decían 3 publicaciones en LinkedIn: desde la v1.1 es 1, en el cierre |
 | 1.5 | 04-oct-2026 | Cambio de alcance aprobado por el sponsor para simplificar F2: las 2 familias prueban la app por su cuenta, sin sesión guiada. Reciben un mensaje con el enlace y los pasos, cada una crea, revisa y juega un pack completo (todos los niveles y el examen final), y responden una encuesta anónima en un formulario de Google. O3 y O4 no cambian |
 | 1.4 | 03-oct-2026 | Cambio de alcance aprobado por el sponsor: las «varias sesiones con contenido distinto» por unidad (los 3 mundos del prototipo) salen del MVP y quedan como mejora abierta a la comunidad, porque exigen que el generador cree el triple de preguntas y cambiar el formato del pack. El modo infinito, que mezcla toda la unidad en cada ronda, cubre la rejugabilidad |
