@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { UI_LANGS } from "../app/src/i18n.js";
-import { DINOS, type Outcome, dinoOf, emptyProgress, levelKey, levelStars, loadProgress, recordGame, saveProgress } from "../app/src/progress.js";
+import { DINOS, type Outcome, anyLevelPassed, dinoOf, emptyProgress, levelKey, levelStars, loadProgress, nextLevel, recordGame, saveProgress } from "../app/src/progress.js";
 
 const outcome = (over: Partial<Outcome> = {}): Outcome => ({
   packId: "agua",
@@ -69,6 +69,33 @@ describe("rewards, as in the prototype", () => {
     const before = emptyProgress();
     recordGame(before, outcome());
     expect(before).toEqual(emptyProgress());
+  });
+});
+
+describe("the level to play next (QZS-32)", () => {
+  const play = (progress = emptyProgress(), game: number, passed = true) => recordGame(progress, outcome({ game, passed })).progress;
+
+  it("is level 1 in a new unit, and nothing counts as passed yet", () => {
+    expect(nextLevel(emptyProgress(), "agua", 5)).toBe(0);
+    expect(anyLevelPassed(emptyProgress(), "agua", 5)).toBe(false);
+  });
+
+  it("is the first level not passed, even after playing out of order", () => {
+    const p = play(play(emptyProgress(), 0), 2);
+    expect(nextLevel(p, "agua", 5)).toBe(1);
+    expect(anyLevelPassed(p, "agua", 5)).toBe(true);
+  });
+
+  it("stays on a boss that is still standing, and is none once every level is passed", () => {
+    let p = [0, 1, 2, 3].reduce((acc, g) => play(acc, g), emptyProgress());
+    p = play(p, 4, false);
+    expect(nextLevel(p, "agua", 5)).toBe(4);
+    p = play(p, 4, true);
+    expect(nextLevel(p, "agua", 5)).toBeUndefined();
+  });
+
+  it("does not mix units", () => {
+    expect(nextLevel(play(emptyProgress(), 0), "otra", 5)).toBe(0);
   });
 });
 

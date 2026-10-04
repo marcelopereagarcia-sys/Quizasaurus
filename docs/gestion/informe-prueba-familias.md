@@ -44,11 +44,11 @@ A los tres niños les gustó jugar y las tres familias lo volverían a usar (5 d
 
 | # | Qué pasó | Paso y aparato | Propuesta | Decisión del PM |
 | --- | --- | --- | --- | --- |
-| 1 | Conseguir la clave de la IA necesitó ayuda; la familia lo señala como lo más difícil | Crear la unidad · móvil | **Corregir antes del lanzamiento:** un botón «Pegar» junto al campo de la clave (copiar y pegar en el móvil es lo más torpe) y avisar al momento si lo pegado no tiene forma de clave de Gemini. Preguntar a la familia B en qué paso exacto se atascó | Corregir en Lanzamiento (QZS-27) |
-| 2 | El niño no jugó todos los niveles | Jugar · móvil | Sin acción: la prueba se hizo en una tarde. No consta ningún fallo de la app | Pendiente |
-| 3 | Revisar las preguntas sacó un 3 en una familia de 1.º | Revisión · ordenador | Dejar a la comunidad: con alumnos que aún no leen solos, revisar recae en el adulto. Una revisión más corta (solo las preguntas dudosas) es una mejora posible | Pendiente |
+| 1 | Conseguir la clave de la IA necesitó ayuda; la familia lo señala como lo más difícil | Crear la unidad · móvil | **Corregir antes del lanzamiento:** un botón «Pegar» junto al campo de la clave (copiar y pegar en el móvil es lo más torpe) y avisar al momento si lo pegado no tiene forma de clave de Gemini. Preguntar a la familia B en qué paso exacto se atascó | **Corregida el 4 oct (QZS-27):** botones «Pegar» y «Mostrar», aviso de formato y pasos al día. Las claves nuevas de Gemini empiezan por «AQ.», no por «AIza» |
+| 2 | El niño no jugó todos los niveles | Jugar · móvil | Sin acción: la prueba se hizo en una tarde. No consta ningún fallo de la app | **Corregida el 4 oct (QZS-32).** Al revisarla apareció una causa probable: «▶ Jugar» empezaba siempre por el nivel 1. Ahora dice «Seguir: nivel N» y abre el primero sin superar |
+| 3 | Revisar las preguntas sacó un 3 en una familia de 1.º | Revisión · ordenador | Dejar a la comunidad: con alumnos que aún no leen solos, revisar recae en el adulto. Una revisión más corta (solo las preguntas dudosas) es una mejora posible | **Corregida el 4 oct (QZS-33):** cada pregunta se lee de un vistazo, con la respuesta correcta en verde, y solo se abre la que hay que corregir |
 
-No se ha encontrado ningún fallo de la app: ninguna familia dice que algo se rompiera. Sí se confirma el riesgo de la clave, que el kit ya preveía.
+Ninguna familia dice que algo se rompiera. Al revisar las incidencias sí apareció un defecto de diseño: «Jugar» no seguía por el nivel pendiente. Además, se confirma el riesgo de la clave, que el kit ya preveía. Las 3 incidencias se corrigieron el mismo día, a petición del PM.
 
 ## Límites de la prueba
 

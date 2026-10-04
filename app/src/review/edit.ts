@@ -20,6 +20,66 @@ export function questionCount(game: Game): number {
   }
 }
 
+/** A question as the adult reads it: what the child sees and which answers are right. */
+export interface QuestionView {
+  /** The question, the statement or the item to place. */
+  text: string;
+  /** Options, bins or steps; `right` marks the correct ones. */
+  answers: { label: string; right: boolean }[];
+  /** The answers are steps, already in the right order. */
+  ordered: boolean;
+  explanation: string;
+}
+
+const withEmoji = (emoji: string | undefined, label: string) => (emoji ? `${emoji} ${label}` : label);
+
+/** One question of a game, ready to read at a glance (QZS-33). */
+export function questionView(game: Game, q: number, yes: string, no: string): QuestionView {
+  switch (game.type) {
+    case "classify": {
+      const item = game.items[q]!;
+      return {
+        text: withEmoji(item.emoji, item.label),
+        answers: game.categories.map((c) => ({ label: withEmoji(c.emoji, c.label), right: c.id === item.category })),
+        ordered: false,
+        explanation: item.explanation,
+      };
+    }
+    case "order": {
+      const round = game.rounds[q]!;
+      return { text: round.prompt, answers: round.items.map((i) => ({ label: withEmoji(i.emoji, i.label), right: true })), ordered: true, explanation: round.explanation };
+    }
+    case "yesno": {
+      const question = game.questions[q]!;
+      return {
+        text: withEmoji(question.emoji, question.statement),
+        answers: [
+          { label: yes, right: question.answer },
+          { label: no, right: !question.answer },
+        ],
+        ordered: false,
+        explanation: question.explanation,
+      };
+    }
+    case "choice":
+    case "boss": {
+      const question = game.questions[q]!;
+      const right = [question.answer, ...(question.alsoAccepted ?? [])];
+      return {
+        text: withEmoji(question.emoji, question.prompt),
+        answers: question.options.map((o) => ({ label: o, right: right.includes(o) })),
+        ordered: false,
+        explanation: question.explanation,
+      };
+    }
+  }
+}
+
+/** Every question of the pack, to tell the adult how much there is to read. */
+export function packQuestionCount(pack: Pack): number {
+  return pack.games.reduce((n, game) => n + questionCount(game), 0);
+}
+
 export function canRemove(game: Game): boolean {
   return questionCount(game) > MIN_QUESTIONS[game.type];
 }

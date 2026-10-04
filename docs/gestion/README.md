@@ -19,7 +19,7 @@ El plan inicial era de 2 semanas (5–18 oct). Como las fases avanzaron más rá
 
 | Artefacto | Estado | Archivo |
 | --- | --- | --- |
-| Project Charter (objetivos SMART, alcance, RACI, riesgos) | Aprobado (v1.7, 4 oct) | [`project-charter.md`](project-charter.md) |
+| Project Charter (objetivos SMART, alcance, RACI, riesgos) | Aprobado (v1.8, 4 oct) | [`project-charter.md`](project-charter.md) |
 | Decisiones de arquitectura (ADR) | 1 aceptada | [`../adr`](../adr/) |
 | Informes de estado diarios (semáforo) | Al día (2–4 oct) | [`estado/`](estado/) |
 | Rúbrica de «pregunta correcta» | Aprobada (3 oct) | [`rubrica-pregunta-correcta.md`](rubrica-pregunta-correcta.md) |

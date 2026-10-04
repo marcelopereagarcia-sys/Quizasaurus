@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { canRemove, finishReview, gateQuestion, issueKind, issuePlace, moveItem, removeQuestion, renameOption } from "../app/src/review/edit.js";
+import { canRemove, finishReview, gateQuestion, issueKind, issuePlace, moveItem, packQuestionCount, questionView, removeQuestion, renameOption } from "../app/src/review/edit.js";
 import type { Pack } from "../src/pack/schema.js";
 
 const pack = JSON.parse(readFileSync(new URL("../examples/ciclo-del-agua.pack.json", import.meta.url), "utf8")) as Pack;
@@ -64,5 +64,35 @@ describe("adult review", () => {
   it("the parental gate asks a multiplication of 12-19 by 6-9", () => {
     expect(gateQuestion(() => 0)).toEqual({ a: 12, b: 6, answer: 72 });
     expect(gateQuestion(() => 0.999)).toEqual({ a: 19, b: 9, answer: 171 });
+  });
+});
+
+describe("reading a question at a glance (QZS-33)", () => {
+  const view = (type: string, q = 0) => questionView(draft.games[gameOf(type)]!, q, "Sí", "No");
+
+  it("shows each game's right answer without opening the fields", () => {
+    const classify = view("classify");
+    expect(classify.answers.filter((a) => a.right)).toHaveLength(1);
+    expect(classify.ordered).toBe(false);
+
+    const order = view("order");
+    expect(order.ordered).toBe(true);
+    expect(order.answers.every((a) => a.right)).toBe(true);
+
+    const yesno = view("yesno");
+    expect(yesno.answers.map((a) => a.label)).toEqual(["Sí", "No"]);
+    expect(yesno.answers.filter((a) => a.right)).toHaveLength(1);
+
+    for (const type of ["choice", "boss"]) {
+      const game = draft.games[gameOf(type)] as Extract<Pack["games"][number], { type: "choice" | "boss" }>;
+      const v = view(type);
+      expect(v.answers.map((a) => a.label)).toEqual(game.questions[0]!.options);
+      expect(v.answers.find((a) => a.right)?.label).toBe(game.questions[0]!.answer);
+      expect(v.explanation).toBe(game.questions[0]!.explanation);
+    }
+  });
+
+  it("counts every question of the pack", () => {
+    expect(packQuestionCount(draft)).toBe(6 + 2 + 3 + 5 + 5);
   });
 });

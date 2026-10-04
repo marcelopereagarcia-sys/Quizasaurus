@@ -11,8 +11,10 @@ import {
   type WebProvider,
   buildProvider,
   classifyError,
+  cleanKey,
   forgetKey,
   generateFromFiles,
+  keyLooksRight,
   loadAiSettings,
   prepareFile,
   saveAiSettings,
@@ -31,6 +33,12 @@ const KEY_SITE: Record<Exclude<WebProvider, "ollama">, { url: string; name: stri
   anthropic: { url: "https://console.anthropic.com/settings/keys", name: "Anthropic Console" },
   openai: { url: "https://platform.openai.com/api-keys", name: "OpenAI Platform" },
 };
+
+/** How each provider's keys start, for the hint when a pasted key does not look like one. */
+const KEY_STARTS: Record<Exclude<WebProvider, "ollama">, string[]> = { gemini: ["AQ.", "AIza"], anthropic: ["sk-ant-"], openai: ["sk-"] };
+
+/** The browser can paste from the clipboard (it may still ask the family first). */
+const CAN_PASTE = typeof navigator !== "undefined" && typeof navigator.clipboard?.readText === "function";
 
 /** Who receives the data, as named in the privacy notes (brand names, the same in every language). */
 const RECIPIENT: Record<WebProvider, string> = { gemini: "Google (Gemini)", anthropic: "Anthropic (Claude)", openai: "OpenAI", ollama: "Ollama" };
@@ -51,6 +59,8 @@ export default function Generator({ t, onGenerated, onCancel }: Props) {
   const [grade, setGrade] = useState(2); // 3.º de primaria
   const [language, setLanguage] = useState<"auto" | "ca" | "es" | "en">("auto");
   const [privacyOk, setPrivacyOk] = useState(false);
+  const [showKey, setShowKey] = useState(false);
+  const [pasteFailed, setPasteFailed] = useState(false);
   const [phase, setPhase] = useState<Phase>({ name: "form" });
 
   const provider = settings.provider;
@@ -60,6 +70,23 @@ export default function Generator({ t, onGenerated, onCancel }: Props) {
   function change(next: AiSettings) {
     setSettings(next);
     saveAiSettings(next);
+  }
+
+  function setKey(key: string) {
+    change({ ...settings, keys: { ...settings.keys, [provider]: cleanKey(key) } });
+  }
+
+  /** Pasting by hand into a hidden field is the hardest step on a phone (family test, F2). */
+  async function paste() {
+    try {
+      const text = cleanKey(await navigator.clipboard.readText());
+      if (!text) throw new Error("Nothing to paste");
+      setKey(text);
+      setPasteFailed(false);
+    } catch {
+      // Not allowed, or nothing copied: the family pastes by hand.
+      setPasteFailed(true);
+    }
   }
 
   async function start(e: Event) {
@@ -82,6 +109,16 @@ export default function Generator({ t, onGenerated, onCancel }: Props) {
   }
 
   if (phase.name === "working") return <Working t={t} progress={phase.progress} />;
+
+  // The same field, hidden or shown (the family checks what they pasted).
+  const keyInput = {
+    autoComplete: "off",
+    autoCapitalize: "off" as const,
+    autoCorrect: "off",
+    spellcheck: false,
+    value: settings.keys[provider] ?? "",
+    onInput: (e: Event) => setKey((e.currentTarget as HTMLInputElement).value),
+  };
 
   return (
     <form class="generator" onSubmit={start}>
@@ -165,15 +202,34 @@ export default function Generator({ t, onGenerated, onCancel }: Props) {
           <>
             <label class="field">
               <span>{t.genKey}</span>
-              <input
-                type="password"
-                autoComplete="off"
-                spellcheck={false}
-                value={settings.keys[provider] ?? ""}
-                onInput={(e) => change({ ...settings, keys: { ...settings.keys, [provider]: (e.currentTarget as HTMLInputElement).value } })}
-              />
+              {showKey ? <input type="text" {...keyInput} /> : <input type="password" {...keyInput} />}
               <small class="hint">{t.genKeyNote(providerName)}</small>
             </label>
+            <div class="actions key-tools">
+              {CAN_PASTE && (
+                <button class="btn small" type="button" onClick={paste}>
+                  {t.genPaste}
+                </button>
+              )}
+              <button class="btn small" type="button" aria-pressed={showKey} onClick={() => setShowKey(!showKey)}>
+                {showKey ? t.genHideKey : t.genShowKey}
+              </button>
+              {settings.keys[provider] && (
+                <button class="btn small" type="button" onClick={() => change(forgetKey(settings, provider))}>
+                  {t.genForgetKey}
+                </button>
+              )}
+            </div>
+            {pasteFailed && (
+              <p class="hint" role="status">
+                {t.genPasteFailed}
+              </p>
+            )}
+            {settings.keys[provider] && !keyLooksRight(provider, settings.keys[provider]) && (
+              <p class="key-warn" role="status">
+                {t.genKeyLooksWrong(KEY_SITE[provider].name, KEY_STARTS[provider])}
+              </p>
+            )}
             {/* Step by step, open by default while there is no key: "a link to Google" alone does not say what to do there. */}
             <details class="key-help" open={!settings.keys[provider]}>
               <summary>{t.genKeyHelp}</summary>
@@ -187,13 +243,6 @@ export default function Generator({ t, onGenerated, onCancel }: Props) {
                 {t.genKeyOpen(KEY_SITE[provider].name)}
               </a>
             </details>
-            {settings.keys[provider] && (
-              <div>
-                <button class="btn small" type="button" onClick={() => change(forgetKey(settings, provider))}>
-                  {t.genForgetKey}
-                </button>
-              </div>
-            )}
             <label class="row privacy">
               <input type="checkbox" checked={privacyOk} onChange={(e) => setPrivacyOk((e.currentTarget as HTMLInputElement).checked)} />
               <span>

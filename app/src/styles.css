@@ -285,6 +285,50 @@ button {
   overflow-wrap: anywhere;
 }
 
+/* The cover (QZS-34): the sign, big and centred, with three wide doors under it. */
+.welcome {
+  min-height: calc(100svh - 64px);
+  justify-content: center;
+}
+
+.welcome-sign {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 44px 20px 26px;
+  text-align: center;
+}
+
+/* Logo and title also follow the screen's height, so «Play» shows without scrolling on a laptop. */
+.welcome-logo {
+  width: clamp(110px, min(34vw, 20vh), 190px);
+  height: auto;
+}
+
+.welcome-sign h1 {
+  justify-content: center;
+  font-size: clamp(1.8rem, min(8.5vw, 5.5vh), 3.6rem);
+}
+
+.welcome-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: min(100%, 440px);
+  align-self: center;
+}
+
+.btn.big {
+  min-height: 68px;
+  font-size: 1.25rem;
+}
+
+.welcome-row {
+  justify-content: center;
+  margin-top: 0;
+}
+
 .sign h1 img {
   flex: none;
   border: 3px solid var(--line);
@@ -433,6 +477,23 @@ button {
 .lvl:active:not(:disabled) {
   transform: translateY(4px);
   box-shadow: 0 2px 0 var(--line);
+}
+
+/* The level to play next, in the prototype's gold. */
+.lvl.is-next {
+  border-color: var(--gold);
+  box-shadow: 0 6px 0 var(--gold);
+}
+
+.your-turn {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 8px;
+  font: 700 0.8rem var(--f-body);
+  color: var(--ink);
+  background: var(--gold);
+  border: 2px solid var(--line);
+  border-radius: 4px;
 }
 
 .lvl:disabled {
@@ -620,6 +681,19 @@ button {
   font-size: 0.95rem;
 }
 
+/* Sharing the unit with another device (QZS-26), at the end of the family corner. */
+.share {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 14px;
+  border-top: 2px dashed var(--line);
+}
+
+.share p {
+  margin: 0;
+}
+
 .pbody h3 {
   font-size: 1.05rem;
 }
@@ -724,6 +798,76 @@ button {
   color: var(--muted);
 }
 
+.review-count {
+  align-self: flex-start;
+  font-weight: 700;
+}
+
+/* A question read at a glance (QZS-33): the right answers in green. */
+.qread {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-wrap: anywhere;
+}
+
+.qread-text {
+  margin: 0;
+  font-weight: 700;
+}
+
+.qread-answers {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Options and bins side by side, as chips: the card stays short. */
+.qread-answers:not(.steps) {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.qread-answers li {
+  display: flex;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  color: var(--muted);
+}
+
+.qread-answers li.is-right {
+  color: var(--ink);
+  font-weight: 600;
+  background: var(--ok-bg);
+  border-color: var(--ok);
+}
+
+.qread-answers.steps {
+  padding-left: 28px;
+  list-style: decimal;
+}
+
+.qread-answers.steps li {
+  display: list-item;
+  padding: 2px 4px;
+  color: var(--ink);
+}
+
+.qread-why {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.qread-why span {
+  font-weight: 700;
+}
+
 .qcards {
   list-style: none;
   margin: 0;
@@ -742,9 +886,20 @@ button {
 
 .qcard-head {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 8px 12px;
+}
+
+.qcard-head strong {
+  white-space: nowrap;
+}
+
+/* «Fix» and «Remove» stay side by side; on a phone they drop below the title together. */
+.qcard-head .actions {
+  flex-wrap: nowrap;
+  margin-left: auto;
 }
 
 .field {
@@ -810,6 +965,17 @@ button {
 
 .generator .row .field {
   flex: 1 1 180px;
+}
+
+/* A key that does not look like one: a warning, not a stop (it may still work). */
+.key-warn {
+  margin: 0;
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  background: var(--bad-bg);
+  border: 2px solid var(--bad);
+  border-radius: 6px;
+  overflow-wrap: anywhere;
 }
 
 .key-help {

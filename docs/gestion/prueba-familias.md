@@ -112,7 +112,7 @@ Si aparece un fallo de la app, se abre un bug en Jira, con el aparato y el paso,
 
 | Riesgo | Mitigación |
 | --- | --- |
-| La familia crea el pack en el ordenador y el niño juega en la tablet: el pack no pasa de un aparato a otro | El mensaje pide hacerlo todo en el mismo aparato |
+| La familia crea el pack en el ordenador y el niño juega en la tablet: el pack no pasa de un aparato a otro | El mensaje pide hacerlo todo en el mismo aparato. Desde el 4 de octubre (QZS-26) la unidad se puede compartir por enlace o como archivo |
 | Conseguir la clave gratuita es el paso más técnico | La app lo explica paso a paso; si alguien se atasca, se apunta como ayuda necesaria (O3) |
 | Gemini gratuito va saturado a ratos | La app reintenta sola hasta unos 90 segundos y, si no lo consigue, explica qué hacer |
 | Fotos con el nombre del niño o con respuestas escritas | El mensaje y la app piden fotos sin nombres ni nada escrito a mano |

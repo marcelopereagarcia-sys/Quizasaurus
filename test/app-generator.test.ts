@@ -5,9 +5,11 @@ import {
   WebGenerationError,
   buildProvider,
   classifyError,
+  cleanKey,
   defaultAiSettings,
   forgetKey,
   generateFromFiles,
+  keyLooksRight,
   loadAiSettings,
   saveAiSettings,
   scaledSize,
@@ -61,6 +63,33 @@ describe("the family's AI settings", () => {
     expect(classifyError(catchError(() => buildProvider(noModel)))).toBe("noModel");
     expect(buildProvider({ ...defaultAiSettings(), keys: { gemini: "k" } }).id).toBe("gemini");
     expect(buildProvider({ ...defaultAiSettings(), provider: "ollama", models: { ...defaultAiSettings().models, ollama: "m" } }).local).toBe(true);
+  });
+});
+
+describe("a pasted key (QZS-27)", () => {
+  // Made-up keys with the right shape: never a real one in the tests.
+  const newGemini = `AQ.${"Ab3_-.".repeat(8)}`;
+  const oldGemini = `AIza${"x".repeat(35)}`;
+
+  it("loses the spaces and line breaks that sneak in when copying", () => {
+    expect(cleanKey(`  ${newGemini}
+`)).toBe(newGemini);
+    expect(cleanKey("AQ.abc def	ghi")).toBe("AQ.abcdefghi");
+  });
+
+  it("is recognised in Gemini's new and old shapes, and in the other providers'", () => {
+    expect(keyLooksRight("gemini", newGemini)).toBe(true);
+    expect(keyLooksRight("gemini", oldGemini)).toBe(true);
+    expect(keyLooksRight("gemini", ` ${newGemini} `)).toBe(true);
+    expect(keyLooksRight("anthropic", `sk-ant-${"a".repeat(30)}`)).toBe(true);
+    expect(keyLooksRight("openai", `sk-proj-${"a".repeat(30)}`)).toBe(true);
+  });
+
+  it("is flagged when it is cut short, from another provider or not a key at all", () => {
+    expect(keyLooksRight("gemini", "AQ.abc")).toBe(false);
+    expect(keyLooksRight("gemini", `sk-ant-${"a".repeat(30)}`)).toBe(false);
+    expect(keyLooksRight("gemini", "https://aistudio.google.com/apikey")).toBe(false);
+    expect(keyLooksRight("anthropic", oldGemini)).toBe(false);
   });
 });
 

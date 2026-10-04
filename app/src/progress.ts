@@ -50,6 +50,20 @@ export function levelStars(correct: number, total: number, passed: boolean): 0 |
   return passed ? (Math.max(1, stars(correct, total)) as 1 | 2 | 3) : 0;
 }
 
+/**
+ * The level the child should play next: the first one not passed yet (a boss
+ * counts only once beaten). Undefined when every level is passed.
+ */
+export function nextLevel(progress: Progress, packId: string, levels: number): number | undefined {
+  for (let i = 0; i < levels; i++) if (!progress.stars[levelKey(packId, i)]) return i;
+  return undefined;
+}
+
+/** Whether any level of the pack has been passed. */
+export function anyLevelPassed(progress: Progress, packId: string, levels: number): boolean {
+  return Array.from({ length: levels }, (_, i) => levelKey(packId, i)).some((key) => progress.stars[key]);
+}
+
 /** The dinosaur that hatched from a level's egg, if it did. */
 export function dinoOf(progress: Progress, key: string): number | undefined {
   const i = progress.hatched.indexOf(key);

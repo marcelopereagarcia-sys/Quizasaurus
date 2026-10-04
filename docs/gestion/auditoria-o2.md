@@ -1,6 +1,6 @@
 # Auditoría automática del reproductor (puerta O2)
 
-> Generado por `npm run audit` el 4 de octubre de 2026 a las 11:26 sobre el commit `6276f9e` con cambios locales sin subir. No editar a mano: se rehace en cada ejecución.
+> Generado por `npm run audit` el 4 de octubre de 2026 a las 18:34 sobre el commit `34664c7` con cambios locales sin subir. No editar a mano: se rehace en cada ejecución.
 
 **Resultado: ✅ superada** · 6 partidas completas · 108 niveles jugados · 510 respuestas · 129 s
 
@@ -19,7 +19,7 @@ Cada partida empieza en un navegador limpio (Chromium sin ventana), como la prim
 
 - **Modo perfecto:** responde siempre lo que dice el pack (la respuesta se lee del pack, nunca de la pantalla). Todas deben contar como acierto.
 - **Modo aleatorio:** toca cualquier opción; en «sí o no», la mitad de las veces desliza la tarjeta con el dedo. El juego debe dar por buenas justo las que coinciden con el pack.
-- En cada pregunta, en cada explicación de un fallo y en cada pantalla (inicio en los 3 idiomas, unidad, rincón de las familias, control parental, revisión adulta, generador y resultados) se busca: página que se desplaza de lado, elementos fuera de la pantalla, texto cortado y texto que se sale de su caja.
+- En cada pregunta, en cada explicación de un fallo y en cada pantalla (portada en los 3 idiomas, mundos y unidades, unidad, rincón de las familias, control parental, revisión adulta leyendo y corrigiendo, generador y resultados) se busca: página que se desplaza de lado, elementos fuera de la pantalla, texto cortado y texto que se sale de su caja.
 - Se cuenta cualquier error de JavaScript o de consola y cualquier petición que falle.
 
 | Pack | Idioma | Niveles | Para qué |
@@ -31,9 +31,9 @@ Cada partida empieza en un navegador limpio (Chromium sin ventana), como la prim
 | Pantalla | Modo | Skin | Niveles | Respuestas (✔ / ✘) | Mal juzgadas | Problemas de diseño | Errores JS |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 375 px (móvil) | perfecto | blocks | 18 | 85 (85 / 0) | 0 | 0 | 0 |
-| 375 px (móvil) | aleatorio | dinos | 18 | 85 (21 / 64) | 0 | 0 | 0 |
+| 375 px (móvil) | aleatorio | dinos | 18 | 85 (34 / 51) | 0 | 0 | 0 |
 | 768 px (tablet) | perfecto | blocks | 18 | 85 (85 / 0) | 0 | 0 | 0 |
-| 768 px (tablet) | aleatorio | dinos | 18 | 85 (29 / 56) | 0 | 0 | 0 |
+| 768 px (tablet) | aleatorio | dinos | 18 | 85 (30 / 55) | 0 | 0 | 0 |
 | 1440 px (ordenador) | perfecto | blocks | 18 | 85 (85 / 0) | 0 | 0 | 0 |
 | 1440 px (ordenador) | aleatorio | dinos | 18 | 85 (28 / 57) | 0 | 0 | 0 |
 

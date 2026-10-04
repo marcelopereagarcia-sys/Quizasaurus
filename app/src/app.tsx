@@ -6,9 +6,10 @@ import { validatePack, validatePackJson } from "../../src/pack/validate.js";
 import { type Dict, UI_LANGS, UI_LANG_NAMES, type UiLang, defaultUiLang, isUiLang, packUiLang } from "./i18n.js";
 import { type AnswerRecord, type GameResult, GameRunner } from "./game/GameRunner.js";
 import { type Step, mixedSteps, stepsFor } from "./game/steps.js";
-import { DINOS, type Progress, dinoHue, dinoOf, emptyProgress, levelKey, loadProgress, recordGame, saveProgress } from "./progress.js";
+import { DINOS, type Progress, anyLevelPassed, dinoHue, dinoOf, emptyProgress, levelKey, loadProgress, nextLevel, recordGame, saveProgress } from "./progress.js";
 import { ParentGate, Review } from "./review/Review.js";
 import { type SavedRun, clearRun, loadRun, saveRun } from "./run.js";
+import { isSharedLink, packFile, packFromLink, packLink } from "./share.js";
 import { BOSS_THRESHOLD_CHOICES, loadSettings, saveSettings } from "./settings.js";
 import { SKINS, SKIN_EMOJI, type Skin, applySkin, loadSkin, saveSkin } from "./skins.js";
 import { loadPacks, removePack, safeStorage, savePack } from "./storage.js";
@@ -29,8 +30,9 @@ const GAME_ICONS: Record<Pack["games"][number]["type"], string> = {
   boss: "🦖",
 };
 
-/** `game` is the game's index in the pack, or the infinite mode. */
+/** `welcome` is the cover; `home` holds the worlds, the units and the collection. `game` is the game's index in the pack, or the infinite mode. */
 type Screen =
+  | { name: "welcome" }
   | { name: "home" }
   | { name: "pack"; id: string }
   | { name: "play"; id: string; game: number | "mix" }
@@ -49,7 +51,7 @@ export function App() {
   const [screen, setScreen] = useState<Screen>(() => {
     const pack = run && [...BUILT_IN, ...loadPacks()].find((p) => p.id === run.packId);
     const gameExists = run && (run.game === "mix" || run.game < (pack?.games.length ?? 0));
-    return pack?.review.status === "approved" && gameExists ? { name: "play", id: pack.id, game: run.game } : { name: "home" };
+    return pack?.review.status === "approved" && gameExists ? { name: "play", id: pack.id, game: run.game } : { name: "welcome" };
   });
   const [notice, setNotice] = useState<string>();
   const [settings, setSettings] = useState(() => loadSettings());
@@ -68,23 +70,43 @@ export function App() {
   }, [lang]);
 
   // Every screen is a step in the browser history, so the phone's back button
-  // goes from a game to its unit and from the unit home, without leaving the app.
+  // goes from a game to its unit, from the unit to "my units" and from there to
+  // the cover, without leaving the app.
   useEffect(() => {
-    const home: Screen = { name: "home" };
-    history.replaceState({ screen: home }, "");
-    // The app opens on home or on a game left halfway (then its unit sits in between).
+    const welcome: Screen = { name: "welcome" };
+    history.replaceState({ screen: welcome }, "");
+    // The app opens on the cover or on a game left halfway (then its units and its unit sit in between).
     if (screen.name === "play") {
+      history.pushState({ screen: { name: "home" } }, "");
       history.pushState({ screen: { name: "pack", id: screen.id } }, "");
       history.pushState({ screen }, "");
     }
-    const onPop = (e: PopStateEvent) => setScreen((e.state as { screen?: Screen } | null)?.screen ?? home);
+    const onPop = (e: PopStateEvent) => setScreen((e.state as { screen?: Screen } | null)?.screen ?? welcome);
     addEventListener("popstate", onPop);
     return () => removeEventListener("popstate", onPop);
   }, []);
 
+  // A unit shared from another device (QZS-26): it is added and opens ready to play.
+  useEffect(() => {
+    if (!isSharedLink(location.hash)) return;
+    const hash = location.hash;
+    // Off the address bar, so a reload does not add it again.
+    history.replaceState(history.state, "", location.pathname + location.search);
+    void packFromLink(hash).then((result) => {
+      if (!result.ok) {
+        setNotice(t.sharedBroken);
+        return;
+      }
+      const persisted = savePack(result.pack);
+      setPacks(loadPacks());
+      setNotice(persisted ? t.sharedAdded(result.pack.title) : t.notSaved);
+      openUnit(result.pack.id);
+    });
+  }, []);
+
   /** Moves between screens through the browser history (see above); `replace` swaps the current step. */
   function go(next: Screen, replace = false) {
-    const depth = (s: Screen) => ({ home: 0, pack: 1, generate: 1, play: 2, review: 2 })[s.name];
+    const depth = (s: Screen) => ({ welcome: 0, home: 1, generate: 1, pack: 2, play: 3, review: 3 })[s.name];
     const back = depth(screen) - depth(next);
     if (replace) {
       history.replaceState({ screen: next }, "");
@@ -98,6 +120,14 @@ export function App() {
       history.pushState({ screen: next }, "");
       setScreen(next);
     }
+  }
+
+  /** Opens a unit with "my units" underneath, so its back button lands there (a loaded or shared unit). */
+  function openUnit(id: string) {
+    const unit: Screen = { name: "pack", id };
+    if (screen.name === "welcome") history.pushState({ screen: { name: "home" } }, "");
+    history.pushState({ screen: unit }, "");
+    setScreen(unit);
   }
 
   function onRunProgress(packId: string, game: number | "mix", state: { steps: Step[]; answers: AnswerRecord[] } | undefined) {
@@ -136,6 +166,7 @@ export function App() {
     const persisted = savePack(result.pack);
     setPacks(loadPacks());
     setNotice(persisted ? t.loaded(result.pack.title) : t.notSaved);
+    openUnit(result.pack.id);
   }
 
   function onRemove(pack: Pack) {
@@ -169,9 +200,15 @@ export function App() {
     leaveReview(pack.id);
   }
 
-  /** From a review back to its unit; after the generator, the unit takes the review's place in the history. */
+  /** From a review back to its unit. After the generator the review sits right on the cover: "my units" takes its place and the unit goes on top. */
   function leaveReview(id: string) {
-    go({ name: "pack", id }, screen.name === "review" && screen.fromGenerator === true);
+    if (screen.name === "review" && screen.fromGenerator === true) {
+      history.replaceState({ screen: { name: "home" } }, "");
+      history.pushState({ screen: { name: "pack", id } }, "");
+      setScreen({ name: "pack", id });
+    } else {
+      go({ name: "pack", id });
+    }
   }
 
   // The generator (pdf.js and the AI SDKs) loads only when a family opens it, so the player stays light.
@@ -183,7 +220,7 @@ export function App() {
       .catch(() => {
         // Offline: the generator's code is not kept on the device.
         setNotice(t.genProblems.unreachable);
-        go({ name: "home" });
+        go({ name: "welcome" });
       });
   }, [screen.name]);
 
@@ -210,8 +247,11 @@ export function App() {
     saveProgress(emptyProgress());
   }
 
-  const current = screen.name !== "home" && screen.name !== "generate" ? allPacks.find((p) => p.id === screen.id) : undefined;
+  const current = screen.name === "pack" || screen.name === "play" || screen.name === "review" ? allPacks.find((p) => p.id === screen.id) : undefined;
   const playable = current?.review.status === "approved";
+  // "Play" goes on from the first level not passed, so a child back another day finishes the unit (family test, F2).
+  const next = current && nextLevel(progress, current.id, current.games.length);
+  const resuming = current !== undefined && next !== undefined && anyLevelPassed(progress, current.id, current.games.length);
   // Inside a unit everything speaks the pack's language (charter v1.3).
   const screenLang = current ? packUiLang(current.language, lang) : lang;
   const ui = UI_LANGS[screenLang];
@@ -234,9 +274,9 @@ export function App() {
       {screen.name === "generate" ? (
         <main class="screen">
           {!screen.unlocked ? (
-            <ParentGate t={t} onPass={() => go({ name: "generate", unlocked: true }, true)} onCancel={() => go({ name: "home" })} />
+            <ParentGate t={t} onPass={() => go({ name: "generate", unlocked: true }, true)} onCancel={() => go({ name: "welcome" })} />
           ) : Generator ? (
-            <Generator t={t} onGenerated={onGenerated} onCancel={() => go({ name: "home" })} />
+            <Generator t={t} onGenerated={onGenerated} onCancel={() => go({ name: "welcome" })} />
           ) : (
             <p class="panel review-head">…</p>
           )}
@@ -315,11 +355,14 @@ export function App() {
           <ol class="levels">
             {current.games.map((game, i) => (
               <li>
-                <button class={`lvl t-${game.type}`} disabled={!playable} onClick={() => go({ name: "play", id: current.id, game: i })}>
+                <button class={`lvl t-${game.type}${playable && i === next ? " is-next" : ""}`} disabled={!playable} onClick={() => go({ name: "play", id: current.id, game: i })}>
                   <span class="li" aria-hidden="true">
                     {GAME_ICONS[game.type]}
                   </span>
-                  <span class="step-n">{ui.level(i + 1)}</span>
+                  <span class="step-n">
+                    {ui.level(i + 1)}
+                    {playable && i === next && <span class="your-turn">{ui.yourTurn}</span>}
+                  </span>
                   <strong class="ln">{game.title}</strong>
                   {/* The template name, unless the pack already titled the game with it. */}
                   {game.title !== ui.gameNames[game.type] && <span class="ls">{ui.gameNames[game.type]}</span>}
@@ -338,8 +381,8 @@ export function App() {
             </li>
           </ol>
           <div class="actions">
-            <button class="btn prime" disabled={!playable} onClick={() => go({ name: "play", id: current.id, game: 0 })}>
-              {ui.play}
+            <button class="btn prime" disabled={!playable} onClick={() => go({ name: "play", id: current.id, game: next ?? 0 })}>
+              {resuming ? ui.continueAt(next + 1) : ui.play}
             </button>
             {!BUILT_IN.some((b) => b.id === current.id) && (
               <button class="btn" onClick={() => onRemove(current)}>
@@ -358,22 +401,52 @@ export function App() {
           />
           <div class="ground" aria-hidden="true" />
         </main>
+      ) : screen.name === "welcome" ? (
+        // The cover (QZS-34): the prototype's sign, big, and three doors.
+        <main class="screen welcome">
+          <header class="sign welcome-sign">
+            <img class="welcome-logo" src="./icons/icon-512.png" width="512" height="512" alt="" />
+            <h1>{t.welcomeTitle}</h1>
+            <p class="sub">{t.appTagline}</p>
+          </header>
+          <div class="welcome-actions">
+            <button class="btn prime big" onClick={() => go({ name: "home" })}>
+              {t.play}
+            </button>
+            <button class="btn big create" onClick={() => go({ name: "generate" })}>
+              {t.createUnit}
+            </button>
+            <label class="btn big file">
+              {t.loadPack}
+              <input type="file" accept="application/json,.json" onChange={onFile} />
+            </label>
+          </div>
+          <div class="sign-row welcome-row">
+            <label class="pill">
+              <span class="sr-only">{t.language}</span>
+              <select value={lang} onChange={(e) => setLang((e.currentTarget as HTMLSelectElement).value as UiLang)}>
+                {(Object.keys(UI_LANGS) as UiLang[]).map((l) => (
+                  <option value={l}>{UI_LANG_NAMES[l]}</option>
+                ))}
+              </select>
+            </label>
+            <span class="pill">💎 {t.gemsPill(progress.gems)}</span>
+            <span class="pill">🦖 {t.dinosPill(Math.min(progress.hatched.length, DINOS.length), DINOS.length)}</span>
+          </div>
+          <div class="ground" aria-hidden="true" />
+        </main>
       ) : (
         <main class="screen">
+          <div>
+            <button class="btn small" onClick={() => go({ name: "welcome" })}>
+              {t.back}
+            </button>
+          </div>
           <header class="sign">
             <h1>
-              <img src="./logo.png" width="56" height="56" alt="" /> Quizasaurus
+              <img src="./logo.png" width="56" height="56" alt="" /> {t.hubTitle}
             </h1>
-            <p class="sub">{t.appTagline}</p>
             <div class="sign-row">
-              <label class="pill">
-                <span class="sr-only">{t.language}</span>
-                <select value={lang} onChange={(e) => setLang((e.currentTarget as HTMLSelectElement).value as UiLang)}>
-                  {(Object.keys(UI_LANGS) as UiLang[]).map((l) => (
-                    <option value={l}>{UI_LANG_NAMES[l]}</option>
-                  ))}
-                </select>
-              </label>
               <span class="pill">💎 {t.gemsPill(progress.gems)}</span>
               <span class="pill">🦖 {t.dinosPill(Math.min(progress.hatched.length, DINOS.length), DINOS.length)}</span>
             </div>
@@ -424,16 +497,6 @@ export function App() {
           </section>
 
           <Collection progress={progress} t={t} />
-
-          <div class="actions">
-            <button class="btn prime" onClick={() => go({ name: "generate" })}>
-              {t.createUnit}
-            </button>
-            <label class="btn file">
-              {t.loadPack}
-              <input type="file" accept="application/json,.json" onChange={onFile} />
-            </label>
-          </div>
           <div class="ground" aria-hidden="true" />
         </main>
       )}
@@ -539,8 +602,80 @@ function FamilyCorner(props: {
             {t.resetProgress}
           </button>
         </div>
+        <SharePanel pack={pack} t={t} />
       </div>
     </details>
+  );
+}
+
+/** The parent sends the unit to the child's device (QZS-26): a link first, a file for iPad and iPhone. */
+function SharePanel({ pack, t }: { pack: Pack; t: Dict }) {
+  const [status, setStatus] = useState<string>();
+  const canSend = typeof navigator.share === "function";
+  const cancelled = (error: unknown) => error instanceof DOMException && error.name === "AbortError";
+
+  async function send() {
+    try {
+      await navigator.share({ title: pack.title, text: t.shareMessage(pack.title), url: await packLink(pack, location.href) });
+      setStatus(undefined);
+    } catch (error) {
+      if (!cancelled(error)) setStatus(t.shareFailed);
+    }
+  }
+
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(await packLink(pack, location.href));
+      setStatus(t.shareCopied);
+    } catch {
+      setStatus(t.shareFailed);
+    }
+  }
+
+  async function saveFile() {
+    const file = packFile(pack);
+    try {
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file], title: pack.title });
+        return;
+      }
+    } catch (error) {
+      if (cancelled(error)) return;
+    }
+    // No system share for files: a plain download.
+    const url = URL.createObjectURL(file);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = file.name;
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    setStatus(t.shareSaved(t.loadPack));
+  }
+
+  return (
+    <section class="share">
+      <h3>{t.shareTitle}</h3>
+      <p>{t.shareIntro}</p>
+      <div class="actions">
+        {canSend && (
+          <button class="btn small" onClick={send}>
+            {t.shareSend}
+          </button>
+        )}
+        <button class="btn small" onClick={copy}>
+          {t.shareCopy}
+        </button>
+        <button class="btn small" onClick={saveFile}>
+          {t.shareFile}
+        </button>
+      </div>
+      {status && (
+        <p class="hint" role="status">
+          {status}
+        </p>
+      )}
+      <p class="hint">{t.shareFileHint(t.loadPack)}</p>
+    </section>
   );
 }
 

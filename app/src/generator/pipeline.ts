@@ -74,6 +74,27 @@ export function forgetKey(settings: AiSettings, provider: WebProvider): AiSettin
   return { ...settings, keys };
 }
 
+/** Keys never hold spaces: the ones (and line breaks) that sneak in when copying are dropped. */
+export function cleanKey(key: string): string {
+  return key.replace(/\s+/g, "");
+}
+
+/**
+ * The shape of each provider's keys. Gemini's new authorization keys start with
+ * "AQ." (the default in Google AI Studio since 28 May 2026) and the older ones
+ * with "AIza".
+ */
+const KEY_SHAPES: Record<Exclude<WebProvider, "ollama">, RegExp> = {
+  gemini: /^(AQ\.|AIza)[\w.-]{20,}$/,
+  anthropic: /^sk-ant-[\w-]{20,}$/,
+  openai: /^sk-[\w-]{20,}$/,
+};
+
+/** Whether a key looks like one of the provider's: only a hint, a key that does not may still work. */
+export function keyLooksRight(provider: Exclude<WebProvider, "ollama">, key: string): boolean {
+  return KEY_SHAPES[provider].test(cleanKey(key));
+}
+
 /** Problems the screen explains in the family's language (QZS-21: understandable errors). */
 export type GenerationProblem =
   | "noFiles"

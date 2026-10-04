@@ -2,7 +2,19 @@ import { useState } from "preact/hooks";
 import type { Game, Pack } from "../../../src/pack/schema.js";
 import type { PackIssue } from "../../../src/pack/validate.js";
 import type { Dict } from "../i18n.js";
-import { MIN_QUESTIONS, canRemove, finishReview, gateQuestion, issueKind, issuePlace, moveItem, removeQuestion, renameOption } from "./edit.js";
+import {
+  MIN_QUESTIONS,
+  canRemove,
+  finishReview,
+  gateQuestion,
+  issueKind,
+  issuePlace,
+  moveItem,
+  packQuestionCount,
+  questionView,
+  removeQuestion,
+  renameOption,
+} from "./edit.js";
 
 interface Props {
   pack: Pack;
@@ -56,6 +68,16 @@ export function ParentGate({ t, onPass, onCancel }: { t: Dict; onPass: () => voi
 function ReviewForm({ pack, t, onDone, onCancel }: Props) {
   const [draft, setDraft] = useState<Pack>(() => structuredClone(pack));
   const [issues, setIssues] = useState<PackIssue[]>([]);
+  // Questions open for fixing, as "game-question"; the rest are read at a glance (QZS-33).
+  const [fixing, setFixing] = useState<Set<string>>(new Set());
+
+  function toggleFix(id: string) {
+    setFixing((prev) => {
+      const next = new Set(prev);
+      if (!next.delete(id)) next.add(id);
+      return next;
+    });
+  }
 
   /** Changes one game of the draft. */
   function edit(gameIndex: number, change: (game: Game) => void) {
@@ -70,6 +92,15 @@ function ReviewForm({ pack, t, onDone, onCancel }: Props) {
     const result = finishReview(draft, approve, new Date());
     if (result.ok) return onDone(result.pack, approve);
     setIssues(result.issues);
+    // The questions with a problem open for fixing.
+    setFixing((prev) => {
+      const next = new Set(prev);
+      for (const issue of result.issues) {
+        const place = issuePlace(issue.path);
+        if (place?.question !== undefined) next.add(`${place.game - 1}-${place.question - 1}`);
+      }
+      return next;
+    });
     window.scrollTo({ top: 0 });
   }
 
@@ -78,6 +109,7 @@ function ReviewForm({ pack, t, onDone, onCancel }: Props) {
       <header class="panel review-head">
         <h2>{t.reviewTitle}</h2>
         <p>{t.reviewIntro}</p>
+        <p class="pill review-count">{t.reviewCount(packQuestionCount(draft), draft.games.length)}</p>
       </header>
 
       {issues.length > 0 && (
@@ -105,25 +137,38 @@ function ReviewForm({ pack, t, onDone, onCancel }: Props) {
             {g + 1}. {game.title} {game.title !== t.gameNames[game.type] && <small>· {t.gameNames[game.type]}</small>}
           </h3>
           <ol class="qcards">
-            {questionsOf(game).map((_, q) => (
-              <li class="panel qcard">
-                <div class="qcard-head">
-                  <strong>{t.questionN(q + 1)}</strong>
-                  <button
-                    class="btn small"
-                    disabled={!canRemove(game)}
-                    title={canRemove(game) ? undefined : t.minQuestions(MIN_QUESTIONS[game.type])}
-                    onClick={() => setDraft((prev) => removeQuestion(prev, g, q))}
-                  >
-                    {t.removeQuestion}
-                  </button>
-                </div>
-                <QuestionFields game={game} g={g} q={q} t={t} onEdit={(change) => edit(g, change)} />
-                <blockquote class="book-quote">
-                  <span>{t.bookSays}:</span> {t.quote(sourceOf(game, q))}
-                </blockquote>
-              </li>
-            ))}
+            {questionsOf(game).map((_, q) => {
+              const id = `${g}-${q}`;
+              const open = fixing.has(id);
+              return (
+                <li class="panel qcard">
+                  <div class="qcard-head">
+                    <strong>{t.questionN(q + 1)}</strong>
+                    <div class="actions">
+                      <button class="btn small fix" aria-expanded={open} onClick={() => toggleFix(id)}>
+                        {open ? t.reviewFixDone : t.reviewFix}
+                      </button>
+                      <button
+                        class="btn small"
+                        disabled={!canRemove(game)}
+                        title={canRemove(game) ? undefined : t.minQuestions(MIN_QUESTIONS[game.type])}
+                        onClick={() => {
+                          setDraft((prev) => removeQuestion(prev, g, q));
+                          // The questions below move up one place: nothing stays open by mistake.
+                          setFixing(new Set());
+                        }}
+                      >
+                        {t.removeQuestion}
+                      </button>
+                    </div>
+                  </div>
+                  {open ? <QuestionFields game={game} g={g} q={q} t={t} onEdit={(change) => edit(g, change)} /> : <QuestionRead game={game} q={q} t={t} />}
+                  <blockquote class="book-quote">
+                    <span>{t.bookSays}:</span> {t.quote(sourceOf(game, q))}
+                  </blockquote>
+                </li>
+              );
+            })}
           </ol>
           {!canRemove(game) && <p class="hint">{t.minQuestions(MIN_QUESTIONS[game.type])}</p>}
         </section>
@@ -150,6 +195,29 @@ function questionsOf(game: Game): unknown[] {
 
 function sourceOf(game: Game, q: number): string {
   return game.type === "classify" ? game.items[q]!.source : game.type === "order" ? game.rounds[q]!.source : game.questions[q]!.source;
+}
+
+/** A question read at a glance: the right answers ticked, the steps numbered. */
+function QuestionRead({ game, q, t }: { game: Game; q: number; t: Dict }) {
+  const view = questionView(game, q, t.yes, t.no);
+  const answers = view.answers.map((a) => (
+    <li class={a.right && !view.ordered ? "is-right" : ""}>
+      {!view.ordered && <span aria-hidden="true">{a.right ? "✅" : "▫️"}</span>}
+      <span>
+        {a.label}
+        {a.right && !view.ordered && <span class="sr-only"> ({t.fieldAnswer})</span>}
+      </span>
+    </li>
+  ));
+  return (
+    <div class="qread">
+      <p class="qread-text">{view.text}</p>
+      {view.ordered ? <ol class="qread-answers steps">{answers}</ol> : <ul class="qread-answers">{answers}</ul>}
+      <p class="qread-why">
+        <span>{t.fieldExplanation}:</span> {view.explanation}
+      </p>
+    </div>
+  );
 }
 
 const value = (e: Event) => (e.currentTarget as HTMLInputElement).value;

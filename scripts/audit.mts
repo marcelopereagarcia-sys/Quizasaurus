@@ -384,12 +384,15 @@ class Auditor {
     await this.passGate();
     await this.page.locator(".review").waitFor();
     await this.check(`${pack.id} · revisión adulta`);
+    // The first question of every game open for fixing, the way an adult corrects one.
+    for (const fix of await this.page.locator(".review-game .qcard:first-child .btn.fix").all()) await fix.click();
+    await this.check(`${pack.id} · revisión adulta (corrigiendo)`);
     await this.page.goBack();
     await this.page.locator("ol.levels").waitFor();
   }
 
   async generator(lang: string) {
-    await this.page.locator("main.screen > .actions .btn.prime").click();
+    await this.page.locator(".welcome-actions .btn.create").click();
     await this.page.locator(".gate").waitFor();
     await this.passGate();
     await this.page.locator("form.generator").waitFor();
@@ -425,10 +428,14 @@ async function auditRun(browser: Browser, base: string, viewport: (typeof VIEWPO
     await page.goto(base);
     await a.home();
     for (const lang of ["ca", "es", "en"]) {
-      await page.locator(".sign select").selectOption(lang);
-      await a.check(`inicio (${lang})`);
+      await page.locator(".welcome select").selectOption(lang);
+      await a.check(`portada (${lang})`);
       await a.generator(lang);
     }
+    // "Play" on the cover leads to the worlds, the units and the collection.
+    await page.locator(".welcome-actions .btn.prime").click();
+    await page.locator(".worlds").waitFor();
+    await a.check("mundos y unidades");
     for (const [p, pack] of PACKS.entries()) {
       await a.openUnit(pack);
       await a.check(`${pack.id} · unidad`);
@@ -464,6 +471,7 @@ async function auditOffline(browser: Browser, base: string): Promise<RunResult["
     });
     await context.setOffline(true);
     await page.reload();
+    await page.locator(".welcome-actions .btn.prime").click();
     await page.locator("ul.levels .lvl").first().click();
     await page.locator("ol.levels > li > button.lvl").first().click();
     await page.locator(".game-screen .stage").waitFor({ timeout: 5_000 });
@@ -532,7 +540,7 @@ function report(runs: RunResult[], offline: RunResult["checks"][number], seconds
     "",
     "- **Modo perfecto:** responde siempre lo que dice el pack (la respuesta se lee del pack, nunca de la pantalla). Todas deben contar como acierto.",
     "- **Modo aleatorio:** toca cualquier opción; en «sí o no», la mitad de las veces desliza la tarjeta con el dedo. El juego debe dar por buenas justo las que coinciden con el pack.",
-    "- En cada pregunta, en cada explicación de un fallo y en cada pantalla (inicio en los 3 idiomas, unidad, rincón de las familias, control parental, revisión adulta, generador y resultados) se busca: página que se desplaza de lado, elementos fuera de la pantalla, texto cortado y texto que se sale de su caja.",
+    "- En cada pregunta, en cada explicación de un fallo y en cada pantalla (portada en los 3 idiomas, mundos y unidades, unidad, rincón de las familias, control parental, revisión adulta leyendo y corrigiendo, generador y resultados) se busca: página que se desplaza de lado, elementos fuera de la pantalla, texto cortado y texto que se sale de su caja.",
     "- Se cuenta cualquier error de JavaScript o de consola y cualquier petición que falle.",
     "",
     "| Pack | Idioma | Niveles | Para qué |",
