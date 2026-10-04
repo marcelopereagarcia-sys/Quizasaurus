@@ -1,6 +1,6 @@
 # Project Charter — Quizasaurus
 
-Versión 1.4 · aprobada el 3 de octubre de 2026 · Marcelo Perea García
+Versión 1.5 · aprobada el 4 de octubre de 2026 · Marcelo Perea García
 
 > Copia exportada del charter aprobado. El original vive en Claude Docs; cualquier cambio de alcance, fechas o presupuesto pasa por el registro de cambios del final.
 
@@ -81,7 +81,7 @@ El sponsor, el project manager y el product owner son la misma persona. El desar
 | Marcelo Perea | Sponsor, PM y product owner | Alto | Alto | Gestionar de cerca |
 | Claude (asistente de IA) | Desarrollo, auditoría técnica y redacción de documentación | Bajo | — | Dirigir con ADR, backlog y criterios de aceptación |
 | Alumno de referencia (3º de primaria) | Usuario final y probador principal | Bajo | Alto | Mantener informado; sesiones de prueba |
-| Familias de prueba (2, amigos) | Prueban el ciclo completo con una unidad propia | Medio | Medio | Sesión guiada de 30 minutos y encuesta corta |
+| Familias de prueba (2, amigos) | Prueban el ciclo completo con una unidad propia | Medio | Medio | Un mensaje con el enlace y los pasos; lo hacen por su cuenta y responden una encuesta corta |
 | Docentes del centro | Posibles prescriptores | Bajo | Bajo | Sin acción en v1.0 |
 | Reclutadores y empleadores | Destinatarios del caso de portfolio | Alto | Bajo | Mantener satisfechos con resultados claros |
 | Editoriales de libros de texto | Titulares de los derechos del material escaneado | Alto | Bajo | Mantener satisfechas: no publicar su contenido |
@@ -110,7 +110,7 @@ El proyecto dura 2 semanas, del 5 al 18 de octubre de 2026, con sprints de un d�
 | Iniciación | lun 5 oct | Charter, ADR y registro de riesgos; backlog inicial en Jira | Charter aprobado |
 | F0 · Generador | mar 6 – mié 7 oct | Esquema del pack y generador CLI; comparativa de modelos | ≥ 90 % correctas (O1) y coste por pack medido |
 | F1 · MVP | jue 8 – dom 11 oct | Reproductor PWA con 5 plantillas; generador con pantalla web | Juega offline en la Xiaomi Pad 7 (O2) |
-| F2 · Prueba con familias | lun 12 – jue 15 oct | 2 familias amigas, sesión guiada; observaciones y encuesta corta | 2 de 2 familias (O3); satisfacción ≥ 4 de 5 (O4) |
+| F2 · Prueba con familias | lun 12 – jue 15 oct | 2 familias amigas lo prueban por su cuenta, cada una con un pack completo; encuesta en un formulario de Google | 2 de 2 familias (O3); satisfacción ≥ 4 de 5 (O4) |
 | Lanzamiento | vie 16 oct | Repositorio público v1.0 y demo; publicación de lanzamiento en LinkedIn | Repo MIT publicado (O5) |
 | Cierre | sáb 17 – dom 18 oct | Informe de cierre e impacto; retrospectiva y lecciones aprendidas | Cierre aprobado |
 
@@ -143,7 +143,7 @@ El riesgo más serio es que un modelo pequeño no genere preguntas fiables en ca
 | R3 | Uso indebido de material con derechos de las editoriales | Media | Alto | No publicar escaneos ni packs de libros; demo con contenido propio |
 | R4 | Exposición de datos de menores | Baja | Alto | Sin cuentas ni servidor; ningún dato personal en la demo; aviso al usar IA en la nube |
 | R5 | Menos tiempo disponible del PM por cambios laborales | Media | Alto | Recortar alcance (skins, idiomas) antes que mover fechas |
-| R6 | Las familias de prueba no encuentran hueco esa semana | Media | Medio | Sesión guiada de 30 minutos a su horario; el alumno de referencia como respaldo |
+| R6 | Las familias de prueba no encuentran hueco esa semana | Media | Medio | Lo hacen en casa cuando les va bien, sin cita; el alumno de referencia como respaldo |
 | R7 | Fallos en tablets o navegadores concretos (offline, voz, emojis) | Media | Medio | Auditoría automática; pruebas en Xiaomi Pad 7 y un iPad; la voz es opcional |
 | R8 | Cambios en las APIs o condiciones de los proveedores de IA | Baja | Medio | Capa de proveedores intercambiable; Ollama como opción local |
 | R9 | El plan de 2 semanas deja poco margen para imprevistos | Alta | Medio | Revisión diaria del avance; el prototipo como base de las plantillas; recortar alcance antes que fechas |
@@ -198,8 +198,9 @@ El charter entra en vigor cuando el sponsor lo aprueba; desde ese momento, cualq
 
 | Versión | Fecha | Cambio |
 | --- | --- | --- |
+| 1.5 | 04-oct-2026 | Cambio de alcance aprobado por el sponsor para simplificar F2: las 2 familias prueban la app por su cuenta, sin sesión guiada. Reciben un mensaje con el enlace y los pasos, cada una crea, revisa y juega un pack completo (todos los niveles y el examen final), y responden una encuesta anónima en un formulario de Google. O3 y O4 no cambian |
 | 1.4 | 03-oct-2026 | Cambio de alcance aprobado por el sponsor: las «varias sesiones con contenido distinto» por unidad (los 3 mundos del prototipo) salen del MVP y quedan como mejora abierta a la comunidad, porque exigen que el generador cree el triple de preguntas y cambiar el formato del pack. El modo infinito, que mezcla toda la unidad en cada ronda, cubre la rejugabilidad |
-| 1.3 | 03-oct-2026 | Cambio de alcance aprobado por el sponsor tras probar la app: (1) dentro de una unidad y sus juegos, la interfaz va en el idioma del pack, para no mezclar idiomas en pantalla; el selector de idioma solo afecta a la pantalla de inicio; (2) el reproductor recupera la identidad visual del prototipo (bloques y dinos, letra pixelada y Lexend) y las 2 skins pasan a ser variaciones de color de esa identidad |
+| 1.3 | 03-oct-2026 | Cambio de alcance aprobado por el sponsor tras probar la app: (1) dentro de una unidad y sus juegos, la interfaz va en el idioma del pack, para no mezclar idiomas en pantalla; el selector de idioma solo afecta a la pantalla de inicio; (2) el reproductor recupera la identidad visual del prototipo (bloques y dinos, letra pixelada y Lexend) y las 2 skins pasan a ser variaciones de color de esa identidad |
 | 1.2 | 03-oct-2026 | Cambio de alcance aprobado por el sponsor: la interfaz pasa de 2 a 3 idiomas (catalán, castellano e inglés), porque el repositorio está en inglés. Más idiomas, solo como contribuciones |
 | 1.1 | 03-oct-2026 | Cambio de alcance aprobado por el sponsor: O5 pasa de 3 publicaciones en LinkedIn a 1 publicación final, en el cierre. Se descarta la de arranque (QZS-10) |
 | 1.0 | 03-oct-2026 | Aprobado por el sponsor; dedicación fijada en ~8 h/día (112 h en total). Sprint 1 iniciado |
