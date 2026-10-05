@@ -22,14 +22,14 @@ PDF / photos ──> OCR ──> Generator ──> Pack (JSON) ──> Adult rev
 ```
 
 1. **The AI only writes content, never game code.** Games are fixed, tested templates; the AI fills them with questions validated against a schema.
-2. **Open pack format.** A pack holds the questions, the game type, the source sentence from the book, language and grade. Packs can be shared.
+2. **Open pack format.** A pack holds the questions, the game type, the source sentence from the book, language and age. Packs can be shared. See [the pack format](docs/pack-format.md).
 3. **Bring your own AI.** Run a local model with Ollama for free, or use your own API key. The project has no servers and no per-use cost.
 4. **An adult reviews every pack** before a child plays it, with the source sentence shown next to each question.
 5. **Offline player.** Installs from the browser on any tablet and works without internet.
 
 ### Make a unit from the web app
 
-Open the app, choose **Make a unit with AI** (an adult gate comes first), upload the PDF or photos of the unit, pick the year, the language and the AI, and wait for the three steps: read, write the questions, check them. The new pack goes straight to the adult review.
+Open the app, choose **Make a unit with AI** (an adult gate comes first), upload the PDF or photos of the unit (or paste its text), pick the age, the language and the AI, and wait for the three steps: read, write the questions, check them. The new pack goes straight to the adult review.
 
 - **Gemini** is recommended: it scored 98.9 % in our model comparison and has a free tier. Get a key at [Google AI Studio](https://aistudio.google.com/apikey) (sign in, accept the terms, **Create API key**); the app shows these steps too. On the free tier, [Google may use what you send to improve its products](https://ai.google.dev/gemini-api/docs/pricing).
 - **Your key stays on your device** (browser storage) and is sent only to the provider you chose. You can delete it from the same screen.
@@ -52,6 +52,10 @@ This repository is also a portfolio piece. It is run with the Google Project Man
 - No accounts, no tracking, no data about children leaves the device.
 - Textbook scans and packs made from copyrighted books are never committed to this repository.
 - No trademarks in themes or names.
+
+## Contributing
+
+New languages, skins, example packs and improvements are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) to set up the project, run the tests and the audit, and see the ideas open to the community.
 
 ---
 

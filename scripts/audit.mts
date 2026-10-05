@@ -62,7 +62,7 @@ function stressPack(lang: Lang): Pack {
     title: w("Audit", 80),
     subject: w("", 60),
     language: lang,
-    grade: { stage: "primary", year: 3 },
+    age: 8,
     topics: [1, 2, 3].map((n) => ({ id: `tema-${n}`, name: w(`${n}`, 60) })),
     games: [
       {

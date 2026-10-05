@@ -1,6 +1,6 @@
 # Project Charter — Quizasaurus
 
-Versión 1.8 · aprobada el 4 de octubre de 2026 · Marcelo Perea García
+Versión 1.9 · aprobada el 5 de octubre de 2026 · Marcelo Perea García
 
 > Copia exportada del charter aprobado. El original vive en Claude Docs; cualquier cambio de alcance, fechas o presupuesto pasa por el registro de cambios del final.
 
@@ -14,7 +14,7 @@ Quizasaurus es una herramienta de código abierto (licencia MIT) que convierte e
 
 **Solución.** Tres piezas independientes:
 
-1. **Formato de pack abierto** (JSON con esquema): preguntas, tipo de juego, frase de origen, idioma y curso.
+1. **Formato de pack abierto** (JSON con esquema): preguntas, tipo de juego, frase de origen, idioma y edad (antes, curso; cambio v1.9).
 2. **Generador**: PDF o fotos → texto (OCR) → pack, con proveedores de IA intercambiables: Ollama en local, Claude, OpenAI o Gemini.
 3. **Reproductor**: web instalable (PWA) que funciona sin conexión, con skins temáticas y varios idiomas.
 
@@ -198,6 +198,7 @@ El charter entra en vigor cuando el sponsor lo aprueba; desde ese momento, cualq
 
 | Versión | Fecha | Cambio |
 | --- | --- | --- |
+| 1.9 | 05-oct-2026 | Cambio de alcance aprobado por el sponsor antes del commit de Lanzamiento: la portada explica en tres pasos qué hace la app (QZS-36, 1 punto) y el generador pide la edad del niño (5 a 15 años) en lugar del curso del sistema español, para que sirva en cualquier país (QZS-37, 2 puntos). El formato del pack añade `age`; los packs con `grade` siguen siendo válidos y el formato sigue en la versión 1 |
 | 1.8 | 04-oct-2026 | Cambio de alcance aprobado por el sponsor: las 3 incidencias de la prueba F2 se corrigen en F2, antes de pasar de fase. Se añaden 2 historias (4 puntos): «Jugar» sigue por el primer nivel sin superar (QZS-32) y revisión en modo lectura (QZS-33). La mejora de la clave (QZS-27) y la de compartir packs (QZS-26, por enlace y por archivo) se adelantan de Lanzamiento a F2. En la misma sesión se añaden una portada de bienvenida (QZS-34, 2 puntos, en Lanzamiento) y «Compartir» a la vista tras crear una unidad y en cada unidad (QZS-35, 1 punto) |
 | 1.7 | 04-oct-2026 | Cambio de alcance aprobado por el sponsor en la revisión de pendientes: Lanzamiento suma 3 mejoras de la app (12 puntos con la documentación). Guardar y compartir un pack en un archivo, para cumplir que los packs se pueden compartir (QZS-26). Botón «Pegar» y aviso de formato en la clave de la IA, la incidencia de la prueba F2 (QZS-27). Generar desde texto pegado, la mitigación del riesgo R2 que faltaba (QZS-28). Las mejoras para la comunidad se listan en la guía de contribución |
 | 1.6 | 04-oct-2026 | Cambio de plazo aprobado por el sponsor: como Iniciación, F0, F1 y la prueba F2 se completaron entre el 2 y el 4 de octubre, se adelantan las fechas. Lanzamiento pasa al 5 y 6 de octubre, y Cierre al 7 y 8; el proyecto termina el 8 de octubre en lugar del 18. Las fechas de O1 a O5 se ajustan al plan nuevo. Se corrigen también la meta de O5, la hoja de ruta y el plan de comunicación, que aún decían 3 publicaciones en LinkedIn: desde la v1.1 es 1, en el cierre |

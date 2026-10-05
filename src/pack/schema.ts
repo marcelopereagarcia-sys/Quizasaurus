@@ -10,7 +10,7 @@
  *   the book it comes from (`source`) and explains the answer (`explanation`).
  * - Answers are stored as values, never as positions, so the player can
  *   shuffle options and the right answer never sits in a fixed place.
- * - Language and grade are set once per pack and apply to every question.
+ * - Language and age are set once per pack and apply to every question.
  */
 import { z } from "zod";
 
@@ -28,6 +28,13 @@ const emoji = text(16).optional();
 /** ISO 639-1 code of the language the content is written in, e.g. "ca" or "es". */
 export const Language = z.string().regex(/^[a-z]{2}$/, 'Use a two-letter language code, e.g. "ca" or "es"');
 
+/**
+ * Age of the children the pack is written for, in years (QZS-37). An age means
+ * the same in every country; a school year does not.
+ */
+export const Age = z.int().min(3).max(18);
+
+/** A school year (Spanish system). Packs made before QZS-37 give this instead of an age. */
 export const Grade = z.strictObject({
   stage: z.enum(["primary", "secondary"]),
   year: z.int().min(1).max(6),
@@ -180,7 +187,8 @@ export const Pack = z
     title: text(80),
     subject: text(60),
     language: Language,
-    grade: Grade,
+    age: Age.optional(),
+    grade: Grade.optional(),
     topics: z
       .array(z.strictObject({ id: slug, name: text(60) }))
       .min(1)
@@ -200,6 +208,10 @@ export const Pack = z
       .optional(),
   })
   .superRefine((pack, ctx) => {
+    if (pack.age === undefined && pack.grade === undefined) {
+      ctx.addIssue({ code: "custom", path: ["age"], message: "Give the age of the children the pack is for (3-18)" });
+    }
+
     const topicIds = pack.topics.map((t) => t.id);
     if (new Set(topicIds).size !== topicIds.length) {
       ctx.addIssue({ code: "custom", path: ["topics"], message: "Topic ids must be unique" });

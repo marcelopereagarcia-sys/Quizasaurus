@@ -14,6 +14,7 @@ import {
   cleanKey,
   forgetKey,
   generateFromFiles,
+  hasText,
   keyLooksRight,
   loadAiSettings,
   prepareFile,
@@ -43,20 +44,19 @@ const CAN_PASTE = typeof navigator !== "undefined" && typeof navigator.clipboard
 /** Who receives the data, as named in the privacy notes (brand names, the same in every language). */
 const RECIPIENT: Record<WebProvider, string> = { gemini: "Google (Gemini)", anthropic: "Anthropic (Claude)", openai: "OpenAI", ollama: "Ollama" };
 
-const GRADES = [
-  ...[1, 2, 3, 4, 5, 6].map((year) => ({ stage: "primary" as const, year })),
-  ...[1, 2, 3, 4].map((year) => ({ stage: "secondary" as const, year })),
-];
+/** Ages instead of school years, which differ from country to country (QZS-37). */
+const AGES = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
 const STEPS: StepName[] = ["read", "generate", "validate"];
 
 type Phase = { name: "form" } | { name: "working"; progress: Progress } | { name: "failed"; problem: GenerationProblem; detail: string };
 
-/** The web generator (QZS-21): files, year, language and provider, then three steps with progress. */
+/** The web generator (QZS-21): files or pasted text, age, language and provider, then three steps with progress. */
 export default function Generator({ t, onGenerated, onCancel }: Props) {
   const [settings, setSettings] = useState<AiSettings>(() => loadAiSettings());
   const [files, setFiles] = useState<File[]>([]);
-  const [grade, setGrade] = useState(2); // 3.º de primaria
+  const [text, setText] = useState("");
+  const [age, setAge] = useState(8);
   const [language, setLanguage] = useState<"auto" | "ca" | "es" | "en">("auto");
   const [privacyOk, setPrivacyOk] = useState(false);
   const [showKey, setShowKey] = useState(false);
@@ -97,8 +97,9 @@ export default function Generator({ t, onGenerated, onCancel }: Props) {
       const inputs: InputFile[] = await Promise.all(files.map(prepareFile));
       const pack = await generateFromFiles({
         files: inputs,
+        text,
         language: language === "auto" ? undefined : language,
-        grade: GRADES[grade]!,
+        age,
         provider: ai,
         onProgress: (progress) => setPhase({ name: "working", progress }),
       });
@@ -154,12 +155,18 @@ export default function Generator({ t, onGenerated, onCancel }: Props) {
             ))}
           </ul>
         )}
+        {/* QZS-28: when scanning fails or the unit is already digital (risk R2). */}
+        <label class="field">
+          <span>{t.genText}</span>
+          <textarea rows={6} value={text} placeholder={t.genTextPlaceholder} onInput={(e) => setText((e.currentTarget as HTMLTextAreaElement).value)} />
+          <small class="hint">{t.genTextHint}</small>
+        </label>
         <div class="row">
           <label class="field">
-            <span>{t.genGrade}</span>
-            <select value={String(grade)} onChange={(e) => setGrade(Number((e.currentTarget as HTMLSelectElement).value))}>
-              {GRADES.map((g, i) => (
-                <option value={String(i)}>{t.gradeName(g.stage, g.year)}</option>
+            <span>{t.genAge}</span>
+            <select value={String(age)} onChange={(e) => setAge(Number((e.currentTarget as HTMLSelectElement).value))}>
+              {AGES.map((a) => (
+                <option value={String(a)}>{t.ageName(a)}</option>
               ))}
             </select>
           </label>
@@ -261,7 +268,7 @@ export default function Generator({ t, onGenerated, onCancel }: Props) {
       </section>
 
       <div class="actions">
-        <button class="btn prime" type="submit" disabled={files.length === 0 || (cloud && !privacyOk)}>
+        <button class="btn prime" type="submit" disabled={(files.length === 0 && !hasText(text)) || (cloud && !privacyOk)}>
           {phase.name === "failed" ? t.genTryAgain : t.genStart}
         </button>
         <button class="btn" type="button" onClick={onCancel}>

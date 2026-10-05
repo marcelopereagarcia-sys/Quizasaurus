@@ -11,6 +11,7 @@ import { geminiProvider } from "../../../src/ai/gemini.js";
 import { DEFAULT_OLLAMA_HOST, ollamaProvider } from "../../../src/ai/ollama.js";
 import { openaiProvider } from "../../../src/ai/openai.js";
 import { type AIProvider, type ProviderId, ProviderConfigError, setRetryListener, setRetryPolicy } from "../../../src/ai/provider.js";
+import { cleanPageText } from "../../../src/extract/clean.js";
 import { extractUnit, type InputFile } from "../../../src/extract/extract.js";
 import { visionFromProvider } from "../../../src/extract/vision.js";
 import { GenerationError, generatePack, MAX_RETRIES } from "../../../src/generate/generate.js";
@@ -168,9 +169,12 @@ export const WEB_RETRY = { retries: 5, baseDelayMs: 2_000, maxDelayMs: 30_000 };
 
 export interface GenerationRequest {
   files: InputFile[];
+  /** Text of the unit pasted by the family (QZS-28): enough on its own, or added after the files. */
+  text?: string | undefined;
   /** ISO 639-1; detected from the text when undefined. */
   language: "ca" | "es" | "en" | undefined;
-  grade: Pack["grade"];
+  /** Age of the children, in years (QZS-37). */
+  age: number;
   provider: AIProvider;
   onProgress: (progress: Progress) => void;
 }
@@ -178,24 +182,35 @@ export interface GenerationRequest {
 /** A unit needs at least this many letters to make a pack from it. */
 const MIN_UNIT_LETTERS = 300;
 
-/** Reads the unit, generates the pack and returns it as a draft for the adult review. */
+/** Whether the pasted text has anything to read (the screen enables "Create" with it). */
+export function hasText(text: string | undefined): boolean {
+  return /\p{L}/u.test(text ?? "");
+}
+
+/** Reads the unit (files and/or pasted text), generates the pack and returns it as a draft for the adult review. */
 export async function generateFromFiles(request: GenerationRequest): Promise<Pack> {
   const { files, provider, onProgress } = request;
-  if (files.length === 0) throw new WebGenerationError("noFiles");
+  const pasted = hasText(request.text) ? cleanPageText(request.text!) : "";
+  if (files.length === 0 && !pasted) throw new WebGenerationError("noFiles");
 
   onProgress({ step: "read" });
-  let text: string;
-  try {
-    const pages = await extractUnit(files, {
-      vision: visionFromProvider(provider),
-      onPage: (page, total) => onProgress({ step: "read", page: { done: page.page, total } }),
-    });
-    text = pages.map((p) => p.text).join("\n\n");
-  } catch (error) {
-    // A broken or locked PDF fails inside pdf.js; anything else keeps its own kind.
-    const problem = classifyError(error);
-    throw problem === "other" ? new WebGenerationError("unreadable", (error as Error).message) : error;
+  const parts: string[] = [];
+  if (files.length > 0) {
+    try {
+      const pages = await extractUnit(files, {
+        vision: visionFromProvider(provider),
+        onPage: (page, total) => onProgress({ step: "read", page: { done: page.page, total } }),
+      });
+      parts.push(...pages.map((p) => p.text));
+    } catch (error) {
+      // A broken or locked PDF fails inside pdf.js; anything else keeps its own kind.
+      const problem = classifyError(error);
+      throw problem === "other" ? new WebGenerationError("unreadable", (error as Error).message) : error;
+    }
   }
+  // Pasted text goes through the same cleaning as a page: "Nom: …" fields are dropped.
+  if (pasted) parts.push(pasted);
+  const text = parts.join("\n\n");
   if ((text.match(/\p{L}/gu) ?? []).length < MIN_UNIT_LETTERS) throw new WebGenerationError("tooLittleText");
 
   let attempt = { n: 1, max: MAX_RETRIES + 1 };
@@ -206,7 +221,7 @@ export async function generateFromFiles(request: GenerationRequest): Promise<Pac
     const result = await generatePack(text, {
       provider,
       language: request.language,
-      grade: request.grade,
+      age: request.age,
       onAttempt: (n, issues) => {
         attempt = { n: n + 1, max: MAX_RETRIES + 1 };
         onProgress(issues.length === 0 ? { step: "validate" } : { step: "generate", attempt });

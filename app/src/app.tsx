@@ -431,6 +431,12 @@ export function App() {
             <img class="welcome-logo" src="./icons/icon-512.png" width="512" height="512" alt="" />
             <h1>{t.welcomeTitle}</h1>
             <p class="sub">{t.appTagline}</p>
+            {/* What the app does, in three steps, for a family that opens it for the first time (QZS-36). */}
+            <ol class="welcome-steps">
+              {t.welcomeSteps.map((step) => (
+                <li>{step}</li>
+              ))}
+            </ol>
           </header>
           <div class="welcome-actions">
             <button class="btn prime big" onClick={() => go({ name: "home" })}>

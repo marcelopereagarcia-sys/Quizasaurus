@@ -4,7 +4,7 @@
   "title": "El ciclo del agua",
   "subject": "Ciencias de la naturaleza",
   "language": "es",
-  "grade": { "stage": "primary", "year": 3 },
+  "age": 8,
   "topics": [
     { "id": "estados", "name": "Los estados del agua" },
     { "id": "ciclo", "name": "El ciclo del agua" },

@@ -19,7 +19,8 @@ export interface GenerateOptions {
   provider: AIProvider;
   /** ISO 639-1 code; detected from the text when not given. */
   language?: string | undefined;
-  grade: Pack["grade"];
+  /** Age of the children, in years (QZS-37). */
+  age: number;
   onAttempt?: (attempt: number, issues: PackIssue[]) => void;
 }
 
@@ -48,10 +49,10 @@ export class GenerationError extends Error {
 }
 
 export async function generatePack(unitText: string, options: GenerateOptions): Promise<GenerationResult> {
-  const { provider, grade } = options;
+  const { provider, age } = options;
   const text = stripPageMarkers(unitText);
   const language = options.language ?? detectLanguage(text);
-  const system = systemPrompt({ language, grade });
+  const system = systemPrompt({ language, age });
   const started = performance.now();
   const usage: TokenUsage = { inputTokens: 0, outputTokens: 0 };
 
@@ -64,7 +65,7 @@ export async function generatePack(unitText: string, options: GenerateOptions): 
 
     const checked = checkAnswer(result.text, text, {
       language,
-      grade,
+      age,
       generator: { provider: provider.id, model: provider.model, createdAt: new Date().toISOString() },
     });
     options.onAttempt?.(attempt, checked.ok ? [] : checked.issues);
@@ -77,7 +78,7 @@ export async function generatePack(unitText: string, options: GenerateOptions): 
   throw new GenerationError(issues, MAX_RETRIES + 1);
 }
 
-type Fixed = Pick<Pack, "language" | "grade"> & { generator: NonNullable<Pack["generator"]> };
+type Fixed = Pick<Pack, "language"> & { age: number; generator: NonNullable<Pack["generator"]> };
 
 /** Parses the AI answer, fills in the fields the program owns and checks everything. */
 export function checkAnswer(answer: string, unitText: string, fixed: Fixed): { ok: true; pack: Pack } | { ok: false; issues: PackIssue[] } {
@@ -94,11 +95,13 @@ export function checkAnswer(answer: string, unitText: string, fixed: Fixed): { o
     return { ok: false, issues: [{ path: "(root)", message: "The answer must be one JSON object" }] };
   }
 
+  // The AI may copy "grade" from the schema: new packs give the age only.
+  const { grade: _grade, ...content } = data as Record<string, unknown>;
   const candidate = {
-    ...data,
+    ...content,
     schemaVersion: PACK_SCHEMA_VERSION,
     language: fixed.language,
-    grade: fixed.grade,
+    age: fixed.age,
     review: { status: "draft" },
     generator: fixed.generator,
   };

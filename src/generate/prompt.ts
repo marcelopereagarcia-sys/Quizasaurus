@@ -7,20 +7,20 @@ import { Pack } from "../pack/schema.js";
 
 export interface PromptOptions {
   language: string;
-  grade: { stage: "primary" | "secondary"; year: number };
+  /** Age of the children, in years (QZS-37). */
+  age: number;
 }
 
 const LANGUAGE_NAMES: Record<string, string> = { ca: "Catalan (català)", es: "Spanish (español)", en: "English" };
 
 export const packJsonSchema = JSON.stringify(z.toJSONSchema(Pack, { unrepresentable: "any" }));
 
-export function systemPrompt({ language, grade }: PromptOptions): string {
+export function systemPrompt({ language, age }: PromptOptions): string {
   const languageName = LANGUAGE_NAMES[language] ?? language;
-  const age = grade.stage === "primary" ? `${grade.year + 5}-${grade.year + 6}` : `${grade.year + 11}-${grade.year + 12}`;
   return `You create study games for children from a school unit. You write content only; the games are already programmed.
 
 AUDIENCE
-- Children in year ${grade.year} of ${grade.stage} school, aged ${age}. They play on a tablet by tapping and dragging.
+- Children aged ${age}. Choose words, sentences and difficulty a ${age}-year-old understands. They play on a tablet by tapping and dragging.
 - Short, simple sentences (at most 15 words). Use the words of the unit; explain nothing the unit does not explain.
 - One clearly correct answer. No trick questions, no "all of the above", no negative questions.
 
@@ -47,7 +47,7 @@ PACK
 
 OUTPUT
 - Answer with one JSON object that follows this JSON Schema, and nothing else.
-- Leave out "schemaVersion", "language", "grade", "review" and "generator": the program fills them in.
+- Leave out "schemaVersion", "language", "age", "grade", "review" and "generator": the program fills them in.
 
 JSON Schema:
 ${packJsonSchema}`;

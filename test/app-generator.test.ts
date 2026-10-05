@@ -9,12 +9,13 @@ import {
   defaultAiSettings,
   forgetKey,
   generateFromFiles,
+  hasText,
   keyLooksRight,
   loadAiSettings,
   saveAiSettings,
   scaledSize,
 } from "../app/src/generator/pipeline.js";
-import { type AIProvider, ProviderConfigError, fetchWithRetry, setRetryListener, toBase64 } from "../src/ai/provider.js";
+import { type AIProvider, type CompletionRequest, ProviderConfigError, fetchWithRetry, setRetryListener, toBase64 } from "../src/ai/provider.js";
 import { extensionOf } from "../src/extract/extract.js";
 import { GenerationError } from "../src/generate/generate.js";
 import { exampleLines, textPdf } from "./fixtures.js";
@@ -29,13 +30,15 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals());
 
 /** A provider that answers with the example pack, as a model would. */
-function fakeProvider(answers: string[]): AIProvider & { calls: number } {
+function fakeProvider(answers: string[]): AIProvider & { calls: number; prompts: string[] } {
   const provider = {
     id: "gemini" as const,
     model: "fake",
     local: false,
     calls: 0,
-    async complete() {
+    prompts: [] as string[],
+    async complete(request: CompletionRequest) {
+      provider.prompts.push(request.prompt);
       const text = answers[Math.min(provider.calls, answers.length - 1)]!;
       provider.calls++;
       return { text, usage: { inputTokens: 1, outputTokens: 1 }, seconds: 0 };
@@ -109,13 +112,13 @@ describe("errors a family can understand", () => {
 describe("generating from the files", () => {
   it("reads a PDF, generates, validates and returns a draft for the adult review", async () => {
     const pdf = await textPdf([exampleLines]);
-    const { review, generator, schemaVersion, language, grade, ...answer } = examplePack;
+    const { review, generator, schemaVersion, language, age, ...answer } = examplePack;
     const provider = fakeProvider([JSON.stringify(answer)]);
     const steps: Progress[] = [];
     const pack = await generateFromFiles({
       files: [{ name: "unidad.pdf", data: pdf }],
       language: "es",
-      grade: { stage: "primary", year: 3 },
+      age: 8,
       provider,
       onProgress: (p) => steps.push(p),
     });
@@ -126,13 +129,13 @@ describe("generating from the files", () => {
 
   it("retries an invalid answer and says which attempt it is on", async () => {
     const pdf = await textPdf([exampleLines]);
-    const { review, generator, schemaVersion, language, grade, ...answer } = examplePack;
+    const { review, generator, schemaVersion, language, age, ...answer } = examplePack;
     const provider = fakeProvider(["not json", JSON.stringify(answer)]);
     const attempts: number[] = [];
     await generateFromFiles({
       files: [{ name: "unidad.pdf", data: pdf }],
       language: "es",
-      grade: { stage: "primary", year: 3 },
+      age: 8,
       provider,
       onProgress: (p) => p.attempt && attempts.push(p.attempt.n),
     });
@@ -143,10 +146,38 @@ describe("generating from the files", () => {
   it("explains an unreadable PDF, a unit with too little text, and no files", async () => {
     const provider = fakeProvider(["{}"]);
     const run = (files: { name: string; data: Uint8Array }[]) =>
-      generateFromFiles({ files, language: "es", grade: { stage: "primary", year: 3 }, provider, onProgress: () => undefined }).catch(classifyError);
+      generateFromFiles({ files, language: "es", age: 8, provider, onProgress: () => undefined }).catch(classifyError);
     expect(await run([{ name: "roto.pdf", data: new TextEncoder().encode("this is not a pdf") }])).toBe("unreadable");
     expect(await run([{ name: "corto.pdf", data: await textPdf([["Solo una línea de texto."]]) }])).toBe("tooLittleText");
     expect(await run([])).toBe("noFiles");
+  });
+});
+
+describe("generating from pasted text (QZS-28)", () => {
+  const { review, generator, schemaVersion, language, age, ...answer } = examplePack;
+  const run = (request: { files?: { name: string; data: Uint8Array }[]; text?: string }, provider = fakeProvider([JSON.stringify(answer)])) =>
+    generateFromFiles({ files: request.files ?? [], text: request.text, language: "es", age: 8, provider, onProgress: () => undefined });
+
+  it("needs no file: the pasted text is enough, and the pack still goes to the adult review", async () => {
+    const pack = await run({ text: exampleLines.join("\n") });
+    expect(pack.review.status).toBe("draft");
+  });
+
+  it("sends the cleaned text to the AI, after the files when there are both", async () => {
+    const provider = fakeProvider([JSON.stringify(answer)]);
+    await run({ files: [{ name: "unidad.pdf", data: await textPdf([["Página del libro sobre las personas y sus etapas."]]) }], text: `Nombre: Ana López\n${exampleLines.join("\n")}` }, provider);
+    const prompt = provider.prompts.join("\n");
+    expect(prompt).toContain("Página del libro");
+    expect(prompt).toContain(exampleLines[0]!);
+    expect(prompt.indexOf("Página del libro")).toBeLessThan(prompt.indexOf(exampleLines[0]!));
+    expect(prompt).not.toContain("Ana López");
+  });
+
+  it("gives the same warnings as a nearly empty PDF, or as no files at all", async () => {
+    expect(await run({ text: "Solo una línea de texto." }).catch(classifyError)).toBe("tooLittleText");
+    expect(await run({ text: "  \n 123 " }).catch(classifyError)).toBe("noFiles");
+    expect(hasText("  \n 123 ")).toBe(false);
+    expect(hasText("Les persones")).toBe(true);
   });
 });
 

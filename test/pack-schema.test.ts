@@ -42,6 +42,14 @@ describe("valid packs", () => {
     expect(validatePack(p)).toMatchObject({ ok: true });
   });
 
+  it("gives the age of the children; packs from before QZS-37 give a school year instead", () => {
+    expect(example.age).toBe(8);
+    const old = pack();
+    delete old.age;
+    old.grade = { stage: "primary", year: 3 };
+    expect(validatePack(old)).toMatchObject({ ok: true });
+  });
+
   it("accepts alternative right answers that are among the options", () => {
     const p = pack();
     p.games[2].questions[0].alsoAccepted = ["La Luna"];
@@ -50,6 +58,16 @@ describe("valid packs", () => {
 });
 
 describe("invalid packs say which field is wrong", () => {
+  it("no age (nor an old school year), or an age out of range", () => {
+    const p = pack();
+    delete p.age;
+    expect(issuesOf(p)).toContainEqual({ path: "age", message: "Give the age of the children the pack is for (3-18)" });
+    p.age = 2;
+    expect(issuesOf(p).map((i) => i.path)).toEqual(["age"]);
+    p.age = 8.5;
+    expect(issuesOf(p).map((i) => i.path)).toEqual(["age"]);
+  });
+
   it("answer that is not one of the options", () => {
     const p = pack();
     p.games[2].questions[1].answer = "Fusión";

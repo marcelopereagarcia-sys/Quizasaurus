@@ -10,7 +10,7 @@ const example = JSON.parse(readFileSync(new URL("../examples/ciclo-del-agua.pack
 
 /** What a well-behaved AI would answer: the content, without the fields the program owns. */
 function aiAnswer(mutate?: (pack: any) => void): string {
-  const { schemaVersion, language, grade, review, ...content } = structuredClone(example) as any;
+  const { schemaVersion, language, age, review, ...content } = structuredClone(example) as any;
   mutate?.(content);
   return JSON.stringify(content);
 }
@@ -30,19 +30,19 @@ function scriptedProvider(...answers: string[]) {
   return { provider, requests };
 }
 
-const grade = { stage: "primary", year: 3 } as const;
+const age = 8;
 
 describe("generatePack", () => {
   it("returns a valid draft pack with the fields the program owns", async () => {
     const { provider, requests } = scriptedProvider(aiAnswer());
-    const result = await generatePack(unitText, { provider, grade });
+    const result = await generatePack(unitText, { provider, age });
 
     expect(result.attempts).toBe(1);
     expect(result.usage).toEqual({ inputTokens: 100, outputTokens: 50 });
     expect(result.pack).toMatchObject({
       schemaVersion: 1,
       language: "es",
-      grade,
+      age,
       review: { status: "draft" },
       generator: { provider: "ollama", model: "fake" },
     });
@@ -54,7 +54,7 @@ describe("generatePack", () => {
     const broken = aiAnswer((p) => (p.games[2].questions[0].answer = "La Luna llena"));
     const { provider, requests } = scriptedProvider(broken, aiAnswer());
     const attempts: number[][] = [];
-    const result = await generatePack(unitText, { provider, grade, onAttempt: (n, issues) => attempts.push([n, issues.length]) });
+    const result = await generatePack(unitText, { provider, age, onAttempt: (n, issues) => attempts.push([n, issues.length]) });
 
     expect(result.attempts).toBe(2);
     expect(attempts).toEqual([[1, 1], [2, 0]]);
@@ -65,7 +65,7 @@ describe("generatePack", () => {
 
   it(`gives up after ${MAX_RETRIES} retries with a clear message`, async () => {
     const { provider, requests } = scriptedProvider("this is not JSON");
-    const error = await generatePack(unitText, { provider, grade }).catch((e: unknown) => e);
+    const error = await generatePack(unitText, { provider, age }).catch((e: unknown) => e);
 
     expect(error).toBeInstanceOf(GenerationError);
     expect(requests).toHaveLength(MAX_RETRIES + 1);
@@ -75,14 +75,14 @@ describe("generatePack", () => {
 
   it("uses the language it is given instead of detecting it", async () => {
     const { provider, requests } = scriptedProvider(aiAnswer());
-    const result = await generatePack(unitText, { provider, grade, language: "ca" });
+    const result = await generatePack(unitText, { provider, age, language: "ca" });
     expect(result.pack.language).toBe("ca");
     expect(requests[0]?.system).toContain("Catalan (català)");
   });
 });
 
 describe("checkAnswer", () => {
-  const fixed = { language: "es", grade, generator: { provider: "ollama", model: "fake", createdAt: "2026-10-03T12:00:00Z" } };
+  const fixed = { language: "es", age, generator: { provider: "ollama", model: "fake", createdAt: "2026-10-03T12:00:00Z" } };
 
   it("accepts JSON wrapped in a code fence", () => {
     expect(checkAnswer("```json\n" + aiAnswer() + "\n```", unitText, fixed)).toMatchObject({ ok: true });
@@ -105,10 +105,12 @@ describe("checkAnswer", () => {
     if (!result.ok) expect(result.issues.map((i) => i.path)).toEqual(["games[0].items[2].label"]);
   });
 
-  it("forces the language, grade and draft status even if the AI sets them", () => {
-    const answer = aiAnswer((p) => Object.assign(p, { language: "en", review: { status: "approved", approvedAt: "2026-01-01T00:00:00Z" } }));
+  it("forces the language, age and draft status even if the AI sets them, and drops a school year", () => {
+    const answer = aiAnswer((p) =>
+      Object.assign(p, { language: "en", age: 12, grade: { stage: "primary", year: 1 }, review: { status: "approved", approvedAt: "2026-01-01T00:00:00Z" } }),
+    );
     const result = checkAnswer(answer, unitText, fixed);
-    expect(result.ok && [result.pack.language, result.pack.review.status]).toEqual(["es", "draft"]);
+    expect(result.ok && [result.pack.language, result.pack.age, result.pack.grade, result.pack.review.status]).toEqual(["es", 8, undefined, "draft"]);
   });
 });
 
@@ -133,9 +135,11 @@ describe("sourcesNotInText", () => {
 });
 
 describe("prompt", () => {
-  it("adapts to the grade and language and carries the schema", () => {
-    const prompt = systemPrompt({ language: "ca", grade });
-    expect(prompt).toContain("year 3 of primary school, aged 8-9");
+  it("adapts to the age and language and carries the schema", () => {
+    const prompt = systemPrompt({ language: "ca", age });
+    expect(prompt).toContain("Children aged 8.");
+    // The school year stays in the schema only for older packs; the instructions speak of age.
+    expect(prompt.split("JSON Schema:")[0]).not.toMatch(/primary|secondary|year \d/);
     expect(prompt).toContain("Catalan (català)");
     expect(prompt).toContain(packJsonSchema);
   });

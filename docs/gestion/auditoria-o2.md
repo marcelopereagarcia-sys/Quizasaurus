@@ -1,8 +1,8 @@
 # Auditoría automática del reproductor (puerta O2)
 
-> Generado por `npm run audit` el 4 de octubre de 2026 a las 19:12 sobre el commit `23673bb` con cambios locales sin subir. No editar a mano: se rehace en cada ejecución.
+> Generado por `npm run audit` el 5 de octubre de 2026 a las 10:16 sobre el commit `79d441d` con cambios locales sin subir. No editar a mano: se rehace en cada ejecución.
 
-**Resultado: ✅ superada** · 6 partidas completas · 108 niveles jugados · 510 respuestas · 130 s
+**Resultado: ✅ superada** · 6 partidas completas · 108 niveles jugados · 510 respuestas · 131 s
 
 ## Criterios de aceptación (QZS-22)
 
@@ -31,11 +31,11 @@ Cada partida empieza en un navegador limpio (Chromium sin ventana), como la prim
 | Pantalla | Modo | Skin | Niveles | Respuestas (✔ / ✘) | Mal juzgadas | Problemas de diseño | Errores JS |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 375 px (móvil) | perfecto | blocks | 18 | 85 (85 / 0) | 0 | 0 | 0 |
-| 375 px (móvil) | aleatorio | dinos | 18 | 85 (24 / 61) | 0 | 0 | 0 |
+| 375 px (móvil) | aleatorio | dinos | 18 | 85 (19 / 66) | 0 | 0 | 0 |
 | 768 px (tablet) | perfecto | blocks | 18 | 85 (85 / 0) | 0 | 0 | 0 |
-| 768 px (tablet) | aleatorio | dinos | 18 | 85 (35 / 50) | 0 | 0 | 0 |
+| 768 px (tablet) | aleatorio | dinos | 18 | 85 (34 / 51) | 0 | 0 | 0 |
 | 1440 px (ordenador) | perfecto | blocks | 18 | 85 (85 / 0) | 0 | 0 | 0 |
-| 1440 px (ordenador) | aleatorio | dinos | 18 | 85 (25 / 60) | 0 | 0 | 0 |
+| 1440 px (ordenador) | aleatorio | dinos | 18 | 85 (21 / 64) | 0 | 0 | 0 |
 
 ## Comprobaciones extra
 

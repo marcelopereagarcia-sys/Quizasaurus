@@ -1,8 +1,8 @@
 /**
  * Generates a draft pack from the text of a unit.
  *
- *   npm run generate -- private/unit.pdf.txt --grade 3
- *   npm run generate -- private/unit.pdf.txt --grade 3 --lang ca --out private/unit.pack.json
+ *   npm run generate -- private/unit.pdf.txt --age 8
+ *   npm run generate -- private/unit.pdf.txt --age 8 --lang ca --out private/unit.pack.json
  *
  * The input is the text written by `npm run extract`. The pack is written next
  * to it (inside private/) as a draft: an adult must review it before playing.
@@ -17,17 +17,15 @@ import { GenerationError, detectLanguage, generatePack, stripPageMarkers } from 
 const { values, positionals } = parseArgs({
   allowPositionals: true,
   options: {
-    grade: { type: "string", default: "3" },
-    stage: { type: "string", default: "primary" },
+    age: { type: "string", default: "8" },
     lang: { type: "string" },
     out: { type: "string" },
   },
 });
 const input = positionals[0];
-const stage = values.stage === "secondary" ? "secondary" : "primary";
-const year = Number(values.grade);
-if (!input || !Number.isInteger(year) || year < 1 || year > 6) {
-  console.error("Usage: npm run generate -- <unit.txt> [--grade 1-6] [--stage primary|secondary] [--lang ca|es|en] [--out pack.json]");
+const age = Number(values.age);
+if (!input || !Number.isInteger(age) || age < 3 || age > 18) {
+  console.error("Usage: npm run generate -- <unit.txt> [--age 3-18] [--lang ca|es|en] [--out pack.json]");
   process.exit(2);
 }
 
@@ -36,13 +34,13 @@ const provider = await providerFromEnv(process.env, "text");
 const text = await readFile(input, "utf8");
 const language = values.lang ?? detectLanguage(stripPageMarkers(text));
 const where = provider.local ? "local" : "cloud: the unit text is sent to this provider";
-console.log(`Generating with ${provider.id}/${provider.model} (${where}), language ${language}, ${stage} year ${year}…`);
+console.log(`Generating with ${provider.id}/${provider.model} (${where}), language ${language}, age ${age}…`);
 
 try {
   const result = await generatePack(text, {
     provider,
     language,
-    grade: { stage, year },
+    age,
     onAttempt: (n, issues) =>
       console.log(issues.length ? `attempt ${n}: ${issues.length} problem(s), e.g. ${issues[0]?.path}: ${issues[0]?.message}` : `attempt ${n}: valid`),
   });
