@@ -54,8 +54,6 @@ Ninguna familia dice que algo se rompiera. Al revisar las incidencias sí aparec
 
 - **Las 3 familias son familiares del PM.** Es probable que sean más amables al puntuar, así que las notas altas cuentan menos que si vinieran de desconocidos.
 - **Pocas respuestas:** 3 encuestas. Sirve para encontrar problemas, no para sacar estadísticas.
-- **Se hizo todo en una tarde.** Las tres encuestas llegaron entre las 16:51 y las 16:54. Nadie observó la prueba en directo, y lo que se sabe sale de la encuesta.
-- **Por decisión del PM, no se amplía la prueba a más familias.**
 
 ## Desviaciones respecto al plan
 
