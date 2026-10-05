@@ -9,7 +9,7 @@
 | **Método** | Híbrido: cascada para el marco (charter, puertas por fase, registro de cambios y cierre) y Scrum con sprints de un día en Jira |
 | **Herramientas** | Jira (backlog, sprints y puntos de historia) · GitHub, GitHub Actions y Pages · Google Forms (encuesta a las familias) · Obsidian (base de conocimiento y traspaso entre sesiones) |
 | **Alcance entregado** | 30 historias de usuario, 91 puntos, 6 fases y 10 cambios aprobados |
-| **Resultado** | [*Release* v1.0.0](https://github.com/marcelopereagarcia-sys/Quizasaurus/releases/tag/v1.0.0), [demo en vivo](https://marcelopereagarcia-sys.github.io/Quizasaurus/), objetivos O1–O4 cumplidos; O5 se completa con la publicación de cierre |
+| **Resultado** | [*Release* v1.0.0](https://github.com/marcelopereagarcia-sys/Quizasaurus/releases/tag/v1.0.0), [demo en vivo](https://marcelopereagarcia-sys.github.io/Quizasaurus/), los cinco objetivos cumplidos · [publicación de cierre en LinkedIn](https://www.linkedin.com/feed/update/urn:li:activity:7512840964365922305/) |
 
 ## El problema y el producto
 
@@ -61,7 +61,7 @@ La IA escribía el código, pero no tomaba las decisiones. Las reglas estaban po
 | O2 | Reproductor sin conexión | 5 plantillas, en catalán y castellano | ✅ 5 plantillas, 3 idiomas, 0 errores en la auditoría |
 | O3 | Ciclo completo sin ayuda técnica | 2 de 2 familias | ✅ 2 de 3 familias; la tercera necesitó ayuda con la clave de la IA, corregido el mismo día |
 | O4 | Satisfacción | ≥ 4 / 5 | ✅ 4,67 / 5; las 3 lo volverían a usar |
-| O5 | Código abierto y caso de portfolio | Repo público, documentación y 1 publicación en LinkedIn | ✅ Repositorio, *release*, [guía de contribución](../CONTRIBUTING.md) y [formato del pack](pack-format.md); 🟡 publicación de cierre |
+| O5 | Código abierto y caso de portfolio | Repo público, documentación y 1 publicación en LinkedIn | ✅ Repositorio, *release*, [guía de contribución](../CONTRIBUTING.md) y [formato del pack](pack-format.md); [publicación en LinkedIn](https://www.linkedin.com/feed/update/urn:li:activity:7512840964365922305/) |
 
 | | Plan inicial | Real |
 | --- | --- | --- |

@@ -13,7 +13,7 @@ El plan inicial era de 2 semanas (5–18 oct). Como las fases avanzaron más rá
 | F1 · MVP | sáb 3 – dom 4 oct | Se juega offline en una tablet Android de gama media (O2) | ✅ 4 oct |
 | F2 · Prueba con familias | dom 4 oct | 2 de 2 familias completan el ciclo (O3); satisfacción ≥ 4 de 5 (O4) | ✅ 4 oct, con una incidencia (O4: 4,67; O3: 2 de 3) |
 | Lanzamiento | lun 5 oct | Repositorio MIT publicado (O5) | ✅ 5 oct (*release* v1.0) |
-| Cierre | lun 5 oct (v1.10) | Informe de cierre e impacto aprobados; publicación final en LinkedIn | Pendiente del sponsor |
+| Cierre | lun 5 oct (v1.10) | Informe de cierre e impacto aprobados; publicación final en LinkedIn | ✅ 5 oct |
 
 ## Artefactos
 
@@ -28,5 +28,5 @@ El plan inicial era de 2 semanas (5–18 oct). Como las fases avanzaron más rá
 | Kit de la prueba con familias: mensaje, encuesta y registro | Usado (4 oct) | [`prueba-familias.md`](prueba-familias.md) |
 | Informe de la prueba con familias (puerta F2) | Puerta F2 aprobada con una incidencia (4 oct) | [`informe-prueba-familias.md`](informe-prueba-familias.md) |
 | Formato del pack y guía de contribución | Publicados (5 oct) | [`../pack-format.md`](../pack-format.md) · [`../../CONTRIBUTING.md`](../../CONTRIBUTING.md) |
-| Informe de cierre e impacto | Pendiente de aprobación | [`informe-cierre.md`](informe-cierre.md) |
-| Retrospectiva y lecciones aprendidas | Pendiente de aprobación | [`retrospectiva.md`](retrospectiva.md) |
+| Informe de cierre e impacto | Aprobado (5 oct) | [`informe-cierre.md`](informe-cierre.md) |
+| Retrospectiva y lecciones aprendidas | Aprobada (5 oct) | [`retrospectiva.md`](retrospectiva.md) |

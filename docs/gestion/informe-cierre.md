@@ -1,10 +1,10 @@
 # Informe de cierre e impacto
 
-**Quizasaurus 1.0 se entregó el 5 de octubre de 2026, 3 días antes del plan revisado y 13 antes del inicial, con unas 38 horas de trabajo frente a las 112 previstas y 0 € de gasto.** Cumple 4 de los 5 objetivos y el quinto (O5) está a falta de la publicación en LinkedIn. El alumno de referencia aprobó el examen para el que nació el prototipo.
+**Quizasaurus 1.0 se entregó el 5 de octubre de 2026, 3 días antes del plan revisado y 13 antes del inicial, con unas 38 horas de trabajo frente a las 112 previstas y 0 € de gasto.** Cumple los 5 objetivos (O3 con una incidencia, corregida el mismo día). El alumno de referencia aprobó el examen para el que nació el prototipo.
 
 - **Fecha del informe:** 5 de octubre de 2026 (Cierre adelantado en la v1.10 del charter)
 - **Versión publicada:** [v1.0.0](https://github.com/marcelopereagarcia-sys/Quizasaurus/releases/tag/v1.0.0) · demo: [marcelopereagarcia-sys.github.io/Quizasaurus](https://marcelopereagarcia-sys.github.io/Quizasaurus/)
-- **Puerta de Cierre:** pendiente de la aprobación del sponsor
+- **Puerta de Cierre:** aprobada por el sponsor el 5 de octubre de 2026
 - Retrospectiva y lecciones aprendidas: [retrospectiva.md](retrospectiva.md)
 
 ## Objetivos O1–O5
@@ -15,7 +15,7 @@
 | O2 | Reproductor PWA que funcione sin conexión | 5 plantillas jugables offline, en catalán y castellano | 5 plantillas en 3 idiomas; la auditoría juega 108 de 108 niveles a 375, 768 y 1440 px y sin conexión, con 0 errores ([auditoría](auditoria-o2.md)) | ✅ 4 oct |
 | O3 | Ciclo completo con familias reales, sin ayuda técnica | 2 de 2 familias | Probaron 3 familias; 2 completaron el ciclo sin ayuda y la tercera necesitó ayuda con la clave de la IA ([informe de la prueba](informe-prueba-familias.md)) | ✅ con incidencia, corregida el 4 oct (QZS-27) |
 | O4 | Satisfacción de la prueba | ≥ 4 sobre 5 | 4,67 sobre 5 | ✅ 4 oct |
-| O5 | Código abierto y caso de portfolio | Repositorio MIT con README, guía de contribución y documentación de gestión + 1 publicación en LinkedIn | Repositorio, [README](../../README.md), [guía de contribución](../../CONTRIBUTING.md), [formato del pack](../pack-format.md), documentación de gestión y *release* v1.0 publicados | 🟡 Falta la publicación en LinkedIn (QZS-40), antes del 8 oct |
+| O5 | Código abierto y caso de portfolio | Repositorio MIT con README, guía de contribución y documentación de gestión + 1 publicación en LinkedIn | Repositorio, [README](../../README.md), [guía de contribución](../../CONTRIBUTING.md), [formato del pack](../pack-format.md), documentación de gestión y *release* v1.0 publicados; [publicación en LinkedIn](https://www.linkedin.com/feed/update/urn:li:activity:7512840964365922305/) (5 oct) | ✅ 5 oct |
 
 ## Planificado frente a real
 
@@ -38,7 +38,7 @@
 | F1 · MVP | 8–11 oct | 3–4 oct | ✅ 4 oct: O2 |
 | F2 · Prueba con familias | 12–15 oct | 4 oct | ✅ 4 oct, con una incidencia: O3 2 de 3, O4 4,67 |
 | Lanzamiento | 16 oct | 5 oct | ✅ 5 oct: *release* v1.0 |
-| Cierre | 17–18 oct | 5 oct | Pendiente del sponsor |
+| Cierre | 17–18 oct | 5 oct | ✅ 5 oct: cierre aprobado |
 
 ### Puntos aceptados por día
 
@@ -109,7 +109,8 @@ Diez cambios en cuatro días, todos aprobados por el sponsor y registrados en el
 
 ## Lo que queda abierto
 
-- **Publicación en LinkedIn (QZS-40):** el PM la revisa y la publica desde su cuenta; su enlace se añadirá aquí.
+La publicación de cierre ya está en [LinkedIn](https://www.linkedin.com/feed/update/urn:li:activity:7512840964365922305/) (5 oct). Quedan:
+
 - **Mejoras para la comunidad:** las 6 de la [guía de contribución](../../CONTRIBUTING.md), entre ellas varios mundos por unidad y una revisión todavía más corta.
 - **Medir la comunidad en un mes** (estrellas, *forks*, packs compartidos) y, si se usa en más exámenes, recoger más resultados.
 - **Higiene del repositorio:** pedir a GitHub que purgue de su caché los commits anteriores a la reescritura del historial.

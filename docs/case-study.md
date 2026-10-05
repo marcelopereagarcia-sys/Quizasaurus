@@ -9,7 +9,7 @@
 | **Method** | Hybrid: a waterfall frame (charter, phase gates, change log, closure) with one-day Scrum sprints in Jira |
 | **Tools** | Jira (backlog, sprints, story points) · GitHub, GitHub Actions and Pages · Google Forms (family survey) · Obsidian (knowledge base and session handover) |
 | **Scope delivered** | 30 user stories, 91 story points, 6 phases, 10 approved change requests |
-| **Outcome** | [v1.0.0 released](https://github.com/marcelopereagarcia-sys/Quizasaurus/releases/tag/v1.0.0), [live demo](https://marcelopereagarcia-sys.github.io/Quizasaurus/), objectives O1–O4 met; O5 completes with the closing post |
+| **Outcome** | [v1.0.0 released](https://github.com/marcelopereagarcia-sys/Quizasaurus/releases/tag/v1.0.0), [live demo](https://marcelopereagarcia-sys.github.io/Quizasaurus/), all five objectives met · [closing post on LinkedIn](https://www.linkedin.com/feed/update/urn:li:activity:7512840964365922305/) |
 
 ## The problem and the product
 
@@ -61,7 +61,7 @@ The AI wrote the code; it did not make the decisions. The rules were written dow
 | O2 | Offline player | 5 templates, Catalan and Spanish | ✅ 5 templates, 3 languages, 0 audit errors |
 | O3 | Full cycle without technical help | 2 of 2 families | ✅ 2 of 3 families; the third needed help with the AI key, fixed the same day |
 | O4 | Satisfaction | ≥ 4 / 5 | ✅ 4.67 / 5; 3 of 3 would use it again |
-| O5 | Open source and portfolio case | Public repo, docs, 1 LinkedIn post | ✅ Repository, release, [contribution guide](../CONTRIBUTING.md) and [pack format](pack-format.md); 🟡 closing post |
+| O5 | Open source and portfolio case | Public repo, docs, 1 LinkedIn post | ✅ Repository, release, [contribution guide](../CONTRIBUTING.md) and [pack format](pack-format.md); [LinkedIn post](https://www.linkedin.com/feed/update/urn:li:activity:7512840964365922305/) |
 
 | | Initial plan | Actual |
 | --- | --- | --- |
