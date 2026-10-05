@@ -73,7 +73,7 @@ Diez cambios en cuatro días, todos aprobados por el sponsor y registrados en el
 | --- | --- | --- |
 | Examen del alumno de referencia (5 oct) | **Aprobado** («bien», según la familia) | Un solo alumno; no se puede separar el efecto del juego del resto del estudio |
 | Las familias lo volverían a usar para un examen | 3 de 3 (5 sobre 5) | Familiares del PM; probablemente amables al puntuar |
-| A los niños les gustó jugar | 3 de 3 (5 sobre 5) | Una sola tarde de uso |
+| A los niños les gustó jugar | 3 de 3 (5 sobre 5) | Muestra pequeña: 3 familias |
 | Preguntas correctas generadas por la IA | 98,9 % en 3 unidades reales | Revisado con una rúbrica por el PM, no por un docente |
 | Calidad técnica | 166 tests; auditoría de 108 niveles con 0 problemas de diseño y 0 errores en cada despliegue | Navegador sin ventana; las tablets reales solo las probó el sponsor |
 | Comunidad (indicadores sin meta) | 0 estrellas, 0 *forks* y 0 contribuciones el día del lanzamiento | Se publicó hoy: medir de nuevo en un mes |

@@ -27,7 +27,7 @@
 | **Algunas cosas se colocaron donde el usuario no mira** | «Compartir» estaba dentro de un panel plegado y el sponsor no lo encontró | Se movió a la vista. Si el usuario no lo encuentra, está mal colocado |
 | **Afirmaciones que no se comprobaron** | El README prometía «5 juegos» y la IA prepara 4 más el reto final | Corregido en la v1.0; cada afirmación pública se contrasta con el código |
 | **Alcance que crece cada día** | 5 de los 10 cambios añadieron alcance, y 3 de ellos en los dos últimos días | Funcionó porque había margen, pero en un plan ajustado habría retrasado la entrega |
-| **Muestra de prueba pequeña y cercana** | 3 familias, todas familiares del PM, en una sola tarde | Sirve para encontrar problemas, no para medir el impacto |
+| **Muestra de prueba pequeña y cercana** | 3 familias, todas familiares del PM | Sirve para encontrar problemas, no para medir el impacto |
 
 ## Qué cambiar en el próximo proyecto
 
