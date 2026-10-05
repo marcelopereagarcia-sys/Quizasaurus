@@ -4,7 +4,7 @@ Quizasaurus se gestiona con el método del certificado Google Project Management
 
 ## Plan: del 2 al 8 de octubre de 2026 · real: del 2 al 5
 
-El plan inicial era de 2 semanas (5–18 oct). Como las fases avanzaron más rápido, en la v1.6 del charter se adelantaron las fechas al 2–8 de octubre, y en la v1.10 el Cierre al 5. Resultado: [informe de cierre](informe-cierre.md).
+El plan inicial era de 2 semanas (5–18 oct). Como las fases avanzaron más rápido, en la v1.6 del charter se adelantaron las fechas al 2–8 de octubre, y en la v1.10 el Cierre al 5. Resultado: [informe de cierre](informe-cierre.md). El caso completo en una página: [caso de estudio](../caso-de-estudio.md) ([en inglés](../case-study.md)).
 
 | Fase | Fechas | Puerta de aprobación | Estado |
 | --- | --- | --- | --- |

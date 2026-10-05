@@ -8,7 +8,9 @@ Quizasaurus turns a school unit (a PDF, photos of the textbook or its text) into
 
 **▶ Try it: [marcelopereagarcia-sys.github.io/Quizasaurus](https://marcelopereagarcia-sys.github.io/Quizasaurus/)** — it opens with an example unit ready to play.
 
-> **Version 1.0** · October 2026 · built in one week (2–8 October) as a public project-management case study. *Resumen en castellano [al final](#en-español).*
+> **Version 1.0** · October 2026 · *Resumen en castellano [al final](#en-español).*
+
+> 📋 **Also a project-management case study.** Run by Marcelo Perea as project manager with the Google Project Management method, and built by an AI assistant (Claude) under his direction: delivered in **4 days instead of the 14 planned**, with **~38 hours of the 112 budgeted** and **€0 spent**. **[Read the case study →](docs/case-study.md)** · [en castellano](docs/caso-de-estudio.md)
 
 <p align="center"><img src="assets/screenshots/welcome.png" width="720" alt="The cover of the app: the Quizasaurus sign, three steps that explain the app, and the buttons Play, Make a unit with AI and Load a pack"></p>
 
@@ -84,14 +86,16 @@ npm run dev
 
 ## A public case study in AI-assisted project management
 
-This repository is also a portfolio piece. It is run with the Google Project Management method (hybrid: a waterfall frame with phase gates, and one-day Scrum sprints in Jira), and every artifact is public:
+This repository is also a portfolio piece: **[the case study](docs/case-study.md)** tells the whole story on one page, in English. It is run with the Google Project Management method (hybrid: a waterfall frame with phase gates, and one-day Scrum sprints in Jira), and every artifact is public:
 
 | Artifact | Where |
 | --- | --- |
-| Project charter, family test, status reports, audit | [`docs/gestion`](docs/gestion/) |
-| Architecture decision records | [`docs/adr`](docs/adr/) |
+| Case study: role, decisions, results against objectives, lessons | [`docs/case-study.md`](docs/case-study.md) · [castellano](docs/caso-de-estudio.md) |
+| Project charter, status reports, family test, closure report, retrospective (in Spanish) | [`docs/gestion`](docs/gestion/) |
+| Architecture decision records (in Spanish) | [`docs/adr`](docs/adr/) |
+| The working rules the AI follows in every session | [`CLAUDE.md`](CLAUDE.md) |
 
-**How it is built:** Marcelo Perea is the project manager and product owner: he sets the goals, makes the decisions and accepts the work. Development, testing and documentation drafts are done with [Claude](https://claude.com/claude-code) as an AI assistant. That split is intentional, and documented.
+**How it is built:** Marcelo Perea is the project manager and product owner: he sets the goals, makes the decisions and accepts the work. Development, testing and documentation drafts are done with [Claude](https://claude.com/claude-code) as an AI assistant, under written rules, with evidence for every acceptance criterion and automatic quality and privacy checks. See [how the AI was directed](docs/case-study.md#how-the-ai-was-directed).
 
 ## Privacy and content rules
 
@@ -113,7 +117,7 @@ New languages, skins, example packs and improvements are welcome. Read [CONTRIBU
 - **Cómo se usa:** «Crear una unidad con IA», sube el tema o pega su texto, elige la edad (de 5 a 15 años), revisa las preguntas y a jugar. Para pasarla a otro aparato, «Compartir» por enlace o por archivo.
 - **La IA que elijas:** Gemini (con nivel gratuito), Claude, OpenAI u Ollama en tu ordenador. La clave se queda en tu aparato.
 - **Código abierto (MIT)**, sin cuentas ni anuncios. Nació de un prototipo hecho en un fin de semana para el examen de Medi de mi hijo, en 3.º de primaria.
-- **Caso de gestión de proyectos con IA:** el charter, las pruebas con familias y los informes de estado están en [`docs/gestion`](docs/gestion/).
+- **Caso de gestión de proyectos con IA:** entregado en 4 días en lugar de 14, con unas 38 horas de las 112 previstas y 0 €. Todo el caso en una página: [caso de estudio](docs/caso-de-estudio.md); el charter, los informes de estado, el informe de cierre y la retrospectiva están en [`docs/gestion`](docs/gestion/).
 
 ## License
 
