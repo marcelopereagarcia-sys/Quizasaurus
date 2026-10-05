@@ -70,6 +70,7 @@ npm run audit
 
 - `npm test` runs the unit tests without network or AI.
 - `npm run audit` builds the app and plays it in a headless browser like a child would: every level of three packs, always right and at random, at 375, 768 and 1440 px, in the three languages, the generator, the review and offline. It fails on any layout problem or JavaScript error and writes its report to `docs/gestion/auditoria-o2.md` (screenshots go to `audit-output/`, which is not committed). The first time, install the browser it uses: `npx playwright install chromium --only-shell`.
+- If you change what people see, refresh the README pictures with `npm run screenshots` (they always use the example pack, never real material).
 - Optional, with your own setup: `npm run test:ollama` (a local vision model) and `npm run test:live` (calls the AI providers in your `.env`; it may cost money).
 
 The same typecheck, tests and audit run on GitHub before every deploy of the app, and a failed audit stops the deploy.

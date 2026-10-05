@@ -4,45 +4,91 @@
 
 **Turn any lesson into games, with the AI you choose.**
 
-Quizasaurus turns a school unit (a PDF or photos of the textbook) into a pack of 5 learning games and a final "boss" quiz that kids play offline on a tablet. Open source, no accounts, no ads.
+Quizasaurus turns a school unit (a PDF, photos of the textbook or its text) into a pack of learning games and a final "boss" quiz that children play offline on a tablet or phone. An adult reviews every question first. Open source, no accounts, no ads.
 
-> 🚧 **Status: in development.** Two-week build, 5–18 October 2026. Follow the plan in [`docs/gestion`](docs/gestion/).
+**▶ Try it: [marcelopereagarcia-sys.github.io/Quizasaurus](https://marcelopereagarcia-sys.github.io/Quizasaurus/)** — it opens with an example unit ready to play.
+
+> **Version 1.0** · October 2026 · built in one week (2–8 October) as a public project-management case study. *Resumen en castellano [al final](#en-español).*
+
+<p align="center"><img src="assets/screenshots/welcome.png" width="720" alt="The cover of the app: the Quizasaurus sign, three steps that explain the app, and the buttons Play, Make a unit with AI and Load a pack"></p>
+
+<p align="center">
+  <img src="assets/screenshots/unit.png" width="150" alt="A unit with its levels: Solid, liquid or gas? is next">
+  <img src="assets/screenshots/game-classify.png" width="150" alt="Classify game: where does ice go? Solid, liquid or gas">
+  <img src="assets/screenshots/game-yesno.png" width="150" alt="Yes or no game: a statement on a card with No and Yes buttons">
+  <img src="assets/screenshots/review.png" width="150" alt="Adult review: each question with its right answer in green and the sentence from the book">
+  <img src="assets/screenshots/generator.png" width="150" alt="Make a unit with AI: choose files or paste the text, the child's age and the language">
+</p>
+<p align="center"><sub>The example unit, «El ciclo del agua» (the water cycle), in Spanish: inside a unit the app speaks the unit's language.</sub></p>
 
 ---
 
 ## Why
 
-It started as a weekend prototype to help my son, in 3rd grade, prepare a science exam: three play sessions, six levels, a dinosaur collection and a T-Rex boss. Quizasaurus turns that one-off into a tool any family or teacher can use with their own material.
+It started as a weekend prototype to help my son, in 3rd grade, prepare a science exam: three play sessions, six levels, a dinosaur collection and a T-Rex boss. Quizasaurus turns that one-off into a tool any family or teacher can use with their own material, in any country.
 
 ## How it works
 
 ```text
-PDF / photos ──> OCR ──> Generator ──> Pack (JSON) ──> Adult review ──> Offline player (PWA)
-                          your AI: Ollama · Claude · OpenAI · Gemini
+PDF / photos / text ──> Reader ──> Generator ──> Pack (JSON) ──> Adult review ──> Offline player (PWA)
+                                   your AI: Gemini · Claude · OpenAI · Ollama
 ```
 
-1. **The AI only writes content, never game code.** Games are fixed, tested templates; the AI fills them with questions validated against a schema.
-2. **Open pack format.** A pack holds the questions, the game type, the source sentence from the book, language and age. Packs can be shared. See [the pack format](docs/pack-format.md).
-3. **Bring your own AI.** Run a local model with Ollama for free, or use your own API key. The project has no servers and no per-use cost.
-4. **An adult reviews every pack** before a child plays it, with the source sentence shown next to each question.
-5. **Offline player.** Installs from the browser on any tablet and works without internet.
+1. **The AI only writes content, never game code.** Games are fixed, tested templates; the AI fills them with questions checked against a schema, and every question quotes the sentence of the book it comes from.
+2. **Open pack format.** A pack holds the questions, the game type, the source sentence, the language and the age of the children. Packs can be shared. See [the pack format](docs/pack-format.md).
+3. **Bring your own AI.** Use your own key (Gemini has a free tier) or run a local model with Ollama. The project has no servers and no per-use cost.
+4. **An adult reviews every pack** before a child plays it.
+5. **Offline player.** Installs from the browser on any tablet or phone and works without internet.
 
-### Make a unit from the web app
+## Use it
 
-Open the app, choose **Make a unit with AI** (an adult gate comes first), upload the PDF or photos of the unit (or paste its text), pick the age, the language and the AI, and wait for the three steps: read, write the questions, check them. The new pack goes straight to the adult review.
+### 1. Make a unit
+
+Choose **Make a unit with AI** (a quick multiplication keeps children out), then:
+
+- **Upload** the PDF or photos of the unit, **or paste its text**.
+- Pick the **age** of the child (5 to 15), the **language** of the unit (Catalan, Spanish or English, or let the app detect it) and the **AI**.
+- Wait for three steps: read the unit, write the questions, check them. The pack goes straight to the review.
+
+About the AI:
 
 - **Gemini** is recommended: it scored 98.9 % in our model comparison and has a free tier. Get a key at [Google AI Studio](https://aistudio.google.com/apikey) (sign in, accept the terms, **Create API key**); the app shows these steps too. On the free tier, [Google may use what you send to improve its products](https://ai.google.dev/gemini-api/docs/pricing).
 - **Your key stays on your device** (browser storage) and is sent only to the provider you chose. You can delete it from the same screen.
 - **Ollama on your computer** needs no key, but it must allow the app's website: start it with `OLLAMA_ORIGINS=https://marcelopereagarcia-sys.github.io` (or `*`).
 - With a cloud AI, the text of the unit and any photos leave your device: photograph pages with no names or handwriting.
 
+### 2. Review it
+
+Each question shows its right answer in green and the sentence from the book. Read them at a glance, open **Fix** only on the ones that are wrong (or **Remove** them), and approve the unit. Only approved units can be played.
+
+### 3. Play
+
+Every game is a level: sort items into groups, put steps in order, pick the right option, swipe yes or no, and beat the final boss. Children tap and drag, never type. They earn diamonds and stars, hatch dinosaur eggs into a collection, and can keep practising in an endless mode. **Play** always goes on from the next level, and the corner for families shows what the child knows and what to review.
+
+### 4. Share it
+
+Made the unit on your phone and the child plays on a tablet? Choose **Share**: send the link (by WhatsApp, email…; the unit travels inside the link, never through a server) or save it as a file and open it with **Load a pack** on the other device.
+
+## For developers
+
+```bash
+git clone https://github.com/marcelopereagarcia-sys/Quizasaurus.git
+cd Quizasaurus
+npm install
+npm run dev
+```
+
+- [CONTRIBUTING.md](CONTRIBUTING.md): set up the project, run the tests and the audit, add a language or a skin, and the ideas open to the community.
+- [docs/pack-format.md](docs/pack-format.md): every field and rule of a pack, to write or fix packs by hand.
+- Stack: TypeScript, Preact and Vite (a PWA), Zod for the pack format, Vitest and Playwright. Every deploy runs the typecheck, the tests and an automatic audit that plays the whole app at phone, tablet and laptop sizes.
+
 ## A public case study in AI-assisted project management
 
-This repository is also a portfolio piece. It is run with the Google Project Management method (hybrid: a waterfall frame and daily Scrum sprints in Jira), and every artifact is public:
+This repository is also a portfolio piece. It is run with the Google Project Management method (hybrid: a waterfall frame with phase gates, and one-day Scrum sprints in Jira), and every artifact is public:
 
 | Artifact | Where |
 | --- | --- |
-| Project charter, risk register, status reports | [`docs/gestion`](docs/gestion/) |
+| Project charter, family test, status reports, audit | [`docs/gestion`](docs/gestion/) |
 | Architecture decision records | [`docs/adr`](docs/adr/) |
 
 **How it is built:** Marcelo Perea is the project manager and product owner: he sets the goals, makes the decisions and accepts the work. Development, testing and documentation drafts are done with [Claude](https://claude.com/claude-code) as an AI assistant. That split is intentional, and documented.
@@ -55,13 +101,19 @@ This repository is also a portfolio piece. It is run with the Google Project Man
 
 ## Contributing
 
-New languages, skins, example packs and improvements are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) to set up the project, run the tests and the audit, and see the ideas open to the community.
+New languages, skins, example packs and improvements are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 
 ## En español
 
-**Quizasaurus convierte una unidad escolar (PDF o fotos) en 5 juegos y un examen final que el niño juega sin conexión.** Es código abierto (MIT), funciona con la IA que elijas (Ollama en local, Claude, OpenAI o Gemini) y no tiene cuentas ni anuncios. Nació de un prototipo hecho en un fin de semana para el examen de Medi de mi hijo, en 3º de primaria. La documentación de gestión del proyecto está en [`docs/gestion`](docs/gestion/).
+**Quizasaurus convierte un tema del colegio (PDF, fotos del libro o su texto) en juegos y un reto final que el niño juega sin conexión, en la tableta o el móvil.** Un adulto revisa antes cada pregunta.
+
+- **Pruébalo:** [marcelopereagarcia-sys.github.io/Quizasaurus](https://marcelopereagarcia-sys.github.io/Quizasaurus/) (en catalán, castellano o inglés).
+- **Cómo se usa:** «Crear una unidad con IA», sube el tema o pega su texto, elige la edad (de 5 a 15 años), revisa las preguntas y a jugar. Para pasarla a otro aparato, «Compartir» por enlace o por archivo.
+- **La IA que elijas:** Gemini (con nivel gratuito), Claude, OpenAI u Ollama en tu ordenador. La clave se queda en tu aparato.
+- **Código abierto (MIT)**, sin cuentas ni anuncios. Nació de un prototipo hecho en un fin de semana para el examen de Medi de mi hijo, en 3.º de primaria.
+- **Caso de gestión de proyectos con IA:** el charter, las pruebas con familias y los informes de estado están en [`docs/gestion`](docs/gestion/).
 
 ## License
 

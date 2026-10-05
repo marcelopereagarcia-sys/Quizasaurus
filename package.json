@@ -1,6 +1,6 @@
 {
   "name": "quizasaurus",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "description": "Turn any lesson into games, with the AI you choose.",
   "license": "MIT",
@@ -25,7 +25,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "audit": "npm run build && tsx scripts/audit.mts"
+    "audit": "npm run build && tsx scripts/audit.mts",
+    "screenshots": "npm run build && tsx scripts/screenshots.mts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.131.0",
