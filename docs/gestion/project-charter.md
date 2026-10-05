@@ -1,6 +1,6 @@
 # Project Charter — Quizasaurus
 
-Versión 1.9 · aprobada el 5 de octubre de 2026 · Marcelo Perea García
+Versión 1.10 · aprobada el 5 de octubre de 2026 · Marcelo Perea García
 
 > Copia exportada del charter aprobado. El original vive en Claude Docs; cualquier cambio de alcance, fechas o presupuesto pasa por el registro de cambios del final.
 
@@ -111,8 +111,8 @@ El plan inicial era de 2 semanas, del 5 al 18 de octubre de 2026. Como las fases
 | F0 · Generador | sáb 3 oct | Esquema del pack y generador CLI; comparativa de modelos | ≥ 90 % correctas (O1) y coste por pack medido |
 | F1 · MVP | sáb 3 – dom 4 oct | Reproductor PWA con 5 plantillas; generador con pantalla web | Juega offline en la Xiaomi Pad 7 (O2) |
 | F2 · Prueba con familias | dom 4 oct | 2 familias amigas lo prueban por su cuenta, cada una con un pack completo; encuesta en un formulario de Google | 2 de 2 familias (O3); satisfacción ≥ 4 de 5 (O4) |
-| Lanzamiento | lun 5 – mar 6 oct | Repositorio público v1.0 y demo; generar desde texto pegado, formato del pack documentado y guía de contribución | Repo MIT publicado (O5) |
-| Cierre | mié 7 – jue 8 oct | Informe de cierre e impacto; retrospectiva y lecciones aprendidas; publicación final en LinkedIn | Cierre aprobado |
+| Lanzamiento | lun 5 oct (era lun 5 – mar 6) | Repositorio público v1.0 y demo; generar desde texto pegado, formato del pack documentado y guía de contribución | Repo MIT publicado (O5) |
+| Cierre | lun 5 oct (era mié 7 – jue 8; v1.10) | Informe de cierre e impacto; retrospectiva y lecciones aprendidas; publicación final en LinkedIn | Cierre aprobado |
 
 Ninguna fase empieza sin pasar la puerta de la anterior. Si F0 no alcanza el 90 %, se revisa el alcance antes de construir el MVP.
 
@@ -198,6 +198,7 @@ El charter entra en vigor cuando el sponsor lo aprueba; desde ese momento, cualq
 
 | Versión | Fecha | Cambio |
 | --- | --- | --- |
+| 1.10 | 05-oct-2026 | Cambio de plazo aprobado por el sponsor: el Lanzamiento terminó en un día (*release* v1.0), así que el Cierre se adelanta del 7–8 al 5 de octubre. Se añaden sus 3 historias (4 puntos): informe de cierre e impacto (QZS-38), retrospectiva (QZS-39) y publicación en LinkedIn (QZS-40). La fecha de O5 (8 de octubre) no cambia: la publicación la hace el sponsor |
 | 1.9 | 05-oct-2026 | Cambio de alcance aprobado por el sponsor antes del commit de Lanzamiento: la portada explica en tres pasos qué hace la app (QZS-36, 1 punto) y el generador pide la edad del niño (5 a 15 años) en lugar del curso del sistema español, para que sirva en cualquier país (QZS-37, 2 puntos). El formato del pack añade `age`; los packs con `grade` siguen siendo válidos y el formato sigue en la versión 1 |
 | 1.8 | 04-oct-2026 | Cambio de alcance aprobado por el sponsor: las 3 incidencias de la prueba F2 se corrigen en F2, antes de pasar de fase. Se añaden 2 historias (4 puntos): «Jugar» sigue por el primer nivel sin superar (QZS-32) y revisión en modo lectura (QZS-33). La mejora de la clave (QZS-27) y la de compartir packs (QZS-26, por enlace y por archivo) se adelantan de Lanzamiento a F2. En la misma sesión se añaden una portada de bienvenida (QZS-34, 2 puntos, en Lanzamiento) y «Compartir» a la vista tras crear una unidad y en cada unidad (QZS-35, 1 punto) |
 | 1.7 | 04-oct-2026 | Cambio de alcance aprobado por el sponsor en la revisión de pendientes: Lanzamiento suma 3 mejoras de la app (12 puntos con la documentación). Guardar y compartir un pack en un archivo, para cumplir que los packs se pueden compartir (QZS-26). Botón «Pegar» y aviso de formato en la clave de la IA, la incidencia de la prueba F2 (QZS-27). Generar desde texto pegado, la mitigación del riesgo R2 que faltaba (QZS-28). Las mejoras para la comunidad se listan en la guía de contribución |
